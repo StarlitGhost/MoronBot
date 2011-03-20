@@ -12,7 +12,7 @@ namespace MoronBot.Functions
         public Source(MoronBot moronBot)
         {
             Name = GetName();
-            Help = "source (<function>)\t\t- Returns a link to the specified function's source on MoronBot's Google Code site. If no function is specified, then it links to the homepage instead.";
+            Help = "source (<function>)\t\t- Returns a link to the specified function's source on MoronBot's GitHub site. If no function is specified, then it links to the homepage instead.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
@@ -26,14 +26,14 @@ namespace MoronBot.Functions
                     string command = moronBot.CommandList.Find(s => s.IndexOf(message.ParameterList[0], StringComparison.InvariantCultureIgnoreCase) >= 0);
                     if (command != null)
                     {
-                        return new IRCResponse(ResponseType.Say, "http://code.google.com/p/moronbot/source/browse/trunk/MoronBot/src/Functions/" + command + ".cs", message.ReplyTo);
+                        return new IRCResponse(ResponseType.Say, "https://github.com/Tyranic-Moron/MoronBot/tree/master/src/Functions/" + command + ".cs", message.ReplyTo);
                     }
                     else
                     {
-                        return new IRCResponse(ResponseType.Say, "Function \"" + message.ParameterList[0] + "\" not found, linking to Functions directory instead: http://code.google.com/p/moronbot/source/browse/trunk/MoronBot/src/Functions/", message.ReplyTo);
+                        return new IRCResponse(ResponseType.Say, "Function \"" + message.ParameterList[0] + "\" not found, linking to Functions directory instead: https://github.com/Tyranic-Moron/MoronBot/tree/master/src/Functions", message.ReplyTo);
                     }
                 }
-                return new IRCResponse(ResponseType.Say, "http://code.google.com/p/moronbot/", message.ReplyTo);
+                return new IRCResponse(ResponseType.Say, "https://github.com/Tyranic-Moron/MoronBot/", message.ReplyTo);
             }
             else
             {
