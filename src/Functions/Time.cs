@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 
 using CwIRC;
@@ -10,7 +12,7 @@ namespace MoronBot.Functions
         public Time(MoronBot moronBot)
         {
             Name = GetName();
-            Help = "time\t\t\t- Tells you the time... roughly.";
+            Help = "time (<offset>)\t\t\t- Tells you the time... roughly. You can provide an offset from the bot's standard time (UTC), if you wish.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
@@ -19,7 +21,24 @@ namespace MoronBot.Functions
         {
             if (Regex.IsMatch(message.Command, "^(time)$", RegexOptions.IgnoreCase))
             {
-                DateTime date = DateTime.Now;
+                DateTime date = DateTime.UtcNow;
+
+                if (message.ParameterList.Count > 0)
+                {
+                    double offset;
+                    if (Double.TryParse(message.ParameterList[0], out offset))
+                    {
+                        if (Math.Abs(offset) <= 15)
+                        {
+                            date = date.AddHours(offset);
+                        }
+                        else
+                        {
+                            return new IRCResponse(ResponseType.Say, "Offset too large, valid offsets are between -15 and +15.", message.ReplyTo);
+                        }
+                    }
+                }
+
                 int hour = date.Hour;
                 string timeOfDayMessage = "morning";
                 if (hour > 12 && hour < 17)
