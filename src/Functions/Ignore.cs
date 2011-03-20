@@ -10,7 +10,7 @@ namespace MoronBot.Functions
         public Ignore(MoronBot moronBot)
         {
             Name = GetName();
-            Help = null;
+            Help = "ignore <user(s)>\t\t- Tells MoronBot to ignore the specified user(s). UserList functions will still work, however (TellAuto, for instance).";
             Type = Types.Command;
             AccessLevel = AccessLevels.UserList;
 

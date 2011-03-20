@@ -15,7 +15,7 @@ namespace MoronBot.Functions
         public RandomKicker(MoronBot moronBot)
         {
             Name = GetName();
-            Help = null;
+            Help = "Kicks certain users with a 1/5 chance every time they say something.";
             Type = Types.UserList;
             AccessLevel = AccessLevels.Anyone;
 

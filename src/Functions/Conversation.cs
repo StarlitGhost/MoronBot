@@ -9,7 +9,7 @@ namespace MoronBot.Functions
         public Conversation(MoronBot moronBot)
         {
             Name = GetName(); ;
-            Help = null;
+            Help = "A set of automatic functions that react to specific keywords/phrases in chat.";
             Type = Types.Regex;
             AccessLevel = AccessLevels.Anyone;
         }

@@ -13,7 +13,7 @@ namespace MoronBot.Functions
         public URLFollow(MoronBot moronBot)
         {
             Name = GetName();
-            Help = null;
+            Help = "Automatic function that follows posted urls and grabs the domain and title of the resultant webpage, then posts them to the chat.";
             Type = Types.Regex;
             AccessLevel = AccessLevels.Anyone;
         }
