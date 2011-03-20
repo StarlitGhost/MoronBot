@@ -24,25 +24,10 @@ namespace MoronBot
     /// </summary>
     class MoronBot
     {
-        List<string> commandList = new List<string>();
-        public List<string> CommandList
-        {
-            get { return commandList; }
-        }
-        Dictionary<string, string> helpLibrary = new Dictionary<string, string>();
-        public Dictionary<string, string> HelpLibrary
-        {
-            get { return helpLibrary; }
-        }
-
-        List<Functions.Function> functions = new List<Functions.Function>();
-        List<Functions.Function> userListFunctions = new List<Functions.Function>();
-        List<Functions.Function> regexFunctions = new List<Functions.Function>();
-        List<Functions.Function> commandFunctions = new List<Functions.Function>();
-
-        public List<IRCResponse> MessageQueue = new List<IRCResponse>();
-
         #region Variables
+
+        BackgroundWorker worker;
+        CwIRC.Interface cwIRC;
 
         string desiredNick, nick;
         /// <summary>
@@ -68,15 +53,34 @@ namespace MoronBot
             get { return channels; }
         }
 
-        BackgroundWorker worker;
-        CwIRC.Interface cwIRC;
+        List<Functions.Function> functions = new List<Functions.Function>();
+        List<Functions.Function> userListFunctions = new List<Functions.Function>();
+        List<Functions.Function> regexFunctions = new List<Functions.Function>();
+        List<Functions.Function> commandFunctions = new List<Functions.Function>();
+
+        List<string> commandList = new List<string>();
+        public List<string> CommandList
+        {
+            get { return commandList; }
+        }
+        Dictionary<string, string> helpLibrary = new Dictionary<string, string>();
+        public Dictionary<string, string> HelpLibrary
+        {
+            get { return helpLibrary; }
+        }
+
+        public List<IRCResponse> MessageQueue = new List<IRCResponse>();
 
         #endregion Variables
 
         #region Constructor & Destructor
         /// <summary>
         /// Constructor for MoronBot.
-        /// Starts a new BackgroundWorker.
+        /// This is where: 
+        ///  - The server-listening process starts (BackgroundWorker).
+        ///  - All of the Bot's Functions are loaded (so add new ones in here).
+        ///  - Settings is initialized from xml.
+        ///  - The initial connection to the server is done.
         /// </summary>
         public MoronBot()
         {
@@ -140,7 +144,7 @@ namespace MoronBot
             cwIRC.USER(desiredNick, "Meh", "Whatever", "MoronBot 0.1.6");
             cwIRC.SendData("PASS mOrOnBoTuS");
 
-            Join(Settings.Instance.Channel);
+            cwIRC.JOIN(Settings.Instance.Channel);
 
             worker.RunWorkerAsync();
         }
@@ -150,37 +154,12 @@ namespace MoronBot
         /// </summary>
         ~MoronBot()
         {
+            cwIRC.QUIT(Settings.Instance.QuitMessage);
             cwIRC.Disconnect();
         }
         #endregion Constructor & Destructor
 
         #region Basic Operations
-        /// <summary>
-        /// Joins the specified channel (Sends the JOIN message).
-        /// </summary>
-        /// <param name="p_channel">The channel to join.</param>
-        public void Join(string p_channel)
-        {
-            p_channel = p_channel.TrimStart('#');
-            cwIRC.JOIN(p_channel);
-        }
-        /// <summary>
-        /// Leaves the specified channel (Sends the PART message).
-        /// </summary>
-        /// <param name="p_channel">The channel to leave.</param>
-        public void Leave(string p_channel, string p_partMessage)
-        {
-            p_channel = p_channel.TrimStart('#');
-            cwIRC.PART(p_channel, p_partMessage);
-        }
-        /// <summary>
-        /// Changes MoronBot's nickname to the specified Nick.
-        /// </summary>
-        /// <param name="p_nick">The nickname to change to.</param>
-        public void Nickname(string p_nick)
-        {
-            cwIRC.NICK(p_nick);
-        }
         /// <summary>
         /// Sends the specified message to the specified channel or user (Sends the PRIVMSG message).
         /// </summary>
@@ -212,14 +191,12 @@ namespace MoronBot
             char ctcpChar = Convert.ToChar((byte)1);
             cwIRC.PRIVMSG(ctcpChar + "ACTION " + p_action + ctcpChar, p_target);
         }
-        /// <summary>
-        /// Leaves the server (Sends the QUIT message).
-        /// </summary>
-        public void Quit()
-        {
-            cwIRC.QUIT(Settings.Instance.QuitMessage);
-        }
 
+        /// <summary>
+        /// Sends the given IRCResponse to the server, using the method specified by the IRCResponse's ResponseType.
+        /// </summary>
+        /// <param name="response">The IRCResponse to send to the server.</param>
+        /// <returns>Whether or not the send was successful (actually whether or not the given response is valid).</returns>
         public bool Send(IRCResponse response)
         {
             if (response != null)
@@ -246,13 +223,27 @@ namespace MoronBot
                 return false;
             }
         }
+
+        /// <summary>
+        /// Sends all IRCResponses in the message queue to the server.
+        /// </summary>
+        void SendQueue()
+        {
+            if (MessageQueue.Count > 0)
+            {
+                foreach (IRCResponse response in MessageQueue)
+                {
+                    Send(response);
+                }
+                MessageQueue.Clear();
+            }
+        }
         #endregion Basic Operations
 
-        #region Process Message
         /// <summary>
         /// Processes messages from the server. Most of the main 'bot' functions are in here.
         /// NOTE: Should probably be split off into separate modules, for easier modification.
-        /// :chat05.ustream.tv 010 Guest4597 chat01.ustream.tv 6667 :Please use this Server/Port instead
+        /// FURTHER-NOTE: Have now split off all of the bot's main functions (the ones listed by |commands), should maybe continue with the rest.
         /// </summary>
         /// <param name="p_message">The message received from the server.</param>
         public void ProcessMessage(BotMessage message)
@@ -297,14 +288,14 @@ namespace MoronBot
                     // Nick accepted?
                     if (message.Type == "376")
                     {
-                        Join(Settings.Instance.Channel);
+                        cwIRC.JOIN(Settings.Instance.Channel);
                     }
 
                     // Nick In Use
                     if (message.Type == "433")
                     {
                         nickUsedCount++;
-                        Nickname(desiredNick + nickUsedCount);
+                        cwIRC.NICK(desiredNick + nickUsedCount);
                         return;
                     }
 
@@ -400,7 +391,7 @@ namespace MoronBot
                                     //Program.form.RefreshListBox();
                                 }
                             }
-                            Join(message.MessageList[2]);
+                            cwIRC.JOIN(message.MessageList[2]);
                         }
                     }
 
@@ -408,7 +399,6 @@ namespace MoronBot
                 }
                 else
                 {
-
                     Program.form.txtIRC_Update(message.ReplyTo + " <" + message.User.Name + "> " + message.MessageString);
 
                     ExecuteFunctionList(userListFunctions, message);
@@ -444,18 +434,13 @@ namespace MoronBot
             }
         }
 
-        void SendQueue()
-        {
-            if (MessageQueue.Count > 0)
-            {
-                foreach (IRCResponse response in MessageQueue)
-                {
-                    Send(response);
-                }
-                MessageQueue.Clear();
-            }
-        }
-
+        /// <summary>
+        /// Executes all of the functions in a given list, passing the given message to all of them
+        /// Also sends any responses that any of them generate.
+        /// </summary>
+        /// <param name="funcList">The list of functions (List<Functions.Function>) to execute.</param>
+        /// <param name="message">The BotMessage to pass to each function.</param>
+        /// <returns>Whether or not any of the functions generated IRCResponses.</returns>
         bool ExecuteFunctionList(List<Functions.Function> funcList, BotMessage message)
         {
             foreach (Functions.Function f in funcList)
@@ -477,7 +462,6 @@ namespace MoronBot
             }
             return false;
         }
-        #endregion Process Message
 
         #region Background Worker
         /// <summary>

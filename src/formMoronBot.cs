@@ -45,7 +45,6 @@ namespace MoronBot
         private void btnExit_Click(object sender, EventArgs e)
         {
             moronBot.SaveXML("settings.xml");
-            moronBot.Quit();
             Close();
         }
 
