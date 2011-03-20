@@ -24,13 +24,6 @@ namespace MoronBot
     /// </summary>
     class MoronBot
     {
-        Dictionary<string, Dictionary<string, object>> functionSettings = new Dictionary<string, Dictionary<string, object>>();
-        public Dictionary<string, Dictionary<string, object>> FunctionSettings
-        {
-            get { return functionSettings; }
-            set { functionSettings = value; }
-        }
-
         List<string> commandList = new List<string>();
         public List<string> CommandList
         {
