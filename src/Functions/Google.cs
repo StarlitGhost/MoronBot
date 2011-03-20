@@ -20,9 +20,9 @@ namespace MoronBot.Functions
         {
             if (Regex.IsMatch(message.Command, "^(google|search|find)$", RegexOptions.IgnoreCase))
             {
-                if (message.Parameters.Length > 0)
+                if (message.ParameterList.Count > 0)
                 {
-                    string searchTerm = message.Parameters.Replace('"', ' ');
+                    string searchTerm = message.Parameters.Replace("\"", "%22");
                     Gapi.Search.SearchResults searchResults;
                     Gapi.Search.SearchResult searchResult;
                     try
@@ -31,7 +31,7 @@ namespace MoronBot.Functions
                         //Gapi.Search.SearchSafety.Active;
                         //Gapi.Search.S
                         if (searchResults.Items.Length == 0)
-                            return new IRCResponse(ResponseType.Say, "No results found for \"" + searchTerm + "\"!", message.ReplyTo);
+                            return new IRCResponse(ResponseType.Say, "No results found for \"" + message.Parameters + "\"!", message.ReplyTo);
 
                         searchResult = searchResults.Items[0];
                     }

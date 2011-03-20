@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Server>c.ustream.tv</Server>
+  <Port>6667</Port>
+  <Channel>#tyranic-moron</Channel>
+  <Nick>MoronBot</Nick>
+  <CurrentNick>MoronBot</CurrentNick>
+  <LeaveMessage>Leaving</LeaveMessage>
+  <QuitMessage>Quitting</QuitMessage>
+  <IgnoreList />
+</Settings>
