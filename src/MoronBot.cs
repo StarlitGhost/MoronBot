@@ -1,0 +1,564 @@
+﻿#region File Information
+/********************************************************************
+    Name:		MoronBot
+    Author:		Matthew Cox
+    Created:	9/12/2009
+    
+    Purpose:	The main class for MoronBot.
+*********************************************************************/
+#endregion File Information
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Text.RegularExpressions;
+using System.Xml.Serialization;
+
+using CwIRC;
+
+namespace MoronBot
+{
+    /// <summary>
+    /// Class to hold MoronBot's details and behaviours.
+    /// </summary>
+    class MoronBot
+    {
+        Dictionary<string, Dictionary<string, object>> functionSettings = new Dictionary<string, Dictionary<string, object>>();
+        public Dictionary<string, Dictionary<string, object>> FunctionSettings
+        {
+            get { return functionSettings; }
+            set { functionSettings = value; }
+        }
+
+        List<string> commandList = new List<string>();
+        public List<string> CommandList
+        {
+            get { return commandList; }
+        }
+        Dictionary<string, string> helpLibrary = new Dictionary<string, string>();
+        public Dictionary<string, string> HelpLibrary
+        {
+            get { return helpLibrary; }
+        }
+
+        List<Functions.Function> functions = new List<Functions.Function>();
+        List<Functions.Function> userListFunctions = new List<Functions.Function>();
+        List<Functions.Function> regexFunctions = new List<Functions.Function>();
+        List<Functions.Function> commandFunctions = new List<Functions.Function>();
+
+        public List<IRCResponse> MessageQueue = new List<IRCResponse>();
+
+        #region Variables
+
+        string desiredNick, nick;
+        /// <summary>
+        /// Nickname of the Bot
+        /// </summary>
+        public string Nick
+        {
+            get
+            {
+                return nick;
+            }
+        }
+        int nickUsedCount = 0;
+
+        public struct Channel 
+        {
+            public string Name;
+            public List<string> Users;
+        }
+        List<Channel> channels;
+        public List<Channel> Channels
+        {
+            get { return channels; }
+        }
+
+        BackgroundWorker worker;
+        CwIRC.Interface cwIRC;
+
+        #endregion Variables
+
+        #region Constructor & Destructor
+        /// <summary>
+        /// Constructor for MoronBot.
+        /// Starts a new BackgroundWorker.
+        /// </summary>
+        public MoronBot()
+        {
+            worker = new BackgroundWorker();
+            worker.DoWork += new DoWorkEventHandler(worker_DoWork);
+            worker.ProgressChanged += new ProgressChangedEventHandler(worker_ProgressChanged);
+            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
+            worker.WorkerReportsProgress = true;
+
+            functions.Add(new Functions.Say(this));
+            functions.Add(new Functions.Join(this));
+            functions.Add(new Functions.Leave(this));
+            functions.Add(new Functions.Nick(this));
+            functions.Add(new Functions.Time(this));
+            functions.Add(new Functions.Dice(this));
+            functions.Add(new Functions.Google(this));
+            functions.Add(new Functions.Translate(this));
+            functions.Add(new Functions.URLFollow(this));
+            functions.Add(new Functions.Ignore(this));
+            functions.Add(new Functions.Conversation(this));
+            functions.Add(new Functions.KrozeStalker(this));
+            functions.Add(new Functions.Log(this));
+            functions.Add(new Functions.Bitly(this));
+            functions.Add(new Functions.RandomKicker(this));
+            functions.Add(new Functions.Source(this));
+            functions.Add(new Functions.Commands(this));
+            functions.Add(new Functions.Welch(this));
+            functions.Add(new Functions.Tell(this)); functions.Add(new Functions.TellAuto(this));
+
+            foreach (Functions.Function f in functions)
+            {
+                commandList.Add(f.Name);
+                helpLibrary.Add(f.Name, f.Help);
+                switch (f.Type)
+                {
+                    case Functions.Types.Command:
+                        commandFunctions.Add(f);
+                        break;
+                    case Functions.Types.Regex:
+                        regexFunctions.Add(f);
+                        break;
+                    case Functions.Types.UserList:
+                        userListFunctions.Add(f);
+                        break;
+                }
+            }
+
+            if (!LoadXML("settings.xml"))
+            {
+                SaveXML("settings.xml");
+            }
+            desiredNick = Settings.Instance.Nick;
+            nick = Settings.Instance.Nick;
+            Settings.Instance.CurrentNick = nick;
+
+            channels = new List<Channel>();
+
+            cwIRC = new CwIRC.Interface();
+            cwIRC.Connect(Settings.Instance.Server, Settings.Instance.Port);
+            cwIRC.NICK(desiredNick);
+            cwIRC.USER(desiredNick+"User", "Meh", "Whatever", "MoronBot 0.1.6");
+            cwIRC.SendData("PASS mOrOnBoTuS");
+
+            Join(Settings.Instance.Channel);
+
+            worker.RunWorkerAsync();
+        }
+        /// <summary>
+        /// Destructor for MoronBot.
+        /// Closes the connection to the IRC Server.
+        /// </summary>
+        ~MoronBot()
+        {
+            cwIRC.Disconnect();
+        }
+        #endregion Constructor & Destructor
+
+        #region Basic Operations
+        /// <summary>
+        /// Joins the specified channel (Sends the JOIN message).
+        /// </summary>
+        /// <param name="p_channel">The channel to join.</param>
+        public void Join(string p_channel)
+        {
+            p_channel = p_channel.TrimStart('#');
+            cwIRC.JOIN(p_channel);
+        }
+        /// <summary>
+        /// Leaves the specified channel (Sends the PART message).
+        /// </summary>
+        /// <param name="p_channel">The channel to leave.</param>
+        public void Leave(string p_channel, string p_partMessage)
+        {
+            p_channel = p_channel.TrimStart('#');
+            cwIRC.PART(p_channel, p_partMessage);
+        }
+        /// <summary>
+        /// Changes MoronBot's nickname to the specified Nick.
+        /// </summary>
+        /// <param name="p_nick">The nickname to change to.</param>
+        public void Nickname(string p_nick)
+        {
+            cwIRC.NICK(p_nick);
+        }
+        /// <summary>
+        /// Sends the specified message to the specified channel or user (Sends the PRIVMSG message).
+        /// </summary>
+        /// <param name="p_message">The message to send.</param>
+        /// <param name="p_target">The channel or user to send the message to.</param>
+        public void Say(string p_message, string p_target)
+        {
+            Program.form.txtIRC_Update(p_target + " <" + desiredNick + "> " + p_message);
+            cwIRC.PRIVMSG(p_message, p_target);
+        }
+        /// <summary>
+        /// Sends the specified notice to the specified channel or user (Sends the NOTICE message).
+        /// </summary>
+        /// <param name="p_message">The notice to send.</param>
+        /// <param name="p_target">The channel or user to send the notice to.</param>
+        public void Notice(string p_message, string p_target)
+        {
+            Program.form.txtIRC_Update(p_target + " [" + desiredNick + "] " + p_message);
+            cwIRC.NOTICE(p_message, p_target);
+        }
+        /// <summary>
+        /// Sends the specified 'action' message to the specified channel or user (Sends the PRIVMSG message, with ctcp ACTION command).
+        /// </summary>
+        /// <param name="p_action">The ACTION message to send.</param>
+        /// <param name="p_target">The channel or user to send the ACTION message to.</param>
+        public void Do(string p_action, string p_target)
+        {
+            Program.form.txtIRC_Update(p_target + " " + desiredNick + " " + p_action);
+            char ctcpChar = Convert.ToChar((byte)1);
+            cwIRC.PRIVMSG(ctcpChar + "ACTION " + p_action + ctcpChar, p_target);
+        }
+        /// <summary>
+        /// Leaves the server (Sends the QUIT message).
+        /// </summary>
+        public void Quit()
+        {
+            cwIRC.QUIT(Settings.Instance.QuitMessage);
+        }
+
+        public bool Send(IRCResponse response)
+        {
+            if (response != null)
+            {
+                switch (response.Type)
+                {
+                    case ResponseType.Say:
+                        Say(response.Response, response.Target);
+                        break;
+                    case ResponseType.Do:
+                        Do(response.Response, response.Target);
+                        break;
+                    case ResponseType.Notice:
+                        Notice(response.Response, response.Target);
+                        break;
+                    case ResponseType.Raw:
+                        cwIRC.SendData(response.Response);
+                        break;
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        #endregion Basic Operations
+
+        #region Process Message
+        /// <summary>
+        /// Processes messages from the server. Most of the main 'bot' functions are in here.
+        /// NOTE: Should probably be split off into separate modules, for easier modification.
+        /// :chat05.ustream.tv 010 Guest4597 chat01.ustream.tv 6667 :Please use this Server/Port instead
+        /// </summary>
+        /// <param name="p_message">The message received from the server.</param>
+        public void ProcessMessage(BotMessage message)
+        {
+            if (message.Type == "PING")
+            {
+                cwIRC.SendData("PONG " + message.MessageString);
+            }
+            else
+            {
+                if (message.Type != "PRIVMSG")
+                {
+                    string parameter = message.MessageList[2].TrimStart(':');
+                    
+                    // Server full, connect to another
+                    if (message.Type == "010")
+                    {
+                        cwIRC.Connect(message.MessageList[3], Int32.Parse(message.MessageList[4]));
+                        cwIRC.NICK(desiredNick);
+                        cwIRC.USER(desiredNick, "Meh", "Whatever", "MoronBot 0.1.6");
+                    }
+
+                    // User List
+                    if (message.Type == "353")
+                    {
+                        Channel newChannel = new Channel();
+                        newChannel.Name = message.MessageList[4];
+                        List<string> Users = new List<string>();
+                        for (int i = 5; i < message.MessageList.Count; i++)
+                        {
+                            if (message.MessageList[i].Length > 0)
+                            {
+                                Users.Add(message.MessageList[i].TrimStart(':'));
+                            }
+                        }
+                        Users.Sort();
+                        newChannel.Users = Users;
+                        channels.Add(newChannel);
+                        Program.form.RefreshListBox();
+                    }
+
+                    // Nick accepted?
+                    if (message.Type == "376")
+                    {
+                        Join(Settings.Instance.Channel);
+                    }
+
+                    // Nick In Use
+                    if (message.Type == "433")
+                    {
+                        nickUsedCount++;
+                        Nickname(desiredNick + nickUsedCount);
+                        return;
+                    }
+
+                    #region Messages in Channel
+
+                    #region Nick Change
+                    if (message.Type == "NICK")
+                    {
+                        Program.form.txtIRC_Update(message.User.Name + " is now known as " + parameter);
+                        if (message.User.Name == nick)
+                        {
+                            nick = parameter;
+                            Settings.Instance.CurrentNick = nick;
+                            Program.form.Text = nick;
+                        }
+                        Program.form.RefreshListBox();
+                        return;
+                    }
+                    #endregion Nick Change
+
+                    #region Join
+                    if (message.Type == "JOIN")
+                    {
+                        if (message.User.Name != nick)
+                        {
+                            for (int i = 0; i < channels.Count; i++)
+                            {
+                                if (channels[i].Name == message.MessageList[2].TrimStart(':'))
+                                {
+                                    if (!channels[i].Users.Contains(message.User.Name))
+                                        channels[i].Users.Add(message.User.Name);
+                                }
+                            }
+                            Program.form.RefreshListBox();
+                        }
+                        Program.form.txtIRC_Update(message.User.Name + " joined " + parameter);
+                        return;
+                    }
+                    #endregion Join
+
+                    #region Leave
+                    if (message.Type == "PART")
+                    {
+                        if (message.User.Name == nick)
+                        {
+                            for (int i = channels.Count - 1; i >= 0 ; i--)
+                            {
+                                if (channels[i].Name == parameter)
+                                {
+                                    channels.RemoveAt(i);
+                                    //Program.form.RefreshListBox();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < channels.Count ; i++)
+                            {
+                                if (channels[i].Name == message.MessageList[2].TrimStart(':'))
+                                {
+                                    channels[i].Users.Remove(message.User.Name);
+                                }
+                            }
+                        }
+                        Program.form.txtIRC_Update(message.User.Name + " left " + parameter + " message: " +  String.Join(" ", message.MessageList.ToArray(), 3, message.MessageList.Count - 3).TrimStart(':'));
+                        return;
+                    }
+                    #endregion Leave
+
+                    #region Quit
+                    if (message.Type == "QUIT")
+                    {
+                        for (int i = 0; i < channels.Count; i++)
+                        {
+                            if (channels[i].Name == message.MessageList[2].TrimStart(':'))
+                            {
+                                channels[i].Users.Remove(message.User.Name);
+                            }
+                        }
+                        Program.form.txtIRC_Update(message.User.Name + " quit, message: " + String.Join(" ", message.MessageList.ToArray(), 2, message.MessageList.Count - 2));
+                    }
+                    #endregion Quit
+
+                    if (message.Type == "KICK")
+                    {
+                        if (message.MessageList[3] == nick)
+                        {
+                            for (int i = channels.Count - 1; i >= 0; i--)
+                            {
+                                if (channels[i].Name == parameter)
+                                {
+                                    channels.RemoveAt(i);
+                                    //Program.form.RefreshListBox();
+                                }
+                            }
+                            Join(message.MessageList[2]);
+                        }
+                    }
+
+                    #endregion Messages in Channel
+                }
+                else
+                {
+
+                    Program.form.txtIRC_Update(message.ReplyTo + " <" + message.User.Name + "> " + message.MessageString);
+
+                    ExecuteFunctionList(userListFunctions, message);
+                    SendQueue();
+
+                    if (Settings.Instance.IgnoreList.Contains(message.User.Name))
+                        return;
+
+                    if (ExecuteFunctionList(regexFunctions, message))
+                    {
+                        SendQueue();
+                        return;
+                    }
+
+                    #region Bot Commands
+                    Match match = Regex.Match(message.MessageString, "^(\\||" + nick + "(,|:)?[ ])", RegexOptions.IgnoreCase);
+                    if (match.Success)
+                    {
+                        if (ExecuteFunctionList(commandFunctions, message))
+                        {
+                            SendQueue();
+                            return;
+                        }
+                        if (Regex.IsMatch(message.Command, "^(pass)$", RegexOptions.IgnoreCase))
+                        {
+                            cwIRC.SendData("PASS mOrOnBoTuS");
+                        }
+                    }
+                    #endregion Bot Commands
+
+                    SendQueue();
+                }
+            }
+        }
+
+        void SendQueue()
+        {
+            if (MessageQueue.Count > 0)
+            {
+                foreach (IRCResponse response in MessageQueue)
+                {
+                    Send(response);
+                }
+                MessageQueue.Clear();
+            }
+        }
+
+        bool ExecuteFunctionList(List<Functions.Function> funcList, BotMessage message)
+        {
+            foreach (Functions.Function f in funcList)
+            {
+                switch (f.AccessLevel)
+                {
+                    case Functions.AccessLevels.Anyone:
+                        if (Send(f.GetResponse(message, this)))
+                            return true;
+                        break;
+                    case Functions.AccessLevels.UserList:
+                        if (f.AccessList.Contains(message.User.Name))
+                        {
+                            if (Send(f.GetResponse(message, this)))
+                                return true;
+                        }
+                        break;
+                }
+            }
+            return false;
+        }
+        #endregion Process Message
+
+        #region Background Worker
+        /// <summary>
+        /// Gets new messages from the IRC server.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            string inMessage;
+            while (true)
+            {
+                while ((inMessage = cwIRC.GetData()) != null)
+                {
+                    worker.ReportProgress(0, inMessage);
+                    Console.WriteLine(inMessage);
+                }
+            }
+        }
+        /// <summary>
+        /// Called when a new message is received.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            BotMessage message = new BotMessage(e.UserState.ToString());
+            Program.form.txtProgLog_Update(message.ToString());
+            ProcessMessage(message);
+        }
+        /// <summary>
+        /// Called when the worker is finished... should possibly remove, can't imagine a situation where it'd be needed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+
+        }
+        #endregion Background Worker
+
+        #region settings.xml
+        /// <summary>
+        /// Loads settings into a Settings object from an XML file
+        /// </summary>
+        /// <param name="p_fileLocation">The location of the settings file to load from</param>
+        /// <param name="p_settings">The Settings object to load the settings into</param>
+        /// <returns>true if load succeeded, false if it failed</returns>
+        public bool LoadXML(string fileLocation)
+        {
+            if (File.Exists(fileLocation))
+            {
+                XmlSerializer deserializer = new XmlSerializer(Settings.Instance.GetType());
+                StreamReader streamReader = new StreamReader(fileLocation);
+                Settings.Assign((Settings)deserializer.Deserialize(streamReader));
+                streamReader.Close();
+
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Saves settings to an XML file from a Settings object
+        /// </summary>
+        /// <param name="p_fileLocation">The location of the settings file to save to</param>
+        /// <param name="settings">The Settings object to save the settings from</param>
+        public void SaveXML(string fileLocation)
+        {
+            XmlSerializer serializer = new XmlSerializer(Settings.Instance.GetType());
+            StreamWriter streamWriter = new StreamWriter(fileLocation);
+            serializer.Serialize(streamWriter, Settings.Instance);
+            streamWriter.Close();
+        }
+        #endregion settings.xml
+    }
+}
