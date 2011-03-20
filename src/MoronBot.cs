@@ -144,7 +144,7 @@ namespace MoronBot
             cwIRC = new CwIRC.Interface();
             cwIRC.Connect(Settings.Instance.Server, Settings.Instance.Port);
             cwIRC.NICK(desiredNick);
-            cwIRC.USER(desiredNick+"User", "Meh", "Whatever", "MoronBot 0.1.6");
+            cwIRC.USER(desiredNick, "Meh", "Whatever", "MoronBot 0.1.6");
             cwIRC.SendData("PASS mOrOnBoTuS");
 
             Join(Settings.Instance.Channel);
