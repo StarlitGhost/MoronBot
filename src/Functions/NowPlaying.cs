@@ -9,7 +9,7 @@ namespace MoronBot.Functions
         public NowPlaying(MoronBot moronBot)
         {
             Name = GetName();
-            Help = "np (<nick>)\t\t- Returns your currently playing music (from Last.fm). You can also supply a specific username to check.";
+            Help = "np (<user>)\t\t- Returns your currently playing music (from Last.fm). You can also supply a specific username to check.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }

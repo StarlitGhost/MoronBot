@@ -99,7 +99,7 @@ namespace MoronBot
             functions.Add(new Functions.Google(this));
             functions.Add(new Functions.Translate(this));
             functions.Add(new Functions.URLFollow(this));
-            functions.Add(new Functions.Ignore(this));
+            functions.Add(new Functions.Ignore(this)); functions.Add(new Functions.Unignore(this));
             functions.Add(new Functions.Conversation(this));
             functions.Add(new Functions.KrozeStalker(this));
             functions.Add(new Functions.Log(this));

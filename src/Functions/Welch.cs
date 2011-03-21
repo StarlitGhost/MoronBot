@@ -19,7 +19,8 @@ namespace MoronBot.Functions
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
-            // Copied from http://theglen.livejournal.com/16735.html, had to find-replace fancy quotes with normal ones.
+            // Read welch.txt into welchList
+            // I copied the list directly from http://theglen.livejournal.com/16735.html, had to find-replace fancy quotes with normal ones.
             StreamReader welchFile = new StreamReader(File.OpenRead("welch.txt"));
 
             while (!welchFile.EndOfStream)
@@ -34,6 +35,7 @@ namespace MoronBot.Functions
         {
             if (Regex.IsMatch(message.Command, "^(welch)$", RegexOptions.IgnoreCase))
             {
+                // Specific thing requested
                 if (message.ParameterList.Count > 0)
                 {
                     int number = 0;
@@ -45,10 +47,13 @@ namespace MoronBot.Functions
                             return new IRCResponse(ResponseType.Say, welchList[number], message.ReplyTo);
                         }
                     }
+                    // Number too large or small, or not a number at all
                     return new IRCResponse(ResponseType.Say, "Invalid number, range is 1-" + welchList.Count, message.ReplyTo);
                 }
+                // No specific thing requested
                 else
                 {
+                    // Return a random thing
                     return new IRCResponse(ResponseType.Say, welchList[rand.Next(welchList.Count)], message.ReplyTo);
                 }
             }

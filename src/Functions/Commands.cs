@@ -19,11 +19,14 @@ namespace MoronBot.Functions
         {
             if (Regex.IsMatch(message.Command, "^(commands?|help|functions?)$", RegexOptions.IgnoreCase))
             {
+                // Specific function asked for
                 if (message.ParameterList.Count > 0)
                 {
+                    // Check function exists
                     string command = moronBot.CommandList.Find(s => s.IndexOf(message.ParameterList[0], StringComparison.InvariantCultureIgnoreCase) >= 0);
                     if (command != null)
                     {
+                        // Check function has help text
                         if (moronBot.HelpLibrary[command] != null)
                         {
                             return new IRCResponse(ResponseType.Notice, moronBot.HelpLibrary[command], message.User.Name);
@@ -32,6 +35,7 @@ namespace MoronBot.Functions
                     }
                     return new IRCResponse(ResponseType.Notice, "\"" + message.ParameterList[0] + "\" not found, try \"" + message.Command + "\" without parameters to see a list of loaded functions.", message.User.Name);
                 }
+                // List of loaded functions asked for
                 else
                 {
                     moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Notice, "Functions loaded are:", message.User.Name));

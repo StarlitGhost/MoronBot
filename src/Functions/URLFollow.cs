@@ -30,21 +30,28 @@ namespace MoronBot.Functions
                 }
                 catch (System.Net.WebException ex)
                 {
+                    // Nothing returned when attempting to fetch the url
                     Program.form.txtProgLog_Update(ex.Message);
                     return new IRCResponse(ResponseType.Say, "Nothing found at " + match.Value, message.ReplyTo);
                 }
                 catch (System.UriFormatException ex)
                 {
+                    // Invalid url detected, don't really care though.
                     return null;
                 }
 
+                // Hunt for the title tags on the page, and grab the text between them.
                 string title;
                 match = Regex.Match(webPage.Page, @"<\s*title\s*>(.*?)</title\s*>", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                // Title tags found
                 if (match.Success)
                 {
+                    // Trim excess whitespace
                     title = "Title: " + match.Groups[1].Value.Trim();
+                    // Remove newlines
                     title = Regex.Replace(title, @"(\r|\n|)", "", RegexOptions.IgnoreCase);
                 }
+                // No title tags found
                 else
                 {
                     title = "No title found";

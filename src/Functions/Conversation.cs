@@ -16,16 +16,19 @@ namespace MoronBot.Functions
 
         public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
         {
+            // Cheese in message
             if (Regex.IsMatch(message.MessageString, "cheese", RegexOptions.IgnoreCase))
             {
                 return new IRCResponse(ResponseType.Do, "loves cheese", message.ReplyTo);
             }
 
+            // Windmill in message
             if (Regex.IsMatch(message.MessageString, "windmill", RegexOptions.IgnoreCase))
             {
                 return new IRCResponse(ResponseType.Say, "WINDMILLS DO NOT WORK THAT WAY!", message.ReplyTo);
             }
 
+            // Someone has greeted MoronBot
             Match match = Regex.Match(message.MessageString, "^('?sup|hi|hey|hello|greetings|bonjour|salut|howdy|'?yo),?[ ]" + Settings.Instance.CurrentNick, RegexOptions.IgnoreCase);
             if (match.Success)
             {

@@ -5,6 +5,7 @@ using System.Text;
 
 namespace MoronBot.Utilities
 {
+    // Utility class to hold commonly needed helper functions to do with URLs and general web stuff.
     static class URL
     {
         public struct WebPage
@@ -13,6 +14,11 @@ namespace MoronBot.Utilities
             public string Page;
         }
 
+        /// <summary>
+        /// Fetches the page a URL refers to, and returns a WebPage struct.
+        /// </summary>
+        /// <param name="url">The URL to fetch.</param>
+        /// <returns>A WebPage struct containing the domain and the page itself.</returns>
         public static WebPage FetchURL(string url)
         {
             try
@@ -46,6 +52,7 @@ namespace MoronBot.Utilities
             }
             catch (System.Exception ex)
             {
+                // Propagate exceptions upwards
                 throw ex;
             }
         }

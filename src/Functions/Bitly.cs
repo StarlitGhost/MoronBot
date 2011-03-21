@@ -20,16 +20,20 @@ namespace MoronBot.Functions
         {
             if (Regex.IsMatch(message.Command, "^(bit\\.?ly|shorten)$", RegexOptions.IgnoreCase))
             {
+                // URL given
                 if (message.Parameters.Length > 0)
                 {
+                    // Check that the 'URL' given, is actually a URL
                     Match match = Regex.Match(message.Parameters, @"https?://[^\s]+", RegexOptions.IgnoreCase);
                     if (match.Success)
                     {
+                        // Use the Bitly API to shorten the given URL
                         string bitlyURL = API.Bit("tyranicmoron", "R_2cec505899bffdf2f88e0a15953661e6", match.Value, "Shorten");
                         return new IRCResponse(ResponseType.Say, bitlyURL, message.ReplyTo);
                     }
                     return new IRCResponse(ResponseType.Say, "No URL detected in your message.", message.ReplyTo);
                 }
+                // No URL given
                 else
                 {
                     return new IRCResponse(ResponseType.Say, "You didn't give a URL to shorten!", message.ReplyTo);
