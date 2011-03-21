@@ -99,7 +99,10 @@ namespace MoronBot.Functions
 
         void WriteMessages(string fileName)
         {
-            using (XmlWriter writer = XmlWriter.Create(fileName))
+            XmlWriterSettings xws = new XmlWriterSettings();
+            xws.Indent = true;
+            xws.NewLineOnAttributes = true;
+            using (XmlWriter writer = XmlWriter.Create(fileName, xws))
             {
                 writer.WriteStartDocument();
                 writer.WriteStartElement("Users");

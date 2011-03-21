@@ -154,7 +154,6 @@ namespace MoronBot
         /// </summary>
         ~MoronBot()
         {
-            cwIRC.QUIT(Settings.Instance.QuitMessage);
             cwIRC.Disconnect();
         }
         #endregion Constructor & Destructor
@@ -231,8 +230,18 @@ namespace MoronBot
         {
             if (MessageQueue.Count > 0)
             {
+                int numSent = 0;
                 foreach (IRCResponse response in MessageQueue)
                 {
+                    if (numSent < 3)
+                    {
+                        numSent++;
+                    }
+                    else
+                    {
+                        System.Threading.Thread.Sleep(5000);
+                        numSent = 1;
+                    }
                     Send(response);
                 }
                 MessageQueue.Clear();
