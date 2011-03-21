@@ -108,7 +108,9 @@ namespace CwIRC
         /// <param name="p_channel">The channel to join.</param>
         public void JOIN(string p_channel)
         {
-            SendData("JOIN #" + p_channel);
+            if (!p_channel.StartsWith("#"))
+                p_channel = "#" + p_channel;
+            SendData("JOIN " + p_channel);
         }
         /// <summary>
         /// Sends the PART message to the IRC server, to leave the specified channel with the specified leaving message.
