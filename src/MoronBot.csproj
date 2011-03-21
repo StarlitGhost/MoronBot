@@ -90,6 +90,7 @@
     <Compile Include="Functions\Conversation.cs" />
     <Compile Include="Functions\Bitly.cs" />
     <Compile Include="Functions\Commands.cs" />
+    <Compile Include="Functions\NowPlaying.cs" />
     <Compile Include="Functions\Tell.cs" />
     <Compile Include="Functions\Welch.cs" />
     <Compile Include="Functions\Source.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="Core\Parse.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\URLUtilities.cs" />
     <EmbeddedResource Include="formMoronBot.resx">
       <DependentUpon>formMoronBot.cs</DependentUpon>
       <SubType>Designer</SubType>

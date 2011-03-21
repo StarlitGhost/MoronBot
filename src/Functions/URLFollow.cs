@@ -23,41 +23,10 @@ namespace MoronBot.Functions
             Match match = Regex.Match(message.MessageString, @"https?://[^\s]+", RegexOptions.IgnoreCase);
             if (match.Success)
             {
+                Utilities.URL.WebPage webPage;
                 try
                 {
-                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(match.Value);
-                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
-                    string actualURL = response.ResponseUri.Scheme + "://" + response.ResponseUri.Host;
-                    string title;
-
-                    Stream responseStream = response.GetResponseStream();
-                    System.Text.Encoding encode = System.Text.Encoding.UTF8;
-                    StreamReader stream = new StreamReader(responseStream, encode);
-
-                    Char[] buffer = new Char[256];
-                    StringBuilder sb = new StringBuilder();
-
-                    int count = stream.Read(buffer, 0, 256);
-                    while (count > 0)
-                    {
-                        sb.Append(buffer);
-                        count = stream.Read(buffer, 0, 256);
-                    }
-                    response.Close();
-                    stream.Close();
-                    string page = sb.ToString();
-                    match = Regex.Match(page, @"<\s*title\s*>(.*?)</title\s*>", RegexOptions.Singleline | RegexOptions.IgnoreCase);
-                    if (match.Success)
-                    {
-                        title = "Title: " + match.Groups[1].Value.Trim();
-                        title = Regex.Replace(title, @"(\r|\n|)", "", RegexOptions.IgnoreCase);
-                    }
-                    else
-                    {
-                        title = "No title found";
-                    }
-                    return new IRCResponse(ResponseType.Say, title + " (at " + actualURL + ")", message.ReplyTo);
+                    webPage = Utilities.URL.FetchURL(match.Value);
                 }
                 catch (System.Net.WebException ex)
                 {
@@ -68,6 +37,20 @@ namespace MoronBot.Functions
                 {
                     return null;
                 }
+
+                string title;
+                match = Regex.Match(webPage.Page, @"<\s*title\s*>(.*?)</title\s*>", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                if (match.Success)
+                {
+                    title = "Title: " + match.Groups[1].Value.Trim();
+                    title = Regex.Replace(title, @"(\r|\n|)", "", RegexOptions.IgnoreCase);
+                }
+                else
+                {
+                    title = "No title found";
+                }
+
+                return new IRCResponse(ResponseType.Say, title + " (at " + webPage.Domain + ")", message.ReplyTo);
             }
             return null;
         }
