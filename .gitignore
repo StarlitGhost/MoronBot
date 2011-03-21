@@ -1,5 +1,5 @@
 
 bin/*
-MoronBot.suo
 src/obj/*
-src/MoronBot.csproj.user
+*.user
+*.suo
