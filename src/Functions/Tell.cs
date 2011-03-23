@@ -84,7 +84,7 @@ namespace MoronBot.Functions
                         MessageMap.Add(message.ParameterList[0].ToUpper(), new List<TellMessage>());
                     }
                     TellMessage tellMessage = new TellMessage();
-                    tellMessage.From = "^ from " + message.User.Name + " on " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    tellMessage.From = "^ from " + message.User.Name + " on " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss (UTC zz)");
                     tellMessage.Message = msg;
                     MessageMap[message.ParameterList[0].ToUpper()].Add(tellMessage);
                     moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Ok, I'll tell " + message.ParameterList[0] + " that when they next speak.", message.ReplyTo));

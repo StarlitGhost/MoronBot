@@ -90,7 +90,6 @@
     <Compile Include="Functions\Conversation.cs" />
     <Compile Include="Functions\Bitly.cs" />
     <Compile Include="Functions\Commands.cs" />
-    <Compile Include="Functions\NowPlaying.cs" />
     <Compile Include="Functions\Tell.cs" />
     <Compile Include="Functions\Welch.cs" />
     <Compile Include="Functions\Source.cs" />
