@@ -16,7 +16,7 @@ namespace MoronBot.Functions
             AccessLevel = AccessLevels.Anyone;
         }
         
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(google|search|find)$", RegexOptions.IgnoreCase))
             {
@@ -31,25 +31,31 @@ namespace MoronBot.Functions
                         //Gapi.Search.SearchSafety.Active;
                         //Gapi.Search.S
                         if (searchResults.Items.Length == 0)
-                            return new IRCResponse(ResponseType.Say, "No results found for \"" + message.Parameters + "\"!", message.ReplyTo);
+                        {
+                            moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "No results found for \"" + message.Parameters + "\"!", message.ReplyTo));
+                            return;
+                        }
 
                         searchResult = searchResults.Items[0];
                     }
                     catch (System.Exception ex)
                     {
-                        return new IRCResponse(ResponseType.Say, ex.GetType().ToString() + " | " + ex.Message, message.ReplyTo);
+                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, ex.GetType().ToString() + " | " + ex.Message, message.ReplyTo));
+                        return;
                     }
                     string searchContent = Regex.Replace(searchResult.Content, @"<.+?>", "");
-                    return new IRCResponse(ResponseType.Say, searchContent + " (" + searchResult.Url + ")", message.ReplyTo);
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, searchContent + " (" + searchResult.Url + ")", message.ReplyTo));
+                    return;
                 }
                 else
                 {
-                    return new IRCResponse(ResponseType.Say, "Search for what?", message.ReplyTo);
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Search for what?", message.ReplyTo));
+                    return;
                 }
             }
             else
             {
-                return null;
+                return;
             }
         }
     }

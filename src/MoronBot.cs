@@ -230,19 +230,10 @@ namespace MoronBot
         {
             if (MessageQueue.Count > 0)
             {
-                int numSent = 0;
                 foreach (IRCResponse response in MessageQueue)
                 {
-                    if (numSent < 3)
-                    {
-                        numSent++;
-                    }
-                    else
-                    {
-                        System.Threading.Thread.Sleep(5000);
-                        numSent = 1;
-                    }
                     Send(response);
+                    System.Threading.Thread.Sleep(1700);
                 }
                 MessageQueue.Clear();
             }
@@ -416,21 +407,16 @@ namespace MoronBot
                     if (Settings.Instance.IgnoreList.Contains(message.User.Name))
                         return;
 
-                    if (ExecuteFunctionList(regexFunctions, message))
-                    {
-                        SendQueue();
-                        return;
-                    }
+                    ExecuteFunctionList(regexFunctions, message);
+                    SendQueue();
 
                     #region Bot Commands
                     Match match = Regex.Match(message.MessageString, "^(\\||" + nick + "(,|:)?[ ])", RegexOptions.IgnoreCase);
                     if (match.Success)
                     {
-                        if (ExecuteFunctionList(commandFunctions, message))
-                        {
-                            SendQueue();
-                            return;
-                        }
+                        ExecuteFunctionList(commandFunctions, message);
+                        SendQueue();
+
                         if (Regex.IsMatch(message.Command, "^(pass)$", RegexOptions.IgnoreCase))
                         {
                             cwIRC.SendData("PASS mOrOnBoTuS");
@@ -457,14 +443,12 @@ namespace MoronBot
                 switch (f.AccessLevel)
                 {
                     case Functions.AccessLevels.Anyone:
-                        if (Send(f.GetResponse(message, this)))
-                            return true;
+                        f.GetResponse(message, this);
                         break;
                     case Functions.AccessLevels.UserList:
                         if (f.AccessList.Contains(message.User.Name))
                         {
-                            if (Send(f.GetResponse(message, this)))
-                                return true;
+                            f.GetResponse(message, this);
                         }
                         break;
                 }

@@ -42,7 +42,7 @@ namespace MoronBot.Functions
             WriteMessages(Settings.Instance.Server + ".tellMessages.xml");
         }
 
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(tell)$", RegexOptions.IgnoreCase))
             {
@@ -71,7 +71,8 @@ namespace MoronBot.Functions
                     }
                     else
                     {
-                        return new IRCResponse(ResponseType.Say, "You've already sent 3 messages in the last 5 minutes, slow down!", message.ReplyTo);
+                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "You've already sent 3 messages in the last 5 minutes, slow down!", message.ReplyTo));
+                        return;
                     }
                 }
 
@@ -86,15 +87,18 @@ namespace MoronBot.Functions
                     tellMessage.From = "^ from " + message.User.Name + " on " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                     tellMessage.Message = msg;
                     MessageMap[message.ParameterList[0].ToUpper()].Add(tellMessage);
-                    return new IRCResponse(ResponseType.Say, "Ok, I'll tell " + message.ParameterList[0] + " that when they next speak.", message.ReplyTo);
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Ok, I'll tell " + message.ParameterList[0] + " that when they next speak.", message.ReplyTo));
+                    return;
                 }
                 else if (message.ParameterList.Count > 0)
                 {
-                    return new IRCResponse(ResponseType.Say, "You didn't give a message for me to tell " + message.ParameterList[0], message.ReplyTo);
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "You didn't give a message for me to tell " + message.ParameterList[0], message.ReplyTo));
+                    return;
                 }
-                return new IRCResponse(ResponseType.Say, "Tell who what?", message.ReplyTo);
+                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Tell who what?", message.ReplyTo));
+                return;
             }
-            return null;
+            return;
         }
 
         void WriteMessages(string fileName)
@@ -171,7 +175,7 @@ namespace MoronBot.Functions
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Tell.MessageMap.ContainsKey(message.User.Name.ToUpper()))
             {
@@ -183,7 +187,7 @@ namespace MoronBot.Functions
                 Tell.MessageMap[message.User.Name.ToUpper()].Clear();
                 Tell.MessageMap.Remove(message.User.Name.ToUpper());
             }
-            return null;
+            return;
         }
     }
 

@@ -17,22 +17,24 @@ namespace MoronBot.Functions
             AccessList.Add("Tyranic-Moron");
         }
         
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(leave|gtfo)$", RegexOptions.IgnoreCase))
             {
                 if (message.ParameterList.Count > 0)
                 {
-                    return new IRCResponse(ResponseType.Raw, "PART " + message.ReplyTo + " :" + message.Parameters, "");
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Raw, "PART " + message.ReplyTo + " :" + message.Parameters, ""));
+                    return;
                 }
                 else
                 {
-                    return new IRCResponse(ResponseType.Raw, "PART " + message.ReplyTo + " :" + Settings.Instance.LeaveMessage, "");
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Raw, "PART " + message.ReplyTo + " :" + Settings.Instance.LeaveMessage, ""));
+                    return;
                 }
             }
             else
             {
-                return null;
+                return;
             }
         }
     }

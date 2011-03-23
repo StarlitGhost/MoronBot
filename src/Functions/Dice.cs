@@ -16,7 +16,7 @@ namespace MoronBot.Functions
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(roll)$", RegexOptions.IgnoreCase))
             {
@@ -37,7 +37,8 @@ namespace MoronBot.Functions
                             }
                             else
                             {
-                                return new IRCResponse(ResponseType.Say, "A modifier is too large, cannot roll.", message.ReplyTo);
+                                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "A modifier is too large, cannot roll.", message.ReplyTo));
+                                return;
                             }
 
                             modMatch = modMatch.NextMatch();
@@ -66,12 +67,14 @@ namespace MoronBot.Functions
                                 numDice = Convert.ToInt32(dice[0]);
                                 if (numDice > 50)
                                 {
-                                    return new IRCResponse(ResponseType.Say, "You can't roll more than 50 dice in one go.", message.ReplyTo);
+                                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "You can't roll more than 50 dice in one go.", message.ReplyTo));
+                                    return;
                                 }
                             }
                             else
                             {
-                                return new IRCResponse(ResponseType.Say, "You can't roll more than 50 dice in one go.", message.ReplyTo);
+                                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "You can't roll more than 50 dice in one go.", message.ReplyTo));
+                                return;
                             }
                             int diceSides = 0;
                             if (dice[1].Length < 4)
@@ -79,12 +82,14 @@ namespace MoronBot.Functions
                                 diceSides = Convert.ToInt32(dice[1]);
                                 if (diceSides > 100)
                                 {
-                                    return new IRCResponse(ResponseType.Say, "No dice can have more than 100 sides.", message.ReplyTo);
+                                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "No dice can have more than 100 sides.", message.ReplyTo));
+                                    return;
                                 }
                             }
                             else
                             {
-                                return new IRCResponse(ResponseType.Say, "No dice can have more than 100 sides.", message.ReplyTo);
+                                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "No dice can have more than 100 sides.", message.ReplyTo));
+                                return;
                             }
 
                             for (int i = 0; i < numDice; i++)
@@ -127,21 +132,24 @@ namespace MoronBot.Functions
                         {
                             rollMessage += rollString;
                         }
-                        return new IRCResponse(ResponseType.Say, rollMessage, message.ReplyTo);
+                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, rollMessage, message.ReplyTo));
+                        return;
                     }
                     else
                     {
-                        return new IRCResponse(ResponseType.Say, "No valid roll detected.", message.ReplyTo);
+                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "No valid roll detected.", message.ReplyTo));
+                        return;
                     }
                 }
                 else
                 {
-                    return new IRCResponse(ResponseType.Say, "Roll what?", message.ReplyTo);
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Roll what?", message.ReplyTo));
+                    return;
                 }
             }
             else
             {
-                return null;
+                return;
             }
         }
     }

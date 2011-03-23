@@ -14,7 +14,7 @@ namespace MoronBot.Functions
             AccessLevel = AccessLevels.Anyone;
         }
         
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(join)$", RegexOptions.IgnoreCase))
             {
@@ -30,16 +30,18 @@ namespace MoronBot.Functions
                         }
                         output += parameter + "\r\n";
                     }
-                    return new IRCResponse(ResponseType.Raw, output, "");
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Raw, output, ""));
+                    return;
                 }
                 else
                 {
-                    return new IRCResponse(ResponseType.Say, message.User.Name + ", you didn't say where I should join.", message.ReplyTo);
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, message.User.Name + ", you didn't say where I should join.", message.ReplyTo));
+                    return;
                 }
             }
             else
             {
-                return null;
+                return;
             }
         }
     }

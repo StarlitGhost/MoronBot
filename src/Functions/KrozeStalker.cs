@@ -29,19 +29,21 @@ namespace MoronBot.Functions
             //doList = Settings.Instance.FunctionSettings[Name]["DoList"];
         }
 
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (userList.Contains(message.User.Name) && rand.Next(0, 10) == 0)
             {
                 switch (rand.Next(1,3))
                 {
                     case 1:
-                        return new IRCResponse(ResponseType.Say, sayList[rand.Next(sayList.Count)], message.ReplyTo);
+                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, sayList[rand.Next(sayList.Count)], message.ReplyTo));
+                        return;
                     case 2:
-                        return new IRCResponse(ResponseType.Do, doList[rand.Next(doList.Count)], message.ReplyTo);
+                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Do, doList[rand.Next(doList.Count)], message.ReplyTo));
+                        return;
                 }
             }
-            return null;
+            return;
         }
 
         void InitLists()

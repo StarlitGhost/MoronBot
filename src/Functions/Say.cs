@@ -14,22 +14,24 @@ namespace MoronBot.Functions
             AccessLevel = AccessLevels.Anyone;
         }
         
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(say)$", RegexOptions.IgnoreCase))
             {
                 if (message.Parameters.Length > 0)
                 {
-                    return new IRCResponse(ResponseType.Say, message.Parameters, message.ReplyTo);
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, message.Parameters, message.ReplyTo));
+                    return;
                 }
                 else
                 {
-                    return new IRCResponse(ResponseType.Say, "Say what?", message.ReplyTo);
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Say what?", message.ReplyTo));
+                    return;
                 }
             }
             else
             {
-                return null;
+                return;
             }
         }
     }

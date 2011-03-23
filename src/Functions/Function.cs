@@ -29,7 +29,7 @@ namespace MoronBot.Functions
 
         public List<string> AccessList = new List<string>();
 
-        abstract public IRCResponse GetResponse(BotMessage message, MoronBot moronBot);
+        abstract public void GetResponse(BotMessage message, MoronBot moronBot);
 
         protected string GetName()
         {

@@ -15,7 +15,7 @@ namespace MoronBot.Functions
             AccessLevel = AccessLevels.Anyone;
         }
         
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(commands?|help|functions?)$", RegexOptions.IgnoreCase))
             {
@@ -29,11 +29,14 @@ namespace MoronBot.Functions
                         // Check function has help text
                         if (moronBot.HelpLibrary[command] != null)
                         {
-                            return new IRCResponse(ResponseType.Notice, moronBot.HelpLibrary[command], message.User.Name);
+                            moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Notice, moronBot.HelpLibrary[command], message.User.Name));
+                            return;
                         }
-                        return new IRCResponse(ResponseType.Notice, "\"" + command + "\" doesn't have any help text specified.", message.User.Name);
+                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Notice, "\"" + command + "\" doesn't have any help text specified.", message.User.Name));
+                        return;
                     }
-                    return new IRCResponse(ResponseType.Notice, "\"" + message.ParameterList[0] + "\" not found, try \"" + message.Command + "\" without parameters to see a list of loaded functions.", message.User.Name);
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Notice, "\"" + message.ParameterList[0] + "\" not found, try \"" + message.Command + "\" without parameters to see a list of loaded functions.", message.User.Name));
+                    return;
                 }
                 // List of loaded functions asked for
                 else
@@ -46,12 +49,12 @@ namespace MoronBot.Functions
                         output += ", " + moronBot.CommandList[i];
                     }
                     moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Notice, output, message.User.Name));
-                    return null;
+                    return;
                 }
             }
             else
             {
-                return null;
+                return;
             }
         }
     }
