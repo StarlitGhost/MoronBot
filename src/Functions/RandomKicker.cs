@@ -22,13 +22,14 @@ namespace MoronBot.Functions
             userList.Add("SirGir");
         }
 
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (userList.Contains(message.User.Name) && rand.Next(0, 5) == 0)
             {
-                return new IRCResponse(ResponseType.Raw, "KICK " + message.ReplyTo + " " + message.User.Name + " ::D", "");
+                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Raw, "KICK " + message.ReplyTo + " " + message.User.Name + " ::D", ""));
+                return;
             }
-            return null;
+            return;
         }
     }
 }

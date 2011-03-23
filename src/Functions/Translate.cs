@@ -14,7 +14,7 @@ namespace MoronBot.Functions
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(translate)$", RegexOptions.IgnoreCase))
             {
@@ -31,16 +31,18 @@ namespace MoronBot.Functions
                         Program.form.txtProgLog_Update(e.ToString());
                         translatedString = "Couldn't work out what language you're using.";
                     }
-                    return new IRCResponse(ResponseType.Say, translatedString, message.ReplyTo);
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, translatedString, message.ReplyTo));
+                    return;
                 }
                 else
                 {
-                    return new IRCResponse(ResponseType.Say, "Translate what?", message.ReplyTo);
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Translate what?", message.ReplyTo));
+                    return;
                 }
             }
             else
             {
-                return null;
+                return;
             }
         }
     }

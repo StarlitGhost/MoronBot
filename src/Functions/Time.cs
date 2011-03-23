@@ -17,7 +17,7 @@ namespace MoronBot.Functions
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(time)$", RegexOptions.IgnoreCase))
             {
@@ -34,7 +34,8 @@ namespace MoronBot.Functions
                         }
                         else
                         {
-                            return new IRCResponse(ResponseType.Say, "Offset too large, valid offsets are between -15 and +15.", message.ReplyTo);
+                            moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Offset too large, valid offsets are between -15 and +15.", message.ReplyTo));
+                            return;
                         }
                     }
                 }
@@ -140,11 +141,12 @@ namespace MoronBot.Functions
                     }
                 }
 
-                return new IRCResponse(ResponseType.Say, "It's " + timeMessage + ".", message.ReplyTo);
+                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "It's " + timeMessage + ".", message.ReplyTo));
+                return;
             }
             else
             {
-                return null;
+                return;
             }
         }
     }

@@ -18,7 +18,7 @@ namespace MoronBot.Functions
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             Match match = Regex.Match(message.MessageString, @"https?://[^\s]+", RegexOptions.IgnoreCase);
             if (match.Success)
@@ -32,12 +32,13 @@ namespace MoronBot.Functions
                 {
                     // Nothing returned when attempting to fetch the url
                     Program.form.txtProgLog_Update(ex.Message);
-                    return new IRCResponse(ResponseType.Say, "Nothing found at " + match.Value, message.ReplyTo);
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Nothing found at " + match.Value, message.ReplyTo));
+                    return;
                 }
                 catch (System.UriFormatException ex)
                 {
                     // Invalid url detected, don't really care though.
-                    return null;
+                    return;
                 }
 
                 // Hunt for the title tags on the page, and grab the text between them.
@@ -57,9 +58,10 @@ namespace MoronBot.Functions
                     title = "No title found";
                 }
 
-                return new IRCResponse(ResponseType.Say, title + " (at " + webPage.Domain + ")", message.ReplyTo);
+                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, title + " (at " + webPage.Domain + ")", message.ReplyTo));
+                return;
             }
-            return null;
+            return;
         }
     }
 }

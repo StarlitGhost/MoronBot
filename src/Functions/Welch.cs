@@ -31,7 +31,7 @@ namespace MoronBot.Functions
             welchFile.Close();
         }
         
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(welch)$", RegexOptions.IgnoreCase))
             {
@@ -44,22 +44,25 @@ namespace MoronBot.Functions
                         number -= 1;
                         if (number >= 0 && number < welchList.Count)
                         {
-                            return new IRCResponse(ResponseType.Say, welchList[number], message.ReplyTo);
+                            moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, welchList[number], message.ReplyTo));
+                            return;
                         }
                     }
                     // Number too large or small, or not a number at all
-                    return new IRCResponse(ResponseType.Say, "Invalid number, range is 1-" + welchList.Count, message.ReplyTo);
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Invalid number, range is 1-" + welchList.Count, message.ReplyTo));
+                    return;
                 }
                 // No specific thing requested
                 else
                 {
                     // Return a random thing
-                    return new IRCResponse(ResponseType.Say, welchList[rand.Next(welchList.Count)], message.ReplyTo);
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, welchList[rand.Next(welchList.Count)], message.ReplyTo));
+                    return;
                 }
             }
             else
             {
-                return null;
+                return;
             }
         }
     }

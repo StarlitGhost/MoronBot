@@ -14,27 +14,30 @@ namespace MoronBot.Functions
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             // Cheese in message
             if (Regex.IsMatch(message.MessageString, "cheese", RegexOptions.IgnoreCase))
             {
-                return new IRCResponse(ResponseType.Do, "loves cheese", message.ReplyTo);
+                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Do, "loves cheese", message.ReplyTo));
+                return;
             }
 
             // Windmill in message
             if (Regex.IsMatch(message.MessageString, "windmill", RegexOptions.IgnoreCase))
             {
-                return new IRCResponse(ResponseType.Say, "WINDMILLS DO NOT WORK THAT WAY!", message.ReplyTo);
+                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "WINDMILLS DO NOT WORK THAT WAY!", message.ReplyTo));
+                return;
             }
 
             // Someone has greeted MoronBot
             Match match = Regex.Match(message.MessageString, "^('?sup|hi|hey|hello|greetings|bonjour|salut|howdy|'?yo),?[ ]" + Settings.Instance.CurrentNick, RegexOptions.IgnoreCase);
             if (match.Success)
             {
-                return new IRCResponse(ResponseType.Say, match.Value.Split(' ')[0] + " " + message.User.Name, message.ReplyTo);
+                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, match.Value.Split(' ')[0] + " " + message.User.Name, message.ReplyTo));
+                return;
             }
-            return null;
+            return;
         }
     }
 }

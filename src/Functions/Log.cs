@@ -17,7 +17,7 @@ namespace MoronBot.Functions
             AccessLevel = AccessLevels.Anyone;
         }
         
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(log)$", RegexOptions.IgnoreCase))
             {
@@ -32,7 +32,7 @@ namespace MoronBot.Functions
                 if (chatLog[message.ReplyTo].Count > 10)
                     chatLog[message.ReplyTo].RemoveAt(0);
             }
-            return null;
+            return;
         }
 
         public void Output(BotMessage message, MoronBot moronBot)

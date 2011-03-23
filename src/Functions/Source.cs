@@ -17,7 +17,7 @@ namespace MoronBot.Functions
             AccessLevel = AccessLevels.Anyone;
         }
         
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(source)$", RegexOptions.IgnoreCase))
             {
@@ -26,18 +26,21 @@ namespace MoronBot.Functions
                     string command = moronBot.CommandList.Find(s => s.IndexOf(message.ParameterList[0], StringComparison.InvariantCultureIgnoreCase) >= 0);
                     if (command != null)
                     {
-                        return new IRCResponse(ResponseType.Say, "https://github.com/Tyranic-Moron/MoronBot/tree/master/src/Functions/" + command + ".cs", message.ReplyTo);
+                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "https://github.com/Tyranic-Moron/MoronBot/tree/master/src/Functions/" + command + ".cs", message.ReplyTo));
+                        return;
                     }
                     else
                     {
-                        return new IRCResponse(ResponseType.Say, "Function \"" + message.ParameterList[0] + "\" not found, linking to Functions directory instead: https://github.com/Tyranic-Moron/MoronBot/tree/master/src/Functions", message.ReplyTo);
+                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Function \"" + message.ParameterList[0] + "\" not found, linking to Functions directory instead: https://github.com/Tyranic-Moron/MoronBot/tree/master/src/Functions", message.ReplyTo));
+                        return;
                     }
                 }
-                return new IRCResponse(ResponseType.Say, "https://github.com/Tyranic-Moron/MoronBot/", message.ReplyTo);
+                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "https://github.com/Tyranic-Moron/MoronBot/", message.ReplyTo));
+                return;
             }
             else
             {
-                return null;
+                return;
             }
         }
     }

@@ -17,7 +17,7 @@ namespace MoronBot.Functions
             AccessList.Add("Tyranic-Moron");
         }
 
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(ignore)$", RegexOptions.IgnoreCase))
             {
@@ -28,11 +28,12 @@ namespace MoronBot.Functions
                         Settings.Instance.IgnoreList.Add(parameter);
                     }
                 }
-                return new IRCResponse(ResponseType.Say, message.Parameters + " are now ignored.", message.ReplyTo);
+                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, message.Parameters + " are now ignored.", message.ReplyTo));
+                return;
             }
             else
             {
-                return null;
+                return;
             }
         }
     }
@@ -49,7 +50,7 @@ namespace MoronBot.Functions
             AccessList.Add("Tyranic-Moron");
         }
 
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(unignore)$", RegexOptions.IgnoreCase))
             {
@@ -60,11 +61,12 @@ namespace MoronBot.Functions
                         Settings.Instance.IgnoreList.Remove(parameter);
                     }
                 }
-                return new IRCResponse(ResponseType.Say, message.Parameters + " are no longer ignored.", message.ReplyTo);
+                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, message.Parameters + " are no longer ignored.", message.ReplyTo));
+                return;
             }
             else
             {
-                return null;
+                return;
             }
         }
     }
