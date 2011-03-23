@@ -14,22 +14,22 @@ namespace MoronBot.Functions
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override IRCResponse GetResponse(BotMessage message, MoronBot moronBot)
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(np)$", RegexOptions.IgnoreCase))
             {
                 if (message.ParameterList.Count > 0)
                 {
-                    return null;
+                    return;
                 }
                 else
                 {
-                    return null;
+                    return;
                 }
             }
             else
             {
-                return null;
+                return;
             }
         }
     }
