@@ -21,7 +21,7 @@ namespace MoronBot.Functions
             if (Regex.IsMatch(message.Command, "^(bit\\.?ly|shorten)$", RegexOptions.IgnoreCase))
             {
                 // URL given
-                if (message.Parameters.Length > 0)
+                if (message.ParameterList.Count > 0)
                 {
                     // Check that the 'URL' given, is actually a URL
                     Match match = Regex.Match(message.Parameters, @"https?://[^\s]+", RegexOptions.IgnoreCase);

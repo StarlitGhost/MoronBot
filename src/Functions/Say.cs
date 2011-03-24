@@ -18,7 +18,7 @@ namespace MoronBot.Functions
         {
             if (Regex.IsMatch(message.Command, "^(say)$", RegexOptions.IgnoreCase))
             {
-                if (message.Parameters.Length > 0)
+                if (message.ParameterList.Count > 0)
                 {
                     moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, message.Parameters, message.ReplyTo));
                     return;
