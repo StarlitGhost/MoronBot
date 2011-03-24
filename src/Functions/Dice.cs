@@ -20,7 +20,7 @@ namespace MoronBot.Functions
         {
             if (Regex.IsMatch(message.Command, "^(roll)$", RegexOptions.IgnoreCase))
             {
-                if (message.Parameters.Length > 0)
+                if (message.ParameterList.Count > 0)
                 {
                     string diceString = message.Parameters.Replace(" ", "");
                     Match diceMatch = Regex.Match(diceString, "(\\+|\\-)?[0-9]+d[0-9]+");

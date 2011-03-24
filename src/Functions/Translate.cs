@@ -18,7 +18,7 @@ namespace MoronBot.Functions
         {
             if (Regex.IsMatch(message.Command, "^(translate)$", RegexOptions.IgnoreCase))
             {
-                if (message.Parameters.Length > 0)
+                if (message.ParameterList.Count > 0)
                 {
                     string translatedString;
                     try
