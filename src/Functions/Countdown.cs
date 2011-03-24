@@ -8,27 +8,18 @@ namespace MoronBot.Functions
 {
     class Countdown : Function
     {
-        public struct TellMessage
+        public struct Event
         {
-            public string From;
-            public string Message;
+            public string EventName;
+            public DateTime EventDate;
         }
 
-        struct UserDateNumber
-        {
-            public string User { get; set; }
-            public DateTime MessageTime { get; set; }
-            public uint Number { get; set; }
-        }
-
-        public static Dictionary<string, List<TellMessage>> MessageMap = new Dictionary<string, List<TellMessage>>();
-
-        List<UserDateNumber> userDateNumberList = new List<UserDateNumber>();
+        public static List<Event> eventList = new List<Event>();
 
         public Countdown(MoronBot moronBot)
         {
             Name = GetName();
-            Help = "countdown/time(un)till <event>\t\t- Tells you the amount of time left until the specified event.";
+            Help = "countdown/time(un)till (<event>)\t\t- Tells you the amount of time left until the specified event. Without a parameter, it will tell you how long until the next desertbus.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
