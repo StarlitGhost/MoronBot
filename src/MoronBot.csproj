@@ -95,6 +95,7 @@
     <Compile Include="Functions\Commands.cs" />
     <Compile Include="Functions\Countdown.cs" />
     <Compile Include="Functions\GitHub\LastCommit.cs" />
+    <Compile Include="Functions\NowPlaying.cs" />
     <Compile Include="Functions\Tell.cs" />
     <Compile Include="Functions\Welch.cs" />
     <Compile Include="Functions\Source.cs" />

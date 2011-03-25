@@ -111,6 +111,7 @@ namespace MoronBot
             functions.Add(new Functions.Tell(this)); functions.Add(new Functions.TellAuto(this));
             functions.Add(new Functions.Countdown(this)); functions.Add(new Functions.Event(this)); functions.Add(new Functions.Upcoming(this));
             functions.Add(new Functions.GitHub.LastCommit(this));
+            functions.Add(new Functions.NowPlaying(this));
 
             foreach (Functions.Function f in functions)
             {

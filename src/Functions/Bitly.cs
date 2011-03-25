@@ -18,17 +18,14 @@ namespace MoronBot.Functions
         
         public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
-            if (Regex.IsMatch(message.Command, "^(bit\\.?ly|shorten)$", RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(message.Command, @"^(bit\.?ly|shorten)$", RegexOptions.IgnoreCase))
             {
                 // URL given
                 if (message.ParameterList.Count > 0)
                 {
-                    // Check that the 'URL' given, is actually a URL
-                    Match match = Regex.Match(message.Parameters, @"https?://[^\s]+", RegexOptions.IgnoreCase);
-                    if (match.Success)
+                    string bitlyURL = Utilities.URL.Shorten(message.Parameters);
+                    if (bitlyURL != null)
                     {
-                        // Use the Bitly API to shorten the given URL
-                        string bitlyURL = API.Bit("tyranicmoron", "R_2cec505899bffdf2f88e0a15953661e6", match.Value, "Shorten");
                         moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, bitlyURL, message.ReplyTo));
                         return;
                     }

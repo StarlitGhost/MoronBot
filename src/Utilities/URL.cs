@@ -2,6 +2,9 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
+
+using Bitly;
 
 namespace MoronBot.Utilities
 {
@@ -55,6 +58,18 @@ namespace MoronBot.Utilities
                 // Propagate exceptions upwards
                 throw ex;
             }
+        }
+
+        public static string Shorten(string url)
+        {
+            // Check that the 'URL' given, is actually a URL
+            Match match = Regex.Match(url, @"https?://[^\s]+", RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                // Use the Bitly API to shorten the given URL
+                return API.Bit("tyranicmoron", "R_2cec505899bffdf2f88e0a15953661e6", match.Value, "Shorten");
+            }
+            return null;
         }
     }
 }
