@@ -23,7 +23,7 @@ namespace MoronBot.Functions.GitHub
                 Utilities.URL.WebPage commitFeed = Utilities.URL.FetchURL("https://github.com/Tyranic-Moron/MoronBot/commits/master.atom");
 
                 MatchCollection commitMessages = Regex.Matches(commitFeed.Page, @"width:81ex'>(.+)?\&lt;/pre>", RegexOptions.IgnoreCase);
-                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Last Commit: " + commitMessages[0].Groups[1].Value.Replace("\n", " | "), message.ReplyTo));
+                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Last Commit Message: " + commitMessages[0].Groups[1].Value.Replace("\n", " | "), message.ReplyTo));
 
             }
             else
