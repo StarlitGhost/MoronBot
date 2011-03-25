@@ -20,6 +20,35 @@ namespace MoronBot.Functions
                 EventName = name;
                 EventDate = date;
             }
+
+            public static int CompareEventStructsByDate(EventStruct a, EventStruct b)
+            {
+                if (a.EventDate == null)
+                {
+                    if (b.EventDate == null)
+                    {
+                        // Both null
+                        return 0;
+                    }
+                    else
+                    {
+                        // B is greater
+                        return -1;
+                    }
+                }
+                else
+                {
+                    if (b.EventDate == null)
+                    {
+                        // A is greater
+                        return 1;
+                    }
+                    else
+                    {
+                        return a.EventDate.CompareTo(b.EventDate);
+                    }
+                }
+            }
         }
 
         public static List<EventStruct> eventList = new List<EventStruct>();
@@ -156,6 +185,7 @@ namespace MoronBot.Functions
                         if (Countdown.eventList.FindIndex(s => s.EventName == eventStruct.EventName) < 0)
                         {
                             Countdown.eventList.Add(eventStruct);
+                            Countdown.eventList.Sort(Countdown.EventStruct.CompareEventStructsByDate);
                             moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString("dd-MM-yyyy \a\t HH:mm"), message.ReplyTo));
                             return;
                         }
@@ -195,7 +225,7 @@ namespace MoronBot.Functions
         public Upcoming(MoronBot moronBot)
         {
             Name = GetName();
-            Help = "upcoming\t\t- Tells you all of the events coming up in the next week.";
+            Help = "upcoming (<days>)\t\t- Tells you all of the events coming up in the next week, or the next <days>, if you give a number parameter.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
@@ -204,10 +234,18 @@ namespace MoronBot.Functions
         {
             if (Regex.IsMatch(message.Command, "^(upcoming)$", RegexOptions.IgnoreCase))
             {
+                double daysAhead = 7;
+                if (message.ParameterList.Count > 0)
+                {
+                    if (!Double.TryParse(message.ParameterList[0], out daysAhead))
+                    {
+                        daysAhead = 7;
+                    }
+                }
                 List<string> weekEvents = new List<string>();
                 foreach (Countdown.EventStruct weekEvent in Countdown.eventList)
                 {
-                    if (weekEvent.EventDate > DateTime.Now && weekEvent.EventDate < DateTime.Now.AddDays(7))
+                    if (weekEvent.EventDate > DateTime.Now && weekEvent.EventDate < DateTime.Now.AddDays(daysAhead))
                     {
                         weekEvents.Add(weekEvent.EventName);
                     }
@@ -222,13 +260,13 @@ namespace MoronBot.Functions
                     }
                     events = events.Remove(events.Length - 2);
 
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Events in the next 7 days:", message.ReplyTo));
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Events in the next " + daysAhead + " days:", message.ReplyTo));
                     moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, events, message.ReplyTo));
                     return;
                 }
                 else
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "There are no events in the coming week!", message.ReplyTo));
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "There are no events in the coming " + daysAhead + " days!", message.ReplyTo));
                     return;
                 }
             }
