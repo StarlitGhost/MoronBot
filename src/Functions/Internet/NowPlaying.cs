@@ -35,7 +35,14 @@ namespace MoronBot.Functions.Internet
 
                 if (message.ParameterList.Count > 0)
                 {
-                    lastfmName = message.ParameterList[0];
+                    if (AccountMap.ContainsKey(message.ParameterList[0].ToUpper()))
+                    {
+                        lastfmName = AccountMap[message.ParameterList[0].ToUpper()];
+                    }
+                    else
+                    {
+                        lastfmName = message.ParameterList[0];
+                    }
                 }
                 else
                 {
