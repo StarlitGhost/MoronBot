@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using CwIRC;
 using Bitly;
 
-namespace MoronBot.Functions
+namespace MoronBot.Functions.Internet
 {
     class NowPlaying : Function
     {

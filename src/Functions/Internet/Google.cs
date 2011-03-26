@@ -4,7 +4,7 @@ using CwIRC;
 
 using Gapi;
 
-namespace MoronBot.Functions
+namespace MoronBot.Functions.Internet
 {
     class Google : Function
     {

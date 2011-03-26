@@ -90,29 +90,29 @@
       <DependentUpon>formMoronBot.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\IRCMessage.cs" />
-    <Compile Include="Functions\Conversation.cs" />
-    <Compile Include="Functions\Bitly.cs" />
+    <Compile Include="Functions\Automatic\Conversation.cs" />
+    <Compile Include="Functions\Internet\Bitly.cs" />
     <Compile Include="Functions\Commands.cs" />
-    <Compile Include="Functions\Countdown.cs" />
+    <Compile Include="Functions\Utility\Countdown.cs" />
     <Compile Include="Functions\GitHub\LastCommit.cs" />
-    <Compile Include="Functions\NowPlaying.cs" />
-    <Compile Include="Functions\Tell.cs" />
-    <Compile Include="Functions\Welch.cs" />
-    <Compile Include="Functions\Source.cs" />
-    <Compile Include="Functions\RandomKicker.cs" />
-    <Compile Include="Functions\Log.cs" />
+    <Compile Include="Functions\Internet\NowPlaying.cs" />
+    <Compile Include="Functions\Utility\Tell.cs" />
+    <Compile Include="Functions\Fun\Welch.cs" />
+    <Compile Include="Functions\GitHub\Source.cs" />
+    <Compile Include="Functions\Automatic\RandomKicker.cs" />
+    <Compile Include="Functions\Utility\Log.cs" />
     <Compile Include="Functions\Function.cs" />
-    <Compile Include="Functions\KrozeStalker.cs" />
-    <Compile Include="Functions\Nick.cs" />
-    <Compile Include="Functions\Leave.cs" />
-    <Compile Include="Functions\Join.cs" />
-    <Compile Include="Functions\Say.cs" />
-    <Compile Include="Functions\Dice.cs" />
-    <Compile Include="Functions\Google.cs" />
-    <Compile Include="Functions\Ignore.cs" />
-    <Compile Include="Functions\Time.cs" />
-    <Compile Include="Functions\Translate.cs" />
-    <Compile Include="Functions\URLFollow.cs" />
+    <Compile Include="Functions\Automatic\KrozeStalker.cs" />
+    <Compile Include="Functions\Bot\Nick.cs" />
+    <Compile Include="Functions\Bot\Leave.cs" />
+    <Compile Include="Functions\Bot\Join.cs" />
+    <Compile Include="Functions\Bot\Say.cs" />
+    <Compile Include="Functions\Fun\Dice.cs" />
+    <Compile Include="Functions\Internet\Google.cs" />
+    <Compile Include="Functions\Bot\Ignore.cs" />
+    <Compile Include="Functions\Utility\Time.cs" />
+    <Compile Include="Functions\Internet\Translate.cs" />
+    <Compile Include="Functions\Automatic\URLFollow.cs" />
     <Compile Include="MoronBot.cs" />
     <Compile Include="Core\Parse.cs" />
     <Compile Include="Program.cs" />
@@ -180,6 +180,7 @@
     <Content Include="GAPI.dll" />
     <Content Include="GithubSharp.Core.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

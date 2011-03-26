@@ -4,7 +4,7 @@ using CwIRC;
 
 using Bitly;
 
-namespace MoronBot.Functions
+namespace MoronBot.Functions.Internet
 {
     class Bitly : Function
     {
