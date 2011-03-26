@@ -33,7 +33,8 @@ namespace MoronBot.Functions
 
         protected string GetName()
         {
-            return this.GetType().ToString().Split('.')[2];
+            string[] name = this.GetType().ToString().Split('.');
+            return name[name.Length - 1];
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 using CwIRC;
 using Bitly;
@@ -16,6 +18,13 @@ namespace MoronBot.Functions.Internet
             Help = "np (<user>)\t\t- Returns your currently playing music (from Last.fm). You can also supply a specific username to check.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            LoadLinks(Settings.Instance.Server + ".NowPlayingLinks.xml");
+        }
+
+        ~NowPlaying()
+        {
+            SaveLinks(Settings.Instance.Server + ".NowPlayingLinks.xml");
         }
 
         public override void GetResponse(BotMessage message, MoronBot moronBot)
@@ -53,17 +62,67 @@ namespace MoronBot.Functions.Internet
                 }
 
                 Match track = Regex.Match(recentFeed.Page, @"<item>\s*?<title>(?<band>.+?)–(?<song>.+?)</title>\s*?<link>(?<link>.+?)</link>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+                if (track.Success)
+                {
+                    string band = track.Groups["band"].Value;
+                    string song = track.Groups["song"].Value;
+                    string link = Utilities.URL.Shorten(track.Groups["link"].Value);
 
-                string band = track.Groups["band"].Value;
-                string song = track.Groups["song"].Value;
-                string link = Utilities.URL.Shorten(track.Groups["link"].Value);
-
-                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "\"" + song.Trim() + "\" by " + band.Trim() + " (" + link + ")", message.ReplyTo));
-                return;
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "\"" + song.Trim() + "\" by " + band.Trim() + " (" + link + ")", message.ReplyTo));
+                    return;
+                }
+                else
+                {
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "User \"" + lastfmName + "\" exists on Last.fm, but hasn't scrobbled any music to it", message.ReplyTo));
+                    return;
+                }
             }
             else
             {
                 return;
+            }
+        }
+
+        public void SaveLinks(string fileName)
+        {
+            XmlWriterSettings xws = new XmlWriterSettings();
+            xws.Indent = true;
+            xws.NewLineOnAttributes = true;
+            using (XmlWriter writer = XmlWriter.Create(fileName, xws))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("Links");
+
+                foreach (KeyValuePair<string, string> link in AccountMap)
+                {
+                    writer.WriteStartElement("Link");
+
+                    writer.WriteElementString("IRCName", link.Key);
+                    writer.WriteElementString("LastFMName", link.Value);
+
+                    writer.WriteEndElement();
+                }
+
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
+            }
+        }
+
+        public void LoadLinks(string fileName)
+        {
+            if (!File.Exists(fileName))
+                return;
+
+            XmlDocument doc = new XmlDocument();
+            doc.Load(new StreamReader(File.OpenRead(fileName)));
+            XmlNode root = doc.DocumentElement;
+
+            foreach (XmlNode linkNode in root.SelectNodes(@"/Links/Link"))
+            {
+                string IRCName = linkNode.SelectSingleNode("IRCName").FirstChild.Value;
+                string LastFMName = linkNode.SelectSingleNode("LastFMName").FirstChild.Value;
+
+                AccountMap.Add(IRCName, LastFMName);
             }
         }
     }
