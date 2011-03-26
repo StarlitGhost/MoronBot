@@ -46,6 +46,10 @@ namespace MoronBot
                     {
                         parameters = parameters.Remove(0, command.Length + 1);
                     }
+                    else
+                    {
+                        parameters = "";
+                    }
                 }
                 else
                 {
