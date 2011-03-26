@@ -19,23 +19,36 @@ namespace MoronBot.Functions
         {
             if (Regex.IsMatch(message.Command, "^(n(ow)?p(laying)?)$", RegexOptions.IgnoreCase))
             {
+                string lastfmName = "";
+
                 if (message.ParameterList.Count > 0)
                 {
-                    return;
+                    lastfmName = message.ParameterList[0];
                 }
                 else
                 {
-                    Utilities.URL.WebPage recentFeed = Utilities.URL.FetchURL("http://ws.audioscrobbler.com/1.0/user/" + message.User.Name + "/recenttracks.rss");
+                    lastfmName = message.User.Name;
+                }
 
-                    Match track = Regex.Match(recentFeed.Page, @"<item>.+?<title>(.+?)</title>.+?<link>(.+?)</link>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+                Utilities.URL.WebPage recentFeed = new Utilities.URL.WebPage();
 
-                    string name = track.Groups[1].Value;
-                    string link = Utilities.URL.Shorten(track.Groups[2].Value);
-
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, name + " (" + link + ")", message.ReplyTo));
-
+                try
+                {
+                    recentFeed = Utilities.URL.FetchURL("http://ws.audioscrobbler.com/1.0/user/" + lastfmName + "/recenttracks.rss");
+                }
+                catch (System.Net.WebException ex)
+                {
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "User \"" + lastfmName + "\" not found on Last.fm", message.ReplyTo));
                     return;
                 }
+
+                Match track = Regex.Match(recentFeed.Page, @"<item>\s*?<title>(.+?)</title>\s*?<link>(.+?)</link>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+
+                string name = track.Groups[1].Value;
+                string link = Utilities.URL.Shorten(track.Groups[2].Value);
+
+                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, name + " (" + link + ")", message.ReplyTo));
+                return;
             }
             else
             {
