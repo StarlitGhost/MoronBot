@@ -92,7 +92,7 @@ namespace MoronBot.Functions.Internet
                     {
                         NowPlaying.AccountMap.Add(message.User.Name.ToUpper(), message.ParameterList[0]);
                     }
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Last.fm account \"" + message.ParameterList[0] + "\" is now linked to IRC name \"" + message.User.Name + "\""));
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Last.fm account \"" + message.ParameterList[0] + "\" is now linked to IRC name \"" + message.User.Name + "\"", message.ReplyTo));
                     return;
                 }
                 else
