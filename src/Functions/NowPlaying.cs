@@ -42,12 +42,13 @@ namespace MoronBot.Functions
                     return;
                 }
 
-                Match track = Regex.Match(recentFeed.Page, @"<item>\s*?<title>(.+?)</title>\s*?<link>(.+?)</link>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+                Match track = Regex.Match(recentFeed.Page, @"<item>\s*?<title>(?<band>.+?)–(?<song>.+?)</title>\s*?<link>(?<link>.+?)</link>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
-                string name = track.Groups[1].Value;
-                string link = Utilities.URL.Shorten(track.Groups[2].Value);
+                string band = track.Groups["band"].Value;
+                string song = track.Groups["song"].Value;
+                string link = Utilities.URL.Shorten(track.Groups["link"].Value);
 
-                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, name + " (" + link + ")", message.ReplyTo));
+                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "\"" + song.Trim() + "\" by " + band.Trim() + " (" + link + ")", message.ReplyTo));
                 return;
             }
             else
