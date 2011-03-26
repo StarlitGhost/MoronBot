@@ -6,7 +6,7 @@ using System.Xml;
 
 using CwIRC;
 
-namespace MoronBot.Functions
+namespace MoronBot.Functions.Utility
 {
     class Tell : Function
     {

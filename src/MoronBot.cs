@@ -90,28 +90,40 @@ namespace MoronBot
             worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
             worker.WorkerReportsProgress = true;
 
-            functions.Add(new Functions.Say(this));
-            functions.Add(new Functions.Join(this));
-            functions.Add(new Functions.Leave(this));
-            functions.Add(new Functions.Nick(this));
-            functions.Add(new Functions.Time(this));
-            functions.Add(new Functions.Dice(this));
-            functions.Add(new Functions.Google(this));
-            functions.Add(new Functions.Translate(this));
-            functions.Add(new Functions.URLFollow(this));
-            functions.Add(new Functions.Ignore(this)); functions.Add(new Functions.Unignore(this));
-            functions.Add(new Functions.Conversation(this));
-            functions.Add(new Functions.KrozeStalker(this));
-            functions.Add(new Functions.Log(this));
-            functions.Add(new Functions.Bitly(this));
-            functions.Add(new Functions.RandomKicker(this));
-            functions.Add(new Functions.Source(this));
-            functions.Add(new Functions.Commands(this));
-            functions.Add(new Functions.Welch(this));
-            functions.Add(new Functions.Tell(this)); functions.Add(new Functions.TellAuto(this));
-            functions.Add(new Functions.Countdown(this)); functions.Add(new Functions.Event(this)); functions.Add(new Functions.Upcoming(this));
+            // Bot Functions
+            functions.Add(new Functions.Bot.Join(this));
+            functions.Add(new Functions.Bot.Leave(this));
+            functions.Add(new Functions.Bot.Nick(this));
+            functions.Add(new Functions.Bot.Ignore(this)); functions.Add(new Functions.Bot.Unignore(this));
+            functions.Add(new Functions.Bot.Say(this));
+
+            // Automatic Functions
+            functions.Add(new Functions.Automatic.Conversation(this));
+            functions.Add(new Functions.Automatic.KrozeStalker(this));
+            functions.Add(new Functions.Automatic.RandomKicker(this));
+            functions.Add(new Functions.Automatic.URLFollow(this));
+
+            // Internet Functions
+            functions.Add(new Functions.Internet.Bitly(this));
+            functions.Add(new Functions.Internet.Google(this));
+            functions.Add(new Functions.Internet.NowPlaying(this));
+            functions.Add(new Functions.Internet.Translate(this));
+
+            // GitHub Functions
             functions.Add(new Functions.GitHub.LastCommit(this));
-            functions.Add(new Functions.NowPlaying(this));
+            functions.Add(new Functions.GitHub.Source(this));
+
+            // Fun Functions
+            functions.Add(new Functions.Fun.Dice(this));
+            functions.Add(new Functions.Fun.Welch(this));
+
+            // Utility Functions
+            functions.Add(new Functions.Utility.Countdown(this)); functions.Add(new Functions.Utility.Event(this)); functions.Add(new Functions.Utility.Upcoming(this));
+            functions.Add(new Functions.Utility.Log(this));
+            functions.Add(new Functions.Utility.Tell(this)); functions.Add(new Functions.Utility.TellAuto(this));
+            functions.Add(new Functions.Utility.Time(this));
+
+            functions.Add(new Functions.Commands(this));
 
             foreach (Functions.Function f in functions)
             {

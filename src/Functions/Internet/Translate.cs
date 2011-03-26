@@ -2,7 +2,7 @@
 
 using CwIRC;
 
-namespace MoronBot.Functions
+namespace MoronBot.Functions.Internet
 {
     class Translate : Function
     {

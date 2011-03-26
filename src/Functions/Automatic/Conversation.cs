@@ -2,7 +2,7 @@
 
 using CwIRC;
 
-namespace MoronBot.Functions
+namespace MoronBot.Functions.Automatic
 {
     class Conversation : Function
     {

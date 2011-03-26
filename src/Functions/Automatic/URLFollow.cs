@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 using CwIRC;
 
-namespace MoronBot.Functions
+namespace MoronBot.Functions.Automatic
 {
     class URLFollow : Function
     {

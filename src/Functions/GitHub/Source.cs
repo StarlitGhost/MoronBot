@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 using CwIRC;
 
-namespace MoronBot.Functions
+namespace MoronBot.Functions.GitHub
 {
     class Source : Function
     {
