@@ -146,9 +146,9 @@ namespace MoronBot.Functions.Utility
         }
     }
 
-    class Event : Function
+    class AddEvent : Function
     {
-        public Event(MoronBot moronBot)
+        public AddEvent(MoronBot moronBot)
         {
             Name = GetName();
             Help = "(add)event <date> <event> \t\t- Adds an 'event' to the list of events used in Countdown. <date> is in dd-MM-yyyy format. You can put the date in brackets if you want to specify time and so forth.";
@@ -210,6 +210,54 @@ namespace MoronBot.Functions.Utility
                 else
                 {
                     moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "You didn't give a date and event!", message.ReplyTo));
+                    return;
+                }
+            }
+            else
+            {
+                return;
+            }
+        }
+    }
+
+    class RemoveEvent : Function
+    {
+        public RemoveEvent(MoronBot moronBot)
+        {
+            Name = GetName();
+            Help = "r(emove)event <event> \t\t- Removes the specified 'event' from the list of events used in Countdown.";
+            Type = Types.Command;
+            AccessLevel = AccessLevels.Anyone;
+        }
+
+        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        {
+            if (Regex.IsMatch(message.Command, "^(r(emove)?event)$", RegexOptions.IgnoreCase))
+            {
+                int index = -1;
+
+                if (message.ParameterList.Count > 0)
+                {
+                    index = Countdown.eventList.FindIndex(s => s.EventName == message.Parameters);
+                    if (index < 0)
+                    {
+                        index = Countdown.eventList.FindIndex(s => Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
+                    }
+                    if (index < 0)
+                    {
+                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in event list!", message.ReplyTo));
+                        return;
+                    }
+                    else
+                    {
+                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Event \"" + Countdown.eventList[index].EventName + "\", with date \"" + Countdown.eventList[index].EventDate.ToString() + "\" removed from the event list!", message.ReplyTo));
+                        Countdown.eventList.RemoveAt(index);
+                        return;
+                    }
+                }
+                else
+                {
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "You didn't specify an event to remove!", message.ReplyTo));
                     return;
                 }
             }
