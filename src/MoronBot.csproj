@@ -93,6 +93,7 @@
     <Compile Include="Functions\Automatic\Conversation.cs" />
     <Compile Include="Functions\Internet\Bitly.cs" />
     <Compile Include="Functions\Commands.cs" />
+    <Compile Include="Functions\Internet\RSSChecker.cs" />
     <Compile Include="Functions\Utility\Countdown.cs" />
     <Compile Include="Functions\GitHub\LastCommit.cs" />
     <Compile Include="Functions\Internet\NowPlaying.cs" />
