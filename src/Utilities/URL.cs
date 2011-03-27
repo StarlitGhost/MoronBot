@@ -33,15 +33,9 @@ namespace MoronBot.Utilities
                 System.Text.Encoding encode = System.Text.Encoding.UTF8;
                 StreamReader stream = new StreamReader(responseStream, encode);
 
-                Char[] buffer = new Char[256];
                 StringBuilder sb = new StringBuilder();
 
-                int count = stream.Read(buffer, 0, 256);
-                while (count > 0)
-                {
-                    sb.Append(buffer);
-                    count = stream.Read(buffer, 0, 256);
-                }
+                sb.Append(stream.ReadToEnd());
 
                 WebPage webPage = new WebPage();
 

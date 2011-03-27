@@ -14,18 +14,29 @@ namespace MoronBot.Functions.Internet
     {
         public struct Feed
         {
-            string URL;
-            DateTime LastUpdate;
+            public string URL;
+            public DateTime LastUpdate;
+
+            public Feed(string url, DateTime lastUpdate)
+            {
+                URL = url;
+                LastUpdate = lastUpdate;
+            }
         }
 
-        public static Dictionary<string, string> FeedMap = new Dictionary<string, string>();
+        public static Dictionary<string, Feed> FeedMap = new Dictionary<string, Feed>();
 
         public RSSChecker(MoronBot moronBot)
         {
             Name = GetName();
             Help = "Automatic function, scans RSS feeds and reports new items in the channel.";
-            Type = Types.Command;
+            Type = Types.Regex;
             AccessLevel = AccessLevels.Anyone;
+
+            Feed homestuck = new Feed();
+            homestuck.URL = "http://www.mspaintadventures.com/rss/rss.xml";
+            homestuck.LastUpdate = DateTime.Now.AddDays(-2);
+            FeedMap.Add("Homestuck", homestuck);
 
             //LoadFeeds(Settings.Instance.Server + ".Feeds.xml");
         }
@@ -37,18 +48,51 @@ namespace MoronBot.Functions.Internet
 
         public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
-            string feedURL = "http://www.mspaintadventures.com/rss/rss.xml";
+            //foreach (KeyValuePair<string, Feed> feed in FeedMap)
+            //{
 
-            XmlDocument doc = new XmlDocument();
 
-            HttpWebRequest request = WebRequest.Create(feedURL) as HttpWebRequest;
+                Utilities.URL.WebPage feedPage = Utilities.URL.FetchURL(FeedMap["Homestuck"].URL);
 
-            using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
-            {
-                StreamReader reader = new StreamReader(response.GetResponseStream());
-                doc.Load(reader);
+                XmlDocument feedDoc = new XmlDocument();
 
-            }
+                feedDoc.LoadXml(feedPage.Page);
+
+                XmlNode firstItem = feedDoc.SelectSingleNode(@"/rss/channel/item");
+
+                DateTime newestDate = new DateTime();
+                DateTime.TryParse(firstItem.SelectSingleNode("pubDate").FirstChild.Value, out newestDate);
+
+                if (newestDate > FeedMap["Homestuck"].LastUpdate)
+                {
+                    XmlNode oldestNew = feedDoc.SelectSingleNode(@"/rss/channel/item");
+
+                    int numUpdates = 0;
+
+                    foreach (XmlNode item in feedDoc.SelectNodes(@"/rss/channel/item"))
+                    {
+                        DateTime itemDate = new DateTime();
+                        DateTime.TryParse(item.SelectSingleNode("pubDate").FirstChild.Value, out itemDate);
+
+                        if (itemDate > FeedMap["Homestuck"].LastUpdate)
+                        {
+                            oldestNew = item;
+                            numUpdates++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    FeedMap["Homestuck"] = new Feed(FeedMap["Homestuck"].URL, newestDate);
+
+                    string itemTitle = oldestNew.SelectSingleNode("title").FirstChild.Value;
+                    string itemLink = oldestNew.SelectSingleNode("link").FirstChild.Value;
+
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Homestuck has updated, " + numUpdates + " new pages! New ones start here: " + itemTitle + " (" + itemLink + ")", message.ReplyTo));
+                }
+            //}
         }
 
         //public void SaveFeeds(string fileName)
