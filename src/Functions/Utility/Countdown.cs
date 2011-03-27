@@ -186,12 +186,12 @@ namespace MoronBot.Functions.Utility
                         {
                             Countdown.eventList.Add(eventStruct);
                             Countdown.eventList.Sort(Countdown.EventStruct.CompareEventStructsByDate);
-                            moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString("dd-MM-yyyy \a\t HH:mm"), message.ReplyTo));
+                            moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm"), message.ReplyTo));
                             return;
                         }
                         else
                         {
-                            moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString("dd-MM-yyyy \a\t HH:mm"), message.ReplyTo));
+                            moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm"), message.ReplyTo));
                             return;
                         }
 
