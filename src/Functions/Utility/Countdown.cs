@@ -273,14 +273,14 @@ namespace MoronBot.Functions.Utility
         public Upcoming(MoronBot moronBot)
         {
             Name = GetName();
-            Help = "upcoming (<days>)\t\t- Tells you all of the events coming up in the next week, or the next <days>, if you give a number parameter.";
+            Help = "upcoming/events (<days>)\t\t- Tells you all of the events coming up in the next week, or the next <days>, if you give a number parameter.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
 
         public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
-            if (Regex.IsMatch(message.Command, "^(upcoming)$", RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(message.Command, "^(upcoming|events)$", RegexOptions.IgnoreCase))
             {
                 double daysAhead = 7;
                 if (message.ParameterList.Count > 0)
