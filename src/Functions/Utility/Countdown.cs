@@ -151,14 +151,14 @@ namespace MoronBot.Functions.Utility
         public AddEvent(MoronBot moronBot)
         {
             Name = GetName();
-            Help = "(add)event <date> <event> \t\t- Adds an 'event' to the list of events used in Countdown. <date> is in dd-MM-yyyy format. You can put the date in brackets if you want to specify time and so forth.";
+            Help = "(add/set)event <date> <event> \t\t- Adds an 'event' to the list of events used in Countdown. <date> is in dd-MM-yyyy format. You can put the date in brackets if you want to specify time and so forth.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
 
         public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
-            if (Regex.IsMatch(message.Command, "^((add)?event)$", RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(message.Command, "^((add|set)?event)$", RegexOptions.IgnoreCase))
             {
                 if (message.ParameterList.Count > 1)
                 {
