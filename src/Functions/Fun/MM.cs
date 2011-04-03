@@ -31,6 +31,15 @@ namespace MoronBot.Functions.Fun
             mmFile.Close();
         }
         
+        ~MM()
+        {
+           StreamWriter mmFile = new StreamWriter("mm.txt");
+           for(string s : mmList) {
+              mmFile.write(s);
+           }
+           mmFile.Close();
+        }
+        
         public override void GetResponse(BotMessage message, MoronBot moronBot)
         {
             if (Regex.IsMatch(message.Command, "^(mm)$", RegexOptions.IgnoreCase))
@@ -38,19 +47,26 @@ namespace MoronBot.Functions.Fun
                 // Specific thing requested
                 if (message.ParameterList.Count > 0)
                 {
-                    int number = 0;
-                    if (Int32.TryParse(message.ParameterList[0], out number))
-                    {
-                        number -= 1;
-                        if (number >= 0 && number < mmList.Count)
-                        {
-                            moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, mmList[number], message.ReplyTo));
-                            return;
-                        }
-                    }
-                    // Number too large or small, or not a number at all
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Invalid number, range is 1-" + mmList.Count, message.ReplyTo));
-                    return;
+                   if(message.ParameterList[0].equals("add")) {
+                      string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
+                      int index = mmList.Count;
+                      mmList.add(index + ". " + msg);
+                      moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Message added at index " + index, message.ReplyTo));
+                   } else {
+                      int number = 0;
+                      if (Int32.TryParse(message.ParameterList[0], out number))
+                      {
+                           number -= 1;
+                           if (number >= 0 && number < mmList.Count)
+                           {
+                               moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, mmList[number], message.ReplyTo));
+                               return;
+                           }
+                       }
+                       // Number too large or small, or not a number at all
+                       moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Invalid number, range is 1-" + mmList.Count, message.ReplyTo));
+                       return;
+                   }
                 }
                 // No specific thing requested
                 else
