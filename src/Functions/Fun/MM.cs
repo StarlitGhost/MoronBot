@@ -33,9 +33,10 @@ namespace MoronBot.Functions.Fun
         
         ~MM()
         {
-           StreamWriter mmFile = new StreamWriter("mm.txt");
-           for(string s : mmList) {
-              mmFile.write(s);
+           StreamWriter mmFile = new StreamWriter(File.OpenWrite("mm.txt"));
+           foreach (string s in mmList)
+           {
+              mmFile.Write(s + "\n");
            }
            mmFile.Close();
         }
@@ -47,10 +48,10 @@ namespace MoronBot.Functions.Fun
                 // Specific thing requested
                 if (message.ParameterList.Count > 0)
                 {
-                   if(message.ParameterList[0].equals("add")) {
+                   if(message.ParameterList[0] == "add") {
                       string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
-                      int index = mmList.Count;
-                      mmList.add(index + ". " + msg);
+                      int index = mmList.Count + 1;
+                      mmList.Add(index + ". " + msg);
                       moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Message added at index " + index, message.ReplyTo));
                    } else {
                       int number = 0;
