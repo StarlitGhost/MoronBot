@@ -116,6 +116,7 @@ namespace MoronBot
 
             // Fun Functions
             functions.Add(new Functions.Fun.Dice(this));
+            functions.Add(new Functions.Fun.MM(this));
             functions.Add(new Functions.Fun.Welch(this));
 
             // Utility Functions
