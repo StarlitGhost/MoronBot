@@ -107,6 +107,7 @@ namespace MoronBot
             functions.Add(new Functions.Internet.Bitly(this));
             functions.Add(new Functions.Internet.Google(this));
             functions.Add(new Functions.Internet.NowPlaying(this)); functions.Add(new Functions.Internet.NowPlayingRegister(this));
+            functions.Add(new Functions.Internet.RSSChecker(this));
             functions.Add(new Functions.Internet.Translate(this));
 
             // GitHub Functions
