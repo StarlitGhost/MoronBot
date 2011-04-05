@@ -421,7 +421,7 @@ namespace MoronBot
                     ExecuteFunctionList(userListFunctions, message);
                     SendQueue();
 
-                    if (Settings.Instance.IgnoreList.Contains(message.User.Name))
+                    if (Settings.Instance.IgnoreList.Contains(message.User.Name.ToUpper()))
                         return;
 
                     ExecuteFunctionList(regexFunctions, message);

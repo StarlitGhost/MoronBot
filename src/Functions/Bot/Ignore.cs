@@ -23,9 +23,9 @@ namespace MoronBot.Functions.Bot
             {
                 foreach (string parameter in message.ParameterList)
                 {
-                    if (!Settings.Instance.IgnoreList.Contains(parameter))
+                    if (!Settings.Instance.IgnoreList.Contains(parameter.ToUpper()))
                     {
-                        Settings.Instance.IgnoreList.Add(parameter);
+                        Settings.Instance.IgnoreList.Add(parameter.ToUpper());
                     }
                 }
                 moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, message.Parameters + " are now ignored.", message.ReplyTo));
@@ -56,9 +56,9 @@ namespace MoronBot.Functions.Bot
             {
                 foreach (string parameter in message.ParameterList)
                 {
-                    if (!Settings.Instance.IgnoreList.Contains(parameter))
+                    if (Settings.Instance.IgnoreList.Contains(parameter.ToUpper()))
                     {
-                        Settings.Instance.IgnoreList.Remove(parameter);
+                        Settings.Instance.IgnoreList.Remove(parameter.ToUpper());
                     }
                 }
                 moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, message.Parameters + " are no longer ignored.", message.ReplyTo));
