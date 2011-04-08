@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -91,7 +92,7 @@ namespace MoronBot.Functions.Utility
                 {
                     eventStruct = eventList.Find(s => s.EventName == "Desert Bus 5");
                 }
-                timeSpan = eventStruct.EventDate - DateTime.Now;
+                timeSpan = eventStruct.EventDate - DateTime.UtcNow;
                 moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, eventStruct.EventName + " will occur in " + timeSpan.Days + " day(s) " + timeSpan.Hours + " hour(s) " + timeSpan.Minutes + " minute(s)", message.ReplyTo));
                 return;
             }
@@ -116,7 +117,7 @@ namespace MoronBot.Functions.Utility
                     writer.WriteStartElement("Event");
 
                     writer.WriteElementString("EventName", eventStruct.EventName);
-                    writer.WriteElementString("EventDate", eventStruct.EventDate.ToString());
+                    writer.WriteElementString("EventDate", eventStruct.EventDate.ToString(CultureInfo.InvariantCulture.DateTimeFormat));
 
                     writer.WriteEndElement();
                 }
@@ -139,7 +140,7 @@ namespace MoronBot.Functions.Utility
             {
                 EventStruct eventStruct = new EventStruct();
                 eventStruct.EventName = eventNode.SelectSingleNode("EventName").FirstChild.Value;
-                eventStruct.EventDate = DateTime.Parse(eventNode.SelectSingleNode("EventDate").FirstChild.Value);
+                eventStruct.EventDate = DateTime.Parse(eventNode.SelectSingleNode("EventDate").FirstChild.Value, CultureInfo.InvariantCulture.DateTimeFormat);
 
                 Countdown.eventList.Add(eventStruct);
             }
@@ -171,12 +172,14 @@ namespace MoronBot.Functions.Utility
                         if (dateMessage.Success)
                         {
                             parseSuccess = DateTime.TryParse(dateMessage.Groups[1].Value, out eventStruct.EventDate);
+                            eventStruct.EventDate = DateTime.SpecifyKind(eventStruct.EventDate, DateTimeKind.Utc);
                             eventStruct.EventName = dateMessage.Groups[2].Value;
                         }
                     }
                     else
                     {
                         parseSuccess = DateTime.TryParse(message.ParameterList[0], out eventStruct.EventDate);
+                        eventStruct.EventDate = DateTime.SpecifyKind(eventStruct.EventDate, DateTimeKind.Utc);
                         eventStruct.EventName = message.Parameters.Remove(0, message.ParameterList[0].Length + 1);
                     }
                     
@@ -293,7 +296,7 @@ namespace MoronBot.Functions.Utility
                 List<string> weekEvents = new List<string>();
                 foreach (Countdown.EventStruct weekEvent in Countdown.eventList)
                 {
-                    if (weekEvent.EventDate > DateTime.Now && weekEvent.EventDate < DateTime.Now.AddDays(daysAhead))
+                    if (weekEvent.EventDate > DateTime.UtcNow && weekEvent.EventDate < DateTime.UtcNow.AddDays(daysAhead))
                     {
                         weekEvents.Add(weekEvent.EventName);
                     }
