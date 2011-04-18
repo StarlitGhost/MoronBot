@@ -96,6 +96,7 @@ namespace MoronBot
             functions.Add(new Functions.Bot.Nick(this));
             functions.Add(new Functions.Bot.Ignore(this)); functions.Add(new Functions.Bot.Unignore(this));
             functions.Add(new Functions.Bot.Say(this));
+            functions.Add(new Functions.Bot.Do(this));
 
             // Automatic Functions
             functions.Add(new Functions.Automatic.Conversation(this));
@@ -126,6 +127,7 @@ namespace MoronBot
             functions.Add(new Functions.Utility.Time(this));
 
             functions.Add(new Functions.Commands(this));
+            functions.Add(new Functions.CTCP(this));
 
             foreach (Functions.Function f in functions)
             {

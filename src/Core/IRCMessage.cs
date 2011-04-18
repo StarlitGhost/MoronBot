@@ -50,6 +50,18 @@ namespace CwIRC
             get { return rawMessage; }
         }
 
+        bool ctcp = false;
+        public bool CTCP
+        {
+            get { return ctcp; }
+        }
+
+        string ctcpString;
+        public string CTCPString
+        {
+            get { return ctcpString; }
+        }
+
         public IRCMessage(string p_message)
         {
             rawMessage = p_message;
@@ -94,6 +106,16 @@ namespace CwIRC
                     if (messageString.StartsWith(":"))
                     {
                         messageString = messageString.Substring(1, messageString.Length - 1);
+                    }
+
+                    if (MessageString[0] == Convert.ToChar((byte)1))
+                    {
+                        int messageEnd = MessageString.IndexOf(Convert.ToChar((byte)1), 1);
+                        if (messageEnd > 1)
+                        {
+                            ctcpString = MessageString.Substring(1, messageEnd - 1);
+                            ctcp = true;
+                        }
                     }
                 }
             }

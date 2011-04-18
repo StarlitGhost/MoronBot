@@ -8,7 +8,7 @@ namespace MoronBot.Functions.Automatic
     {
         public Conversation(MoronBot moronBot)
         {
-            Name = GetName(); ;
+            Name = GetName();
             Help = "A set of automatic functions that react to specific keywords/phrases in chat.";
             Type = Types.Regex;
             AccessLevel = AccessLevels.Anyone;

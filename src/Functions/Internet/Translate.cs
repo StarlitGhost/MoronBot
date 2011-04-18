@@ -8,7 +8,7 @@ namespace MoronBot.Functions.Internet
     {
         public Translate(MoronBot moronBot)
         {
-            Name = this.GetType().ToString().Split('.')[2];
+            Name = GetName();
             Help = "translate <sentence>\t- Translates the given sentence to English.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;

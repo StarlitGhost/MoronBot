@@ -91,6 +91,8 @@
     </Compile>
     <Compile Include="Core\IRCMessage.cs" />
     <Compile Include="Functions\Automatic\Conversation.cs" />
+    <Compile Include="Functions\Bot\Do.cs" />
+    <Compile Include="Functions\CTCP.cs" />
     <Compile Include="Functions\Fun\MM.cs" />
     <Compile Include="Functions\Internet\Bitly.cs" />
     <Compile Include="Functions\Commands.cs" />

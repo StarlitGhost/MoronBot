@@ -10,7 +10,7 @@ namespace MoronBot.Functions.Internet
     {
         public Google(MoronBot moronBot)
         {
-            Name = GetName(); ;
+            Name = GetName();
             Help = "google/search/find <terms>\t- Gives you the first google search result for a given search term.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
