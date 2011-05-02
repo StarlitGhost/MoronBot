@@ -21,7 +21,7 @@ namespace MoronBot.Functions.Utility
         {
             if (Regex.IsMatch(message.Command, "^(time)$", RegexOptions.IgnoreCase))
             {
-                DateTime date = DateTime.UtcNow;
+                DateTime date = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "GMT Standard Time");
 
                 if (message.ParameterList.Count > 0)
                 {
