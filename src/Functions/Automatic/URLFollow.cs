@@ -23,6 +23,11 @@ namespace MoronBot.Functions.Automatic
             Match match = Regex.Match(message.MessageString, @"https?://[^\s]+", RegexOptions.IgnoreCase);
             if (match.Success)
             {
+                if (Regex.IsMatch(match.Value, @"\.(jpg|gif|png)$"))
+                {
+                    return;
+                }
+
                 Utilities.URL.WebPage webPage;
                 try
                 {
@@ -50,7 +55,9 @@ namespace MoronBot.Functions.Automatic
                     // Trim excess whitespace
                     title = "Title: " + match.Groups[1].Value.Trim();
                     // Remove newlines
-                    title = Regex.Replace(title, @"(\r|\n|)", "", RegexOptions.IgnoreCase);
+                    title = Regex.Replace(title, @"(\r|\n)", " ", RegexOptions.IgnoreCase);
+                    // Reduce multiple spaces to a single space
+                    title = Regex.Replace(title, @"(\s+)", " ", RegexOptions.IgnoreCase);
                 }
                 // No title tags found
                 else

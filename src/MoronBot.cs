@@ -100,8 +100,8 @@ namespace MoronBot
 
             // Automatic Functions
             functions.Add(new Functions.Automatic.Conversation(this));
-            functions.Add(new Functions.Automatic.KrozeStalker(this));
-            functions.Add(new Functions.Automatic.RandomKicker(this));
+            //functions.Add(new Functions.Automatic.KrozeStalker(this));
+            //functions.Add(new Functions.Automatic.RandomKicker(this)); // 'Kick Gir'
             functions.Add(new Functions.Automatic.URLFollow(this));
 
             // Internet Functions
