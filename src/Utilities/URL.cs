@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 
 using Bitly;
 
@@ -64,6 +65,57 @@ namespace MoronBot.Utilities
                 return API.Bit("tyranicmoron", "R_2cec505899bffdf2f88e0a15953661e6", match.Value, "Shorten");
             }
             return null;
+        }
+
+        public static string Pastebin(string text, string title)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://pastebin.com/api/api_post.php");
+            request.Method = "POST";
+            request.ContentType = "application/x-www-form-urlencoded";
+
+            string api_dev_key = "103e700947c8d6782b3fb99c85ae4d9f";
+            string api_option = "paste";
+            string api_paste_code = text;
+
+            string api_user_key = "";
+            string api_paste_name = title;
+            string api_paste_format = "text";
+            string api_paste_private = "0";
+            string api_paste_expire_date = "10M";
+
+            string postData =
+                "api_dev_key=" + HttpUtility.UrlEncode(api_dev_key) +
+                "&api_option=" + HttpUtility.UrlEncode(api_option) +
+                "&api_paste_code=" + HttpUtility.UrlEncode(api_paste_code) +
+
+                "&api_user_key=" + HttpUtility.UrlEncode(api_user_key) +
+                "&api_paste_name=" + HttpUtility.UrlEncode(api_paste_name) +
+                "&api_paste_format=" + HttpUtility.UrlEncode(api_paste_format) +
+                "&api_paste_private=" + HttpUtility.UrlEncode(api_paste_private) +
+                "&api_paste_expire_date=" + HttpUtility.UrlEncode(api_paste_expire_date);
+
+            UTF8Encoding encoding = new UTF8Encoding();
+            byte[] bytes = encoding.GetBytes(postData);
+
+            request.ContentLength = bytes.Length;
+
+            using (Stream writeStream = request.GetRequestStream())
+            {
+                writeStream.Write(bytes, 0, bytes.Length);
+            }
+
+            string result;
+            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+            {
+                using (Stream responseStream = response.GetResponseStream())
+                {
+                    using (StreamReader readStream = new StreamReader(responseStream, Encoding.UTF8))
+                    {
+                        result = readStream.ReadToEnd();
+                    }
+                }
+            }
+            return result;
         }
     }
 }

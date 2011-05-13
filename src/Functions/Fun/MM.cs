@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 
 using CwIRC;
+using MoronBot.Utilities;
 
 namespace MoronBot.Functions.Fun
 {
@@ -48,12 +49,25 @@ namespace MoronBot.Functions.Fun
                 // Specific thing requested
                 if (message.ParameterList.Count > 0)
                 {
-                   if(message.ParameterList[0] == "add") {
+                   if(message.ParameterList[0] == "add")
+                   {
                       string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
                       int index = mmList.Count + 1;
                       mmList.Add(index + ". " + msg);
                       moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Message added at index " + index, message.ReplyTo));
-                   } else {
+                   }
+                   else if (message.ParameterList[0] == "list")
+                   {
+                       string list = "";
+                       foreach (string item in mmList)
+                       {
+                           list += item + "\n";
+                       }
+                       string url = URL.Pastebin(list, "M&M List");
+                       moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "M&M list posted: " + url + " (link expires in 10 mins)", message.ReplyTo));
+                   }
+                   else
+                   {
                       int number = 0;
                       if (Int32.TryParse(message.ParameterList[0], out number))
                       {
