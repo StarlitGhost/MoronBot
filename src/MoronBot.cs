@@ -17,6 +17,8 @@ using System.Xml.Serialization;
 
 using CwIRC;
 
+using MoronBot.Utilities;
+
 namespace MoronBot
 {
     /// <summary>
@@ -70,6 +72,7 @@ namespace MoronBot
         }
 
         public List<IRCResponse> MessageQueue = new List<IRCResponse>();
+
 
         #endregion Variables
 
@@ -185,7 +188,7 @@ namespace MoronBot
         /// <param name="p_target">The channel or user to send the message to.</param>
         public void Say(string p_message, string p_target)
         {
-            Program.form.txtIRC_Update(p_target + " <" + desiredNick + "> " + p_message);
+            Log("<" + desiredNick + "> " + p_message, p_target);
             cwIRC.PRIVMSG(p_message, p_target);
         }
         /// <summary>
@@ -195,7 +198,7 @@ namespace MoronBot
         /// <param name="p_target">The channel or user to send the notice to.</param>
         public void Notice(string p_message, string p_target)
         {
-            Program.form.txtIRC_Update(p_target + " [" + desiredNick + "] " + p_message);
+            Log("[" + desiredNick + "] " + p_message, p_target);
             cwIRC.NOTICE(p_message, p_target);
         }
         /// <summary>
@@ -205,7 +208,7 @@ namespace MoronBot
         /// <param name="p_target">The channel or user to send the ACTION message to.</param>
         public void Do(string p_action, string p_target)
         {
-            Program.form.txtIRC_Update(p_target + " " + desiredNick + " " + p_action);
+            Log("*" + desiredNick + " " + p_action + "*", p_target);
             char ctcpChar = Convert.ToChar((byte)1);
             cwIRC.PRIVMSG(ctcpChar + "ACTION " + p_action + ctcpChar, p_target);
         }
@@ -270,122 +273,85 @@ namespace MoronBot
             if (message.Type == "PING")
             {
                 cwIRC.SendData("PONG " + message.MessageString);
+                return;
             }
-            else
+
+            string parameter = message.MessageList[2].TrimStart(':');
+
+            string logText = "";
+
+            switch (message.Type)
             {
-                if (message.Type != "PRIVMSG")
-                {
-                    string parameter = message.MessageList[2].TrimStart(':');
-                    
-                    // Server full, connect to another
-                    if (message.Type == "010")
+                case "010": // Server full, connect to another
+                    cwIRC.Connect(message.MessageList[3], Int32.Parse(message.MessageList[4]));
+                    cwIRC.NICK(desiredNick);
+                    cwIRC.USER(desiredNick, "Meh", "Whatever", "MoronBot 0.1.6");
+                    break;
+                case "332": // Current Topic
+                    break;
+                case "333": // Who set the current topic, and when
+                    break;
+                case "353": // User List
+                    Channel newChannel = new Channel();
+                    newChannel.Name = message.MessageList[4];
+                    List<string> Users = new List<string>();
+                    for (int i = 5; i < message.MessageList.Count; i++)
                     {
-                        cwIRC.Connect(message.MessageList[3], Int32.Parse(message.MessageList[4]));
-                        cwIRC.NICK(desiredNick);
-                        cwIRC.USER(desiredNick, "Meh", "Whatever", "MoronBot 0.1.6");
-                    }
-
-                    // User List
-                    if (message.Type == "353")
-                    {
-                        Channel newChannel = new Channel();
-                        newChannel.Name = message.MessageList[4];
-                        List<string> Users = new List<string>();
-                        for (int i = 5; i < message.MessageList.Count; i++)
+                        if (message.MessageList[i].Length > 0)
                         {
-                            if (message.MessageList[i].Length > 0)
+                            Users.Add(message.MessageList[i].TrimStart(':'));
+                        }
+                    }
+                    Users.Sort();
+                    newChannel.Users = Users;
+                    channels.Add(newChannel);
+                    Program.form.RefreshListBox();
+                    break;
+                case "376": // Nick accepted?
+                    cwIRC.JOIN(Settings.Instance.Channel);
+                    break;
+                case "433": // Nick In Use
+                    nickUsedCount++;
+                    cwIRC.NICK(desiredNick + nickUsedCount);
+                    break;
+                case "NICK":
+                    if (message.User.Name == nick)
+                    {
+                        nick = parameter;
+                        Settings.Instance.CurrentNick = nick;
+                        Program.form.Text = nick;
+                    }
+                    Program.form.RefreshListBox();
+                    Log(message.User.Name + " is now known as " + parameter, parameter);
+                    break;
+                case "JOIN":
+                    if (message.User.Name != nick)
+                    {
+                        for (int i = 0; i < channels.Count; i++)
+                        {
+                            if (channels[i].Name == message.MessageList[2].TrimStart(':'))
                             {
-                                Users.Add(message.MessageList[i].TrimStart(':'));
+                                if (!channels[i].Users.Contains(message.User.Name))
+                                    channels[i].Users.Add(message.User.Name);
                             }
                         }
-                        Users.Sort();
-                        newChannel.Users = Users;
-                        channels.Add(newChannel);
                         Program.form.RefreshListBox();
                     }
-
-                    // Nick accepted?
-                    if (message.Type == "376")
+                    Log(message.User.Name + " joined " + parameter, parameter);
+                    break;
+                case "PART":
+                    if (message.User.Name == nick)
                     {
-                        cwIRC.JOIN(Settings.Instance.Channel);
-                    }
-
-                    // Nick In Use
-                    if (message.Type == "433")
-                    {
-                        nickUsedCount++;
-                        cwIRC.NICK(desiredNick + nickUsedCount);
-                        return;
-                    }
-
-                    #region Messages in Channel
-
-                    #region Nick Change
-                    if (message.Type == "NICK")
-                    {
-                        Program.form.txtIRC_Update(message.User.Name + " is now known as " + parameter);
-                        if (message.User.Name == nick)
+                        for (int i = channels.Count - 1; i >= 0; i--)
                         {
-                            nick = parameter;
-                            Settings.Instance.CurrentNick = nick;
-                            Program.form.Text = nick;
-                        }
-                        Program.form.RefreshListBox();
-                        return;
-                    }
-                    #endregion Nick Change
-
-                    #region Join
-                    if (message.Type == "JOIN")
-                    {
-                        if (message.User.Name != nick)
-                        {
-                            for (int i = 0; i < channels.Count; i++)
+                            if (channels[i].Name == parameter)
                             {
-                                if (channels[i].Name == message.MessageList[2].TrimStart(':'))
-                                {
-                                    if (!channels[i].Users.Contains(message.User.Name))
-                                        channels[i].Users.Add(message.User.Name);
-                                }
-                            }
-                            Program.form.RefreshListBox();
-                        }
-                        Program.form.txtIRC_Update(message.User.Name + " joined " + parameter);
-                        return;
-                    }
-                    #endregion Join
-
-                    #region Leave
-                    if (message.Type == "PART")
-                    {
-                        if (message.User.Name == nick)
-                        {
-                            for (int i = channels.Count - 1; i >= 0 ; i--)
-                            {
-                                if (channels[i].Name == parameter)
-                                {
-                                    channels.RemoveAt(i);
-                                    //Program.form.RefreshListBox();
-                                }
+                                channels.RemoveAt(i);
+                                //Program.form.RefreshListBox();
                             }
                         }
-                        else
-                        {
-                            for (int i = 0; i < channels.Count ; i++)
-                            {
-                                if (channels[i].Name == message.MessageList[2].TrimStart(':'))
-                                {
-                                    channels[i].Users.Remove(message.User.Name);
-                                }
-                            }
-                        }
-                        Program.form.txtIRC_Update(message.User.Name + " left " + parameter + " message: " +  String.Join(" ", message.MessageList.ToArray(), 3, message.MessageList.Count - 3).TrimStart(':'));
-                        return;
                     }
-                    #endregion Leave
-
-                    #region Quit
-                    if (message.Type == "QUIT")
+                    else
                     {
                         for (int i = 0; i < channels.Count; i++)
                         {
@@ -394,31 +360,99 @@ namespace MoronBot
                                 channels[i].Users.Remove(message.User.Name);
                             }
                         }
-                        Program.form.txtIRC_Update(message.User.Name + " quit, message: " + String.Join(" ", message.MessageList.ToArray(), 2, message.MessageList.Count - 2));
                     }
-                    #endregion Quit
 
-                    if (message.Type == "KICK")
+                    logText = message.User.Name + " left " + parameter + " message: " + String.Join(" ", message.MessageList.ToArray(), 3, message.MessageList.Count - 3).TrimStart(':');
+
+                    Log(logText, parameter);
+                    break;
+                case "QUIT":
+                    for (int i = 0; i < channels.Count; i++)
                     {
-                        if (message.MessageList[3] == nick)
+                        if (channels[i].Name == message.MessageList[2].TrimStart(':'))
                         {
-                            for (int i = channels.Count - 1; i >= 0; i--)
-                            {
-                                if (channels[i].Name == parameter)
-                                {
-                                    channels.RemoveAt(i);
-                                    //Program.form.RefreshListBox();
-                                }
-                            }
-                            cwIRC.JOIN(message.MessageList[2]);
+                            channels[i].Users.Remove(message.User.Name);
                         }
                     }
 
-                    #endregion Messages in Channel
-                }
-                else
-                {
-                    Program.form.txtIRC_Update(message.ReplyTo + " <" + message.User.Name + "> " + message.MessageString);
+                    logText = message.User.Name + " quit, message: " + String.Join(" ", message.MessageList.ToArray(), 2, message.MessageList.Count - 2);
+
+                    Log(logText, parameter);
+                    break;
+                case "KICK":
+                    if (message.MessageList[3] == nick)
+                    {
+                        for (int i = channels.Count - 1; i >= 0; i--)
+                        {
+                            if (channels[i].Name == parameter)
+                            {
+                                channels.RemoveAt(i);
+                                //Program.form.RefreshListBox();
+                            }
+                        }
+                        cwIRC.JOIN(message.MessageList[2]);
+                    }
+
+                    logText = message.User.Name + " kicked " + message.MessageList[3];
+
+                    Log(logText, parameter);
+                    break;
+                case "MODE":
+                    string setter = message.User.Name.TrimStart(':');
+                    string modes = message.MessageList[3].TrimStart(':');
+                    string targets = "";
+                    if (message.MessageList.Count > 4)
+                    {
+                        for (int i = 4; i < message.MessageList.Count; ++i)
+                        {
+                            if (i < message.MessageList.Count - 1)
+                            {
+                                targets += message.MessageList[i] + " ";
+                            }
+                            else
+                            {
+                                targets += message.MessageList[i];
+                            }
+                        }
+                    }
+                    else
+                    {
+                        targets = message.MessageList[2];
+                    }
+                    string channel = message.MessageList[2];
+                    Log("# " + setter + " set mode: " + modes + " " + targets, channel);
+                    break;
+                case "TOPIC":
+                    Log("# " + message.User.Name + " changed the topic to: " + message.MessageString, message.ReplyTo);
+                    break;
+                case "NOTICE":
+                case "001":
+                case "002":
+                case "003":
+                case "004":
+                case "005":
+                case "251":
+                case "252":
+                case "253":
+                case "254":
+                case "255":
+                case "265":
+                case "266":
+                case "375":
+                case "372":
+                case "366":
+                    break;
+                case "PRIVMSG": // User messages
+                    char ctcpChar = Convert.ToChar((byte)1);
+                    string action = ctcpChar + "ACTION ";
+                    if (message.MessageString.StartsWith(action))
+                    {
+                        Log("*" + message.User.Name + " " + message.MessageString.Replace(action, "").TrimEnd(ctcpChar) + "*", message.ReplyTo);
+                    }
+                    else
+                    {
+                        Log("<" + message.User.Name + "> " + message.MessageString, message.ReplyTo);
+                    }
 
                     ExecuteFunctionList(userListFunctions, message);
                     SendQueue();
@@ -429,7 +463,6 @@ namespace MoronBot
                     ExecuteFunctionList(regexFunctions, message);
                     SendQueue();
 
-                    #region Bot Commands
                     Match match = Regex.Match(message.MessageString, "^(\\||" + nick + "(,|:)?[ ])", RegexOptions.IgnoreCase);
                     if (match.Success)
                     {
@@ -441,10 +474,12 @@ namespace MoronBot
                             cwIRC.SendData("PASS mOrOnBoTuS");
                         }
                     }
-                    #endregion Bot Commands
 
                     SendQueue();
-                }
+                    break;
+                default:
+                    Log(message.RawMessage, "-unknown");
+                    break;
             }
         }
 
@@ -549,5 +584,16 @@ namespace MoronBot
             streamWriter.Close();
         }
         #endregion settings.xml
+
+        void Log(string data, string fileName)
+        {
+            DateTime date = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "GMT Standard Time");
+
+            string timeData = date.ToString(@"[HH:mm] ") + data;
+            Program.form.txtIRC_Update(fileName + " " + timeData);
+
+            string fileDate = date.ToString(@" yyyy-MM-dd");
+            Logger.Write(timeData, @".\logs\" + Settings.Instance.Server + fileDate + @"\" + fileName + @".txt");
+        }
     }
 }

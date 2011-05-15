@@ -1,19 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 
 using CwIRC;
+using MoronBot.Utilities;
 
 namespace MoronBot.Functions.Utility
 {
     class Log : Function
     {
-        Dictionary<string, List<string>> chatLog = new Dictionary<string, List<string>>();
-
         public Log(MoronBot moronBot)
         {
             Name = GetName();
-            Help = "log\t\t- Sends you the last 10 things that were said in the channel you are in.";
-            Type = Types.Regex;
+            Help = "log\t\t- Posts the daily log to pastebin.com, and returns a link to it.";
+            Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
         
@@ -21,33 +22,39 @@ namespace MoronBot.Functions.Utility
         {
             if (Regex.IsMatch(message.Command, "^(log)$", RegexOptions.IgnoreCase))
             {
-                Output(message, moronBot);
+                DateTime date = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "GMT Standard Time");
+
+                if (message.ParameterList.Count > 0)
+                {
+                    int dayOffset;
+                    if (Int32.TryParse(message.ParameterList[0], out dayOffset))
+                    {
+                        if (dayOffset < 0 && dayOffset > -99999)
+                        {
+                            date = date.AddDays(dayOffset);
+                        }
+                    }
+                }
+
+                string fileDate = date.ToString(@" yyyy-MM-dd");
+                string filePath = @".\logs\" + Settings.Instance.Server + fileDate + @"\" + message.ReplyTo + @".txt";
+
+                if (File.Exists(filePath))
+                {
+                    using (StreamReader reader = new StreamReader(filePath))
+                    {
+                        string logText = reader.ReadToEnd();
+
+                        string logLink = URL.Pastebin(logText, message.ReplyTo + " Log" + fileDate);
+
+                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Log for" + fileDate + " posted: " + logLink + " (link expires in 10 mins)", message.ReplyTo));
+                    }
+                }
+                else
+                {
+                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "I don't have a log file for" + fileDate + " :(", message.ReplyTo));
+                }
             }
-            else
-            {
-                if (!chatLog.ContainsKey(message.ReplyTo))
-                    chatLog[message.ReplyTo] = new List<string>();
-
-                chatLog[message.ReplyTo].Add("<" + message.User.Name + "> " + message.MessageString);
-                if (chatLog[message.ReplyTo].Count > 10)
-                    chatLog[message.ReplyTo].RemoveAt(0);
-            }
-            return;
-        }
-
-        public void Output(BotMessage message, MoronBot moronBot)
-        {
-            List<IRCResponse> responseList = new List<IRCResponse>();
-
-            if (!(chatLog[message.ReplyTo].Count > 0))
-                return;
-
-            foreach (string line in chatLog[message.ReplyTo])
-            {
-                responseList.Add(new IRCResponse(ResponseType.Notice, line, message.User.Name));
-            }
-
-            moronBot.MessageQueue.AddRange(responseList);
         }
     }
 }
