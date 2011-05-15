@@ -260,6 +260,17 @@ namespace MoronBot
                 MessageQueue.Clear();
             }
         }
+
+        void Log(string data, string fileName)
+        {
+            DateTime date = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "GMT Standard Time");
+
+            string timeData = date.ToString(@"[HH:mm] ") + data;
+            Program.form.txtIRC_Update(fileName + " " + timeData);
+
+            string fileDate = date.ToString(@" yyyy-MM-dd");
+            Logger.Write(timeData, @".\logs\" + Settings.Instance.Server + fileDate + @"\" + fileName + @".txt");
+        }
         #endregion Basic Operations
 
         /// <summary>
@@ -584,16 +595,5 @@ namespace MoronBot
             streamWriter.Close();
         }
         #endregion settings.xml
-
-        void Log(string data, string fileName)
-        {
-            DateTime date = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "GMT Standard Time");
-
-            string timeData = date.ToString(@"[HH:mm] ") + data;
-            Program.form.txtIRC_Update(fileName + " " + timeData);
-
-            string fileDate = date.ToString(@" yyyy-MM-dd");
-            Logger.Write(timeData, @".\logs\" + Settings.Instance.Server + fileDate + @"\" + fileName + @".txt");
-        }
     }
 }
