@@ -79,7 +79,7 @@ namespace MoronBot.Functions.Utility
                 if (message.ParameterList.Count > 1)
                 {
                     string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
-                    if (msg.Replace(' ','').Length > 0)
+                    if (msg.Trim(' ').Length > 0)
                     {
                         if (!MessageMap.ContainsKey(message.ParameterList[0].ToUpper()))
                         {

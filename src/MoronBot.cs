@@ -124,6 +124,7 @@ namespace MoronBot
             functions.Add(new Functions.Fun.Welch(this));
 
             // Utility Functions
+            functions.Add(new Functions.Utility.Calc(this));
             functions.Add(new Functions.Utility.Countdown(this)); functions.Add(new Functions.Utility.AddEvent(this)); functions.Add(new Functions.Utility.RemoveEvent(this)); functions.Add(new Functions.Utility.Upcoming(this));
             functions.Add(new Functions.Utility.Log(this));
             functions.Add(new Functions.Utility.Tell(this)); functions.Add(new Functions.Utility.TellAuto(this));
