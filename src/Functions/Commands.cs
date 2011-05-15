@@ -23,7 +23,7 @@ namespace MoronBot.Functions
                 if (message.ParameterList.Count > 0)
                 {
                     // Check function exists
-                    string command = moronBot.CommandList.Find(s => s.IndexOf(message.ParameterList[0], StringComparison.InvariantCultureIgnoreCase) >= 0);
+                    string command = moronBot.CommandList.Find(s => s.IndexOf(message.ParameterList[0], StringComparison.InvariantCultureIgnoreCase) == 0);
                     if (command != null)
                     {
                         // Check function has help text
