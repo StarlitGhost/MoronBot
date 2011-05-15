@@ -79,18 +79,22 @@ namespace MoronBot.Functions.Utility
                 if (message.ParameterList.Count > 1)
                 {
                     string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
-                    if (!MessageMap.ContainsKey(message.ParameterList[0].ToUpper()))
+                    if (msg.Replace(' ','').Length > 0)
                     {
-                        MessageMap.Add(message.ParameterList[0].ToUpper(), new List<TellMessage>());
+                        if (!MessageMap.ContainsKey(message.ParameterList[0].ToUpper()))
+                        {
+                            MessageMap.Add(message.ParameterList[0].ToUpper(), new List<TellMessage>());
+                        }
+                        TellMessage tellMessage = new TellMessage();
+                        tellMessage.From = "^ from " + message.User.Name + " on " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss (UTC zz)");
+                        tellMessage.Message = msg;
+                        MessageMap[message.ParameterList[0].ToUpper()].Add(tellMessage);
+                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Ok, I'll tell " + message.ParameterList[0] + " that when they next speak.", message.ReplyTo));
+                        return;
                     }
-                    TellMessage tellMessage = new TellMessage();
-                    tellMessage.From = "^ from " + message.User.Name + " on " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss (UTC zz)");
-                    tellMessage.Message = msg;
-                    MessageMap[message.ParameterList[0].ToUpper()].Add(tellMessage);
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Ok, I'll tell " + message.ParameterList[0] + " that when they next speak.", message.ReplyTo));
-                    return;
                 }
-                else if (message.ParameterList.Count > 0)
+
+                if (message.ParameterList.Count > 0)
                 {
                     moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "You didn't give a message for me to tell " + message.ParameterList[0], message.ReplyTo));
                     return;
