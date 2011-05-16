@@ -1,20 +1,20 @@
 ﻿using System.Text.RegularExpressions;
 
 using CwIRC;
+using System.Collections.Generic;
 
 namespace MoronBot.Functions.Internet
 {
     class Translate : Function
     {
-        public Translate(MoronBot moronBot)
+        public Translate()
         {
-            Name = GetName();
             Help = "translate <sentence>\t- Translates the given sentence to English.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(translate)$", RegexOptions.IgnoreCase))
             {
@@ -31,18 +31,16 @@ namespace MoronBot.Functions.Internet
                         Program.form.txtProgLog_Update(e.ToString());
                         translatedString = "Couldn't work out what language you're using.";
                     }
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, translatedString, message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, translatedString, message.ReplyTo) };
                 }
                 else
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Translate what?", message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Translate what?", message.ReplyTo) };
                 }
             }
             else
             {
-                return;
+                return null;
             }
         }
     }

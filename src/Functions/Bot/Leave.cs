@@ -7,9 +7,8 @@ namespace MoronBot.Functions.Bot
 {
     class Leave : Function
     {
-        public Leave(MoronBot moronBot)
+        public Leave()
         {
-            Name = GetName();
             Help = "leave/gtfo [<channel>]\t- Leaves the current channel, or the one specified.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
@@ -17,25 +16,20 @@ namespace MoronBot.Functions.Bot
             AccessList.Add("Tyranic-Moron");
         }
         
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(leave|gtfo)$", RegexOptions.IgnoreCase))
             {
                 if (message.ParameterList.Count > 0)
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Raw, "PART " + message.ReplyTo + " :" + message.Parameters, ""));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Raw, "PART " + message.ReplyTo + " :" + message.Parameters, "") };
                 }
                 else
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Raw, "PART " + message.ReplyTo + " :" + Settings.Instance.LeaveMessage, ""));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Raw, "PART " + message.ReplyTo + " :" + Settings.Instance.LeaveMessage, "") };
                 }
             }
-            else
-            {
-                return;
-            }
+            return null;
         }
     }
 }

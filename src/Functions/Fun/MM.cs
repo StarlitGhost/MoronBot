@@ -13,9 +13,8 @@ namespace MoronBot.Functions.Fun
         Random rand = new Random();
         List<string> mmList = new List<string>();
 
-        public MM(MoronBot moronBot)
+        public MM()
         {
-            Name = GetName();
             Help = "MM (<number>)\t\t- Returns a random \"Thing Players can no longer do in an MM game DM'd by Xela'\", or a specific one if you add a number.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
@@ -42,7 +41,7 @@ namespace MoronBot.Functions.Fun
            mmFile.Close();
         }
         
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(mm)$", RegexOptions.IgnoreCase))
             {
@@ -54,7 +53,7 @@ namespace MoronBot.Functions.Fun
                       string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
                       int index = mmList.Count + 1;
                       mmList.Add(index + ". " + msg);
-                      moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Message added at index " + index, message.ReplyTo));
+                      return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Message added at index " + index, message.ReplyTo) };
                    }
                    else if (message.ParameterList[0] == "list")
                    {
@@ -64,7 +63,7 @@ namespace MoronBot.Functions.Fun
                            list += item + "\n";
                        }
                        string url = URL.Pastebin(list, "M&M List", "10M", "text", "1");
-                       moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "M&M list posted: " + url + " (link expires in 10 mins)", message.ReplyTo));
+                       return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "M&M list posted: " + url + " (link expires in 10 mins)", message.ReplyTo) };
                    }
                    else
                    {
@@ -74,26 +73,23 @@ namespace MoronBot.Functions.Fun
                            number -= 1;
                            if (number >= 0 && number < mmList.Count)
                            {
-                               moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, mmList[number], message.ReplyTo));
-                               return;
+                               return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, mmList[number], message.ReplyTo) };
                            }
                        }
                        // Number too large or small, or not a number at all
-                       moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Invalid number, range is 1-" + mmList.Count, message.ReplyTo));
-                       return;
+                       return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Invalid number, range is 1-" + mmList.Count, message.ReplyTo) };
                    }
                 }
                 // No specific thing requested
                 else
                 {
                     // Return a random thing
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, mmList[rand.Next(mmList.Count)], message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, mmList[rand.Next(mmList.Count)], message.ReplyTo) };
                 }
             }
             else
             {
-                return;
+                return null;
             }
         }
     }

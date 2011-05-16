@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace MoronBot
 {
     public partial class formMoronBot : Form
     {
-        MoronBot moronBot;
+        public MoronBot moronBot;
         private readonly BindingSource _bindingSourceChannels = new BindingSource();
         private readonly BindingSource _bindingSourceUsers = new BindingSource();
 

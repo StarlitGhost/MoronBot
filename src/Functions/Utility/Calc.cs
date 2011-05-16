@@ -1,27 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-
-using MoronBot.Utilities;
-using MoronBot.Utilities.Calc;
 using CwIRC;
+using MoronBot.Utilities.Calc;
 
 namespace MoronBot.Functions.Utility
 {
     class Calc : Function
     {
-        public Calc(MoronBot moronBot)
+        public Calc()
         {
-            Name = GetName();
-            Help = "calc <expr>\t\t- Calculates the result of the given expression. Supported operations, in decreasing order of precedence, are: ( ), ^, % / *, - +";
+            Help = "calc <expr>\t\t- Calculates the result of the given expression. " +
+                "Supported operations, in decreasing order of precedence, are: ( ), ^, % / *, - +";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, @"^(calc(ulate)?)$", RegexOptions.IgnoreCase))
             {
@@ -58,18 +53,16 @@ namespace MoronBot.Functions.Utility
                         output = "Expression is not arithmetic.";
                     }
 
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, output, message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, output, message.ReplyTo) };
                 }
                 else // No expr given
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "You didn't give an expression to calculate!", message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't give an expression to calculate!", message.ReplyTo) };
                 }
             }
             else
             {
-                return;
+                return null;
             }
         }
 

@@ -54,9 +54,8 @@ namespace MoronBot.Functions.Utility
 
         public static List<EventStruct> eventList = new List<EventStruct>();
 
-        public Countdown(MoronBot moronBot)
+        public Countdown()
         {
-            Name = GetName();
             Help = "countdown/time(un)till (<event>)\t\t- Tells you the amount of time left until the specified event. Without a parameter, it will tell you how long until the next desertbus.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
@@ -69,7 +68,7 @@ namespace MoronBot.Functions.Utility
             SaveEvents(Settings.Instance.Server + ".events.xml");
         }
         
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(countdown|time(un)?till)$", RegexOptions.IgnoreCase))
             {
@@ -84,8 +83,7 @@ namespace MoronBot.Functions.Utility
                     }
                     if (eventStruct.EventName == null)
                     {
-                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in event list!", message.ReplyTo));
-                        return;
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in event list!", message.ReplyTo) };
                     }
                 }
                 else
@@ -93,12 +91,11 @@ namespace MoronBot.Functions.Utility
                     eventStruct = eventList.Find(s => s.EventName == "Desert Bus 5");
                 }
                 timeSpan = eventStruct.EventDate - DateTime.UtcNow;
-                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, eventStruct.EventName + " will occur in " + timeSpan.Days + " day(s) " + timeSpan.Hours + " hour(s) " + timeSpan.Minutes + " minute(s)", message.ReplyTo));
-                return;
+                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, eventStruct.EventName + " will occur in " + timeSpan.Days + " day(s) " + timeSpan.Hours + " hour(s) " + timeSpan.Minutes + " minute(s)", message.ReplyTo) };
             }
             else
             {
-                return;
+                return null;
             }
         }
 
@@ -149,15 +146,14 @@ namespace MoronBot.Functions.Utility
 
     class AddEvent : Function
     {
-        public AddEvent(MoronBot moronBot)
+        public AddEvent()
         {
-            Name = GetName();
             Help = "(add/set)event <date> <event> \t\t- Adds an 'event' to the list of events used in Countdown. <date> is in dd-MM-yyyy format. You can put the date in brackets if you want to specify time and so forth.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^((add|set)?event)$", RegexOptions.IgnoreCase))
             {
@@ -189,51 +185,45 @@ namespace MoronBot.Functions.Utility
                         {
                             Countdown.eventList.Add(eventStruct);
                             Countdown.eventList.Sort(Countdown.EventStruct.CompareEventStructsByDate);
-                            moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm"), message.ReplyTo));
-                            return;
+                            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm"), message.ReplyTo) };
                         }
                         else
                         {
-                            moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm"), message.ReplyTo));
-                            return;
+                            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm"), message.ReplyTo) };
                         }
 
                     }
                     else
                     {
-                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Parsing of date: " + message.ParameterList[0] + " failed, expected format is dd-MM-yyyy", message.ReplyTo));
-                        return;
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Parsing of date: " + message.ParameterList[0] + " failed, expected format is dd-MM-yyyy", message.ReplyTo) };
                     }
                 }
                 else if (message.ParameterList.Count > 0)
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "You didn't give an event!", message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't give an event!", message.ReplyTo) };
                 }
                 else
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "You didn't give a date and event!", message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't give a date and event!", message.ReplyTo) };
                 }
             }
             else
             {
-                return;
+                return null;
             }
         }
     }
 
     class RemoveEvent : Function
     {
-        public RemoveEvent(MoronBot moronBot)
+        public RemoveEvent()
         {
-            Name = GetName();
             Help = "r(emove)event <event> \t\t- Removes the specified 'event' from the list of events used in Countdown.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(r(emove)?event)$", RegexOptions.IgnoreCase))
             {
@@ -248,40 +238,38 @@ namespace MoronBot.Functions.Utility
                     }
                     if (index < 0)
                     {
-                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in event list!", message.ReplyTo));
-                        return;
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in event list!", message.ReplyTo) };
                     }
                     else
                     {
-                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Event \"" + Countdown.eventList[index].EventName + "\", with date \"" + Countdown.eventList[index].EventDate.ToString() + "\" removed from the event list!", message.ReplyTo));
+                        List<IRCResponse> response = new List<IRCResponse>();
+                        response.Add(new IRCResponse(ResponseType.Say, "Event \"" + Countdown.eventList[index].EventName + "\", with date \"" + Countdown.eventList[index].EventDate.ToString() + "\" removed from the event list!", message.ReplyTo));
                         Countdown.eventList.RemoveAt(index);
-                        return;
+                        return response;
                     }
                 }
                 else
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "You didn't specify an event to remove!", message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't specify an event to remove!", message.ReplyTo) };
                 }
             }
             else
             {
-                return;
+                return null;
             }
         }
     }
 
     class Upcoming : Function
     {
-        public Upcoming(MoronBot moronBot)
+        public Upcoming()
         {
-            Name = GetName();
             Help = "upcoming/events (<days>)\t\t- Tells you all of the events coming up in the next week, or the next <days>, if you give a number parameter.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(upcoming|events)$", RegexOptions.IgnoreCase))
             {
@@ -311,19 +299,19 @@ namespace MoronBot.Functions.Utility
                     }
                     events = events.Remove(events.Length - 2);
 
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Events in the next " + daysAhead + " days:", message.ReplyTo));
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, events, message.ReplyTo));
-                    return;
+                    List<IRCResponse> responses = new List<IRCResponse>();
+                    responses.Add(new IRCResponse(ResponseType.Say, "Events in the next " + daysAhead + " days:", message.ReplyTo));
+                    responses.Add(new IRCResponse(ResponseType.Say, events, message.ReplyTo));
+                    return responses;
                 }
                 else
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "There are no events in the coming " + daysAhead + " days!", message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "There are no events in the coming " + daysAhead + " days!", message.ReplyTo) };
                 }
             }
             else
             {
-                return;
+                return null;
             }
         }
     }

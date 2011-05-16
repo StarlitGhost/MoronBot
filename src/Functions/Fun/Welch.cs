@@ -12,9 +12,8 @@ namespace MoronBot.Functions.Fun
         Random rand = new Random();
         List<string> welchList = new List<string>();
 
-        public Welch(MoronBot moronBot)
+        public Welch()
         {
-            Name = GetName();
             Help = "welch (<number>)\t\t- Returns a random \"Thing Mr. Welch can no longer do in an RPG\", or a specific one if you add a number.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
@@ -31,7 +30,7 @@ namespace MoronBot.Functions.Fun
             welchFile.Close();
         }
         
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(welch)$", RegexOptions.IgnoreCase))
             {
@@ -44,25 +43,22 @@ namespace MoronBot.Functions.Fun
                         number -= 1;
                         if (number >= 0 && number < welchList.Count)
                         {
-                            moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, welchList[number], message.ReplyTo));
-                            return;
+                            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, welchList[number], message.ReplyTo) };
                         }
                     }
                     // Number too large or small, or not a number at all
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Invalid number, range is 1-" + welchList.Count, message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Invalid number, range is 1-" + welchList.Count, message.ReplyTo) };
                 }
                 // No specific thing requested
                 else
                 {
                     // Return a random thing
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, welchList[rand.Next(welchList.Count)], message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, welchList[rand.Next(welchList.Count)], message.ReplyTo) };
                 }
             }
             else
             {
-                return;
+                return null;
             }
         }
     }

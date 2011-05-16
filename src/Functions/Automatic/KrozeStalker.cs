@@ -15,9 +15,8 @@ namespace MoronBot.Functions.Automatic
 
         Random rand = new Random();
 
-        public KrozeStalker(MoronBot moronBot)
+        public KrozeStalker()
         {
-            Name = GetName();
             Help = "Not a directly callable function; runs automatically, is generally creepy towards Kroze :3";
             Type = Types.UserList;
             AccessLevel = AccessLevels.Anyone;
@@ -29,21 +28,19 @@ namespace MoronBot.Functions.Automatic
             //doList = Settings.Instance.FunctionSettings[Name]["DoList"];
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (userList.Contains(message.User.Name) && rand.Next(0, 10) == 0)
             {
                 switch (rand.Next(1,3))
                 {
                     case 1:
-                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, sayList[rand.Next(sayList.Count)], message.ReplyTo));
-                        return;
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, sayList[rand.Next(sayList.Count)], message.ReplyTo) };
                     case 2:
-                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Do, doList[rand.Next(doList.Count)], message.ReplyTo));
-                        return;
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Do, doList[rand.Next(doList.Count)], message.ReplyTo) };
                 }
             }
-            return;
+            return null;
         }
 
         void InitLists()

@@ -26,9 +26,8 @@ namespace MoronBot.Functions.Internet
 
         public static Dictionary<string, Feed> FeedMap = new Dictionary<string, Feed>();
 
-        public RSSChecker(MoronBot moronBot)
+        public RSSChecker()
         {
-            Name = GetName();
             Help = "Automatic function, scans RSS feeds and reports new items in the channel.";
             Type = Types.Regex;
             AccessLevel = AccessLevels.Anyone;
@@ -46,7 +45,7 @@ namespace MoronBot.Functions.Internet
             //SaveFeeds(Settings.Instance.Server + ".Feeds.xml");
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             //foreach (KeyValuePair<string, Feed> feed in FeedMap)
             //{
@@ -90,9 +89,10 @@ namespace MoronBot.Functions.Internet
                     string itemTitle = oldestNew.SelectSingleNode("title").FirstChild.Value;
                     string itemLink = oldestNew.SelectSingleNode("link").FirstChild.Value;
 
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Homestuck has updated, " + numUpdates + " new pages! New ones start here: " + itemTitle + " (" + itemLink + ")", message.ReplyTo));
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Homestuck has updated, " + numUpdates + " new pages! New ones start here: " + itemTitle + " (" + itemLink + ")", message.ReplyTo) };
                 }
             //}
+                return null;
         }
 
         //public void SaveFeeds(string fileName)

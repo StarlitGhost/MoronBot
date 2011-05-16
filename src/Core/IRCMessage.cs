@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace CwIRC
 {
-    class IRCMessage
+    public class IRCMessage
     {
         string messageType;
         public string Type

@@ -24,7 +24,7 @@ namespace MoronBot
     /// <summary>
     /// Class to hold MoronBot's details and behaviours.
     /// </summary>
-    class MoronBot
+    public class MoronBot
     {
         #region Variables
 
@@ -94,44 +94,44 @@ namespace MoronBot
             worker.WorkerReportsProgress = true;
 
             // Bot Functions
-            functions.Add(new Functions.Bot.Join(this));
-            functions.Add(new Functions.Bot.Leave(this));
-            functions.Add(new Functions.Bot.Nick(this));
-            functions.Add(new Functions.Bot.Ignore(this)); functions.Add(new Functions.Bot.Unignore(this));
-            functions.Add(new Functions.Bot.Say(this));
-            functions.Add(new Functions.Bot.Do(this));
+            functions.Add(new Functions.Bot.Join());
+            functions.Add(new Functions.Bot.Leave());
+            functions.Add(new Functions.Bot.Nick());
+            functions.Add(new Functions.Bot.Ignore()); functions.Add(new Functions.Bot.Unignore());
+            functions.Add(new Functions.Bot.Say());
+            functions.Add(new Functions.Bot.Do());
 
             // Automatic Functions
-            functions.Add(new Functions.Automatic.Conversation(this));
-            //functions.Add(new Functions.Automatic.KrozeStalker(this));
-            //functions.Add(new Functions.Automatic.RandomKicker(this)); // 'Kick Gir'
-            functions.Add(new Functions.Automatic.URLFollow(this));
+            functions.Add(new Functions.Automatic.Conversation());
+            //functions.Add(new Functions.Automatic.KrozeStalker());
+            //functions.Add(new Functions.Automatic.RandomKicker()); // 'Kick Gir'
+            functions.Add(new Functions.Automatic.URLFollow());
 
             // Internet Functions
-            functions.Add(new Functions.Internet.Bitly(this));
-            functions.Add(new Functions.Internet.Google(this));
-            functions.Add(new Functions.Internet.NowPlaying(this)); functions.Add(new Functions.Internet.NowPlayingRegister(this));
-            functions.Add(new Functions.Internet.RSSChecker(this));
-            functions.Add(new Functions.Internet.Translate(this));
+            functions.Add(new Functions.Internet.Bitly());
+            functions.Add(new Functions.Internet.Google());
+            functions.Add(new Functions.Internet.NowPlaying()); functions.Add(new Functions.Internet.NowPlayingRegister());
+            functions.Add(new Functions.Internet.RSSChecker());
+            functions.Add(new Functions.Internet.Translate());
 
             // GitHub Functions
-            functions.Add(new Functions.GitHub.LastCommit(this));
-            functions.Add(new Functions.GitHub.Source(this));
+            functions.Add(new Functions.GitHub.LastCommit());
+            functions.Add(new Functions.GitHub.Source());
 
             // Fun Functions
-            functions.Add(new Functions.Fun.Dice(this));
-            functions.Add(new Functions.Fun.MM(this));
-            functions.Add(new Functions.Fun.Welch(this));
+            functions.Add(new Functions.Fun.Dice());
+            functions.Add(new Functions.Fun.MM());
+            functions.Add(new Functions.Fun.Welch());
 
             // Utility Functions
-            functions.Add(new Functions.Utility.Calc(this));
-            functions.Add(new Functions.Utility.Countdown(this)); functions.Add(new Functions.Utility.AddEvent(this)); functions.Add(new Functions.Utility.RemoveEvent(this)); functions.Add(new Functions.Utility.Upcoming(this));
-            functions.Add(new Functions.Utility.Log(this));
-            functions.Add(new Functions.Utility.Tell(this)); functions.Add(new Functions.Utility.TellAuto(this));
-            functions.Add(new Functions.Utility.Time(this));
+            functions.Add(new Functions.Utility.Calc());
+            functions.Add(new Functions.Utility.Countdown()); functions.Add(new Functions.Utility.AddEvent()); functions.Add(new Functions.Utility.RemoveEvent()); functions.Add(new Functions.Utility.Upcoming());
+            functions.Add(new Functions.Utility.Log());
+            functions.Add(new Functions.Utility.Tell()); functions.Add(new Functions.Utility.TellAuto());
+            functions.Add(new Functions.Utility.Time());
 
-            functions.Add(new Functions.Commands(this));
-            functions.Add(new Functions.CTCP(this));
+            functions.Add(new Functions.Commands());
+            functions.Add(new Functions.CTCP());
 
             foreach (Functions.Function f in functions)
             {
@@ -475,7 +475,7 @@ namespace MoronBot
                     ExecuteFunctionList(regexFunctions, message);
                     SendQueue();
 
-                    Match match = Regex.Match(message.MessageString, "^(\\||" + nick + "(,|:)?[ ])", RegexOptions.IgnoreCase);
+                    Match match = Regex.Match(message.MessageString, @"^(\||" + nick + @"(,|:)?[ ])", RegexOptions.IgnoreCase);
                     if (match.Success)
                     {
                         ExecuteFunctionList(commandFunctions, message);
@@ -506,18 +506,20 @@ namespace MoronBot
         {
             foreach (Functions.Function f in funcList)
             {
+                List<IRCResponse> responses = null;
                 switch (f.AccessLevel)
                 {
                     case Functions.AccessLevels.Anyone:
-                        f.GetResponse(message, this);
+                        responses = f.GetResponse(message);
                         break;
                     case Functions.AccessLevels.UserList:
                         if (f.AccessList.Contains(message.User.Name))
                         {
-                            f.GetResponse(message, this);
+                            responses = f.GetResponse(message);
                         }
                         break;
                 }
+                MessageQueue.AddRange(responses);
             }
             return false;
         }

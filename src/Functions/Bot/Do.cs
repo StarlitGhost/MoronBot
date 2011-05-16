@@ -1,37 +1,35 @@
 ﻿using System.Text.RegularExpressions;
 
 using CwIRC;
+using System.Collections.Generic;
 
 namespace MoronBot.Functions.Bot
 {
     class Do : Function
     {
-        public Do(MoronBot moronBot)
+        public Do()
         {
-            Name = GetName();
             Help = "do <text>\t\t- 'Does' the given text in the current channel.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
         
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(do)$", RegexOptions.IgnoreCase))
             {
                 if (message.ParameterList.Count > 0)
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Do, message.Parameters, message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Do, message.Parameters, message.ReplyTo) };
                 }
                 else
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Do what?", message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Do what?", message.ReplyTo) };
                 }
             }
             else
             {
-                return;
+                return null;
             }
         }
     }

@@ -7,9 +7,8 @@ namespace MoronBot.Functions.Bot
 {
     class Ignore : Function
     {
-        public Ignore(MoronBot moronBot)
+        public Ignore()
         {
-            Name = GetName();
             Help = "ignore <user(s)>\t\t- Tells MoronBot to ignore the specified user(s). UserList functions will still work, however (TellAuto, for instance).";
             Type = Types.Command;
             AccessLevel = AccessLevels.UserList;
@@ -17,7 +16,7 @@ namespace MoronBot.Functions.Bot
             AccessList.Add("Tyranic-Moron");
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(ignore)$", RegexOptions.IgnoreCase))
             {
@@ -28,21 +27,19 @@ namespace MoronBot.Functions.Bot
                         Settings.Instance.IgnoreList.Add(parameter.ToUpper());
                     }
                 }
-                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, message.Parameters + " are now ignored.", message.ReplyTo));
-                return;
+                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, message.Parameters + " are now ignored.", message.ReplyTo) };
             }
             else
             {
-                return;
+                return null;
             }
         }
     }
 
     class Unignore : Function
     {
-        public Unignore(MoronBot moronBot)
+        public Unignore()
         {
-            Name = GetName();
             Help = "unignore <user(s)>\t\t- Tells MoronBot to unignore the specified user(s).";
             Type = Types.Command;
             AccessLevel = AccessLevels.UserList;
@@ -50,7 +47,7 @@ namespace MoronBot.Functions.Bot
             AccessList.Add("Tyranic-Moron");
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(unignore)$", RegexOptions.IgnoreCase))
             {
@@ -61,12 +58,11 @@ namespace MoronBot.Functions.Bot
                         Settings.Instance.IgnoreList.Remove(parameter.ToUpper());
                     }
                 }
-                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, message.Parameters + " are no longer ignored.", message.ReplyTo));
-                return;
+                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, message.Parameters + " are no longer ignored.", message.ReplyTo) };
             }
             else
             {
-                return;
+                return null;
             }
         }
     }

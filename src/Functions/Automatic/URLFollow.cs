@@ -5,27 +5,27 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using CwIRC;
+using System.Collections.Generic;
 
 namespace MoronBot.Functions.Automatic
 {
     class URLFollow : Function
     {
-        public URLFollow(MoronBot moronBot)
+        public URLFollow()
         {
-            Name = GetName();
             Help = "Automatic function that follows posted urls and grabs the domain and title of the resultant webpage, then posts them to the chat.";
             Type = Types.Regex;
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             Match match = Regex.Match(message.MessageString, @"https?://[^\s]+", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 if (Regex.IsMatch(match.Value, @"\.(jpg|gif|png)$"))
                 {
-                    return;
+                    return null;
                 }
 
                 Utilities.URL.WebPage webPage;
@@ -37,13 +37,12 @@ namespace MoronBot.Functions.Automatic
                 {
                     // Nothing returned when attempting to fetch the url
                     Program.form.txtProgLog_Update(ex.Message);
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Nothing found at " + match.Value, message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Nothing found at " + match.Value, message.ReplyTo) };
                 }
                 catch (System.UriFormatException ex)
                 {
                     // Invalid url detected, don't really care though.
-                    return;
+                    return null;
                 }
 
                 // Hunt for the title tags on the page, and grab the text between them.
@@ -65,10 +64,9 @@ namespace MoronBot.Functions.Automatic
                     title = "No title found";
                 }
 
-                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, title + " (at " + webPage.Domain + ")", message.ReplyTo));
-                return;
+                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, title + " (at " + webPage.Domain + ")", message.ReplyTo) };
             }
-            return;
+            return null;
         }
     }
 }

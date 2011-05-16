@@ -12,9 +12,8 @@ namespace MoronBot.Functions.Automatic
 
         Random rand = new Random();
 
-        public RandomKicker(MoronBot moronBot)
+        public RandomKicker()
         {
-            Name = GetName();
             Help = "Kicks certain users with a 1/5 chance every time they say something.";
             Type = Types.UserList;
             AccessLevel = AccessLevels.Anyone;
@@ -22,14 +21,13 @@ namespace MoronBot.Functions.Automatic
             userList.Add("SirGir");
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (userList.Contains(message.User.Name) && rand.Next(0, 5) == 0)
             {
-                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Raw, "KICK " + message.ReplyTo + " " + message.User.Name + " ::D", ""));
-                return;
+                return new List<IRCResponse>() { new IRCResponse(ResponseType.Raw, "KICK " + message.ReplyTo + " " + message.User.Name + " ::D", "") };
             }
-            return;
+            return null;
         }
     }
 }

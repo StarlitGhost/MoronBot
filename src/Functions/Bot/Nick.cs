@@ -7,9 +7,8 @@ namespace MoronBot.Functions.Bot
 {
     class Nick : Function
     {
-        public Nick(MoronBot moronBot)
+        public Nick()
         {
-            Name = GetName();
             Help = "nick <nick>\t\t- Changes the bot's nick to the one specified.";
             Type = Types.Command;
             AccessLevel = AccessLevels.UserList;
@@ -17,24 +16,22 @@ namespace MoronBot.Functions.Bot
             AccessList.Add("Tyranic-Moron");
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(nick(name)?|name)$", RegexOptions.IgnoreCase))
             {
                 if (message.ParameterList.Count > 0)
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Raw, "NICK " + message.ParameterList[0], ""));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Raw, "NICK " + message.ParameterList[0], "") };
                 }
                 else
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Change my nick to what?", message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Change my nick to what?", message.ReplyTo) };
                 }
             }
             else
             {
-                return;
+                return null;
             }
         }
     }

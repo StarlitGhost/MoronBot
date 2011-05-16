@@ -1,23 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
-
 using CwIRC;
 
 namespace MoronBot.Functions.Utility
 {
     class Time : Function
     {
-        public Time(MoronBot moronBot)
+        public Time()
         {
-            Name = GetName();
             Help = "time (<offset>)\t\t\t- Tells you the time... roughly. You can provide an offset from the bot's standard time (UTC), if you wish.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(time)$", RegexOptions.IgnoreCase))
             {
@@ -34,8 +31,7 @@ namespace MoronBot.Functions.Utility
                         }
                         else
                         {
-                            moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Offset too large, valid offsets are between -15 and +15.", message.ReplyTo));
-                            return;
+                            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Offset too large, valid offsets are between -15 and +15.", message.ReplyTo) };
                         }
                     }
                 }
@@ -141,12 +137,11 @@ namespace MoronBot.Functions.Utility
                     }
                 }
 
-                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "It's " + timeMessage + ".", message.ReplyTo));
-                return;
+                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "It's " + timeMessage + ".", message.ReplyTo) };
             }
             else
             {
-                return;
+                return null;
             }
         }
     }

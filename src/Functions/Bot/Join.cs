@@ -1,20 +1,20 @@
 ﻿using System.Text.RegularExpressions;
 
 using CwIRC;
+using System.Collections.Generic;
 
 namespace MoronBot.Functions.Bot
 {
     class Join : Function
     {
-        public Join(MoronBot moronBot)
+        public Join()
         {
-            Name = GetName();
             Help = "join <channel>\t\t- Joins the specified channel.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
         
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(join)$", RegexOptions.IgnoreCase))
             {
@@ -30,19 +30,14 @@ namespace MoronBot.Functions.Bot
                         }
                         output += parameter + "\r\n";
                     }
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Raw, output, ""));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Raw, output, "") };
                 }
                 else
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, message.User.Name + ", you didn't say where I should join.", message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, message.User.Name + ", you didn't say where I should join.", message.ReplyTo) };
                 }
             }
-            else
-            {
-                return;
-            }
+            return null;
         }
     }
 }

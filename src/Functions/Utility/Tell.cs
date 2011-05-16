@@ -27,9 +27,8 @@ namespace MoronBot.Functions.Utility
 
         List<UserDateNumber> userDateNumberList = new List<UserDateNumber>();
 
-        public Tell(MoronBot moronBot)
+        public Tell()
         {
-            Name = GetName();
             Help = "tell <user> <message>\t\t- Tells the specified user the specified message, when they next speak.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
@@ -42,7 +41,7 @@ namespace MoronBot.Functions.Utility
             WriteMessages(Settings.Instance.Server + ".tellMessages.xml");
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(tell)$", RegexOptions.IgnoreCase))
             {
@@ -71,8 +70,7 @@ namespace MoronBot.Functions.Utility
                     }
                     else
                     {
-                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "You've already sent 3 messages in the last 5 minutes, slow down!", message.ReplyTo));
-                        return;
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You've already sent 3 messages in the last 5 minutes, slow down!", message.ReplyTo) };
                     }
                 }
 
@@ -89,20 +87,17 @@ namespace MoronBot.Functions.Utility
                         tellMessage.From = "^ from " + message.User.Name + " on " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss (UTC zz)");
                         tellMessage.Message = msg;
                         MessageMap[message.ParameterList[0].ToUpper()].Add(tellMessage);
-                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Ok, I'll tell " + message.ParameterList[0] + " that when they next speak.", message.ReplyTo));
-                        return;
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Ok, I'll tell " + message.ParameterList[0] + " that when they next speak.", message.ReplyTo) };
                     }
                 }
 
                 if (message.ParameterList.Count > 0)
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "You didn't give a message for me to tell " + message.ParameterList[0], message.ReplyTo));
-                    return;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't give a message for me to tell " + message.ParameterList[0], message.ReplyTo) };
                 }
-                moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Tell who what?", message.ReplyTo));
-                return;
+                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Tell who what?", message.ReplyTo) };
             }
-            return;
+            return null;
         }
 
         void WriteMessages(string fileName)
@@ -171,27 +166,28 @@ namespace MoronBot.Functions.Utility
 
     class TellAuto : Function
     {
-        public TellAuto(MoronBot moronBot)
+        public TellAuto()
         {
-            Name = GetName();
             Help = "Automatic function that will output messages sent to a particular user when that user speaks.";
             Type = Types.UserList;
             AccessLevel = AccessLevels.Anyone;
         }
 
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Tell.MessageMap.ContainsKey(message.User.Name.ToUpper()))
             {
+                List<IRCResponse> responses = new List<IRCResponse>();
                 foreach (Tell.TellMessage msg in Tell.MessageMap[message.User.Name.ToUpper()])
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, msg.Message, message.ReplyTo));
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, msg.From, message.ReplyTo));
+                    responses.Add(new IRCResponse(ResponseType.Say, msg.Message, message.ReplyTo));
+                    responses.Add(new IRCResponse(ResponseType.Say, msg.From, message.ReplyTo));
                 }
                 Tell.MessageMap[message.User.Name.ToUpper()].Clear();
                 Tell.MessageMap.Remove(message.User.Name.ToUpper());
+                return responses;
             }
-            return;
+            return null;
         }
     }
 

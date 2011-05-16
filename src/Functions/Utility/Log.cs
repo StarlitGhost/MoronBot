@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
-
 using CwIRC;
 using MoronBot.Utilities;
 
@@ -10,15 +9,14 @@ namespace MoronBot.Functions.Utility
 {
     class Log : Function
     {
-        public Log(MoronBot moronBot)
+        public Log()
         {
-            Name = GetName();
             Help = "log\t\t- Posts the daily log to pastebin.com, and returns a link to it.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
         
-        public override void GetResponse(BotMessage message, MoronBot moronBot)
+        public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(log)$", RegexOptions.IgnoreCase))
             {
@@ -47,14 +45,15 @@ namespace MoronBot.Functions.Utility
 
                         string logLink = URL.Pastebin(logText, message.ReplyTo + " Log" + fileDate, "10M", "text", "1");
 
-                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Log for" + fileDate + " posted: " + logLink + " (link expires in 10 mins)", message.ReplyTo));
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Log for" + fileDate + " posted: " + logLink + " (link expires in 10 mins)", message.ReplyTo) };
                     }
                 }
                 else
                 {
-                    moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "I don't have a log file for" + fileDate + " :(", message.ReplyTo));
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "I don't have a log file for" + fileDate + " :(", message.ReplyTo) };
                 }
             }
+            return null;
         }
     }
 }

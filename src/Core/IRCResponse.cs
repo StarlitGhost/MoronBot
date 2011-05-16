@@ -1,6 +1,6 @@
 ﻿namespace CwIRC
 {
-    enum ResponseType
+    public enum ResponseType
     {
         Say,
         Do,
@@ -9,7 +9,7 @@
 
     }
 
-    class IRCResponse
+    public class IRCResponse
     {
         ResponseType responseType;
         public ResponseType Type
