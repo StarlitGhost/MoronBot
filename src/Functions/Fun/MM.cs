@@ -63,7 +63,7 @@ namespace MoronBot.Functions.Fun
                        {
                            list += item + "\n";
                        }
-                       string url = URL.Pastebin(list, "M&M List");
+                       string url = URL.Pastebin(list, "M&M List", "10M", "text", "1");
                        moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "M&M list posted: " + url + " (link expires in 10 mins)", message.ReplyTo));
                    }
                    else

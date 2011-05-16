@@ -45,7 +45,7 @@ namespace MoronBot.Functions.Utility
                     {
                         string logText = reader.ReadToEnd();
 
-                        string logLink = URL.Pastebin(logText, message.ReplyTo + " Log" + fileDate);
+                        string logLink = URL.Pastebin(logText, message.ReplyTo + " Log" + fileDate, "10M", "text", "1");
 
                         moronBot.MessageQueue.Add(new IRCResponse(ResponseType.Say, "Log for" + fileDate + " posted: " + logLink + " (link expires in 10 mins)", message.ReplyTo));
                     }

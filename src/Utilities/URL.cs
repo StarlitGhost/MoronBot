@@ -28,6 +28,7 @@ namespace MoronBot.Utilities
             try
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:2.0.1) Gecko/20100101 Firefox/4.0.1";
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
                 Stream responseStream = response.GetResponseStream();
@@ -67,7 +68,7 @@ namespace MoronBot.Utilities
             return null;
         }
 
-        public static string Pastebin(string text, string title)
+        public static string Pastebin(string text, string title = "", string expire = "10M", string format = "text", string privacy = "1")
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://pastebin.com/api/api_post.php");
             request.Method = "POST";
@@ -79,9 +80,9 @@ namespace MoronBot.Utilities
 
             string api_user_key = "";
             string api_paste_name = title;
-            string api_paste_format = "text";
-            string api_paste_private = "0";
-            string api_paste_expire_date = "10M";
+            string api_paste_format = format;
+            string api_paste_private = privacy;
+            string api_paste_expire_date = expire;
 
             string postData =
                 "api_dev_key=" + HttpUtility.UrlEncode(api_dev_key) +
