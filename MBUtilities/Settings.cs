@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Xml.Serialization;
 
-namespace MoronBot
+using System.Windows.Forms;
+
+namespace MBUtilities
 {
     [Serializable()]
     public class Settings
@@ -47,6 +51,13 @@ namespace MoronBot
         public string LeaveMessage = "Leaving";
         public string QuitMessage = "Quitting";
         public List<string> IgnoreList = new List<string>();
+
+        [XmlIgnore]
+        public static string AppPath = Path.GetDirectoryName(Application.ExecutablePath);
+        [XmlIgnore]
+        public string FunctionPath = Path.Combine(AppPath, "Functions");
+        [XmlIgnore]
+        public string DataPath = Path.Combine(AppPath, "Data");
 
         //public Dictionary<string, Dictionary<string, List<string>>> FunctionSettings = new Dictionary<string, Dictionary<string, List<string>>>();
     }

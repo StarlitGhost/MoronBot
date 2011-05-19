@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-namespace MoronBot.Utilities.Plugin
+namespace MBUtilities
 {
-    public class Loader
+    public class PluginLoader
     {
         public static List<T> GetPlugins<T>(string folder)
         {
@@ -38,6 +38,19 @@ namespace MoronBot.Utilities.Plugin
             }
 
             return tList;
+        }
+
+        public static void WatchDirectory(string path, FileSystemEventHandler handler)
+        {
+            FileSystemWatcher watcher = new FileSystemWatcher();
+
+            watcher.Filter = "*.dll";
+
+            watcher.Created += new FileSystemEventHandler(handler);
+
+            watcher.Path = path;
+
+            watcher.EnableRaisingEvents = true;
         }
     }
 }

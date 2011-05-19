@@ -1,15 +1,12 @@
 ﻿using System.IO;
 
-namespace MoronBot.Utilities
+namespace MBUtilities
 {
-    static class Logger
+    public static class Logger
     {
         public static void Write(string data, string fileName)
         {
-            string path = Path.GetDirectoryName(fileName);
-
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            FileUtils.CreateDirIfNotExists(fileName);
 
             using (StreamWriter log = new StreamWriter(fileName, true))
             {

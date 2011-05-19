@@ -57,12 +57,12 @@
       <HintPath>Bitly.dll</HintPath>
     </Reference>
     <Reference Include="GAPI, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\GAPI.dll</HintPath>
+      <HintPath>..\bin\GAPI.dll</HintPath>
     </Reference>
     <Reference Include="GithubSharp.Core, Version=1.0.4101.6854, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>GithubSharp.Core.dll</HintPath>
     </Reference>
+    <Reference Include="MBUtilities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -87,14 +87,10 @@
     <Compile Include="formMoronBot.Designer.cs">
       <DependentUpon>formMoronBot.cs</DependentUpon>
     </Compile>
-    <Compile Include="Functions\CTCP.cs" />
     <Compile Include="Functions\Commands.cs" />
     <Compile Include="MoronBot.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utilities\Logger.cs" />
-    <Compile Include="Utilities\Plugin\Loader.cs" />
-    <Compile Include="Utilities\URL.cs" />
     <EmbeddedResource Include="formMoronBot.resx">
       <DependentUpon>formMoronBot.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -118,7 +114,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

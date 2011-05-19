@@ -6,7 +6,7 @@ using System.Web;
 
 using Bitly;
 
-namespace MoronBot.Utilities
+namespace MBUtilities
 {
     // Utility class to hold commonly needed helper functions to do with URLs and general web stuff.
     public static class URL

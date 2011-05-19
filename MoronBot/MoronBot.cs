@@ -18,9 +18,8 @@ using System.Xml.Serialization;
 
 using CwIRC;
 using MBFunctionInterface;
+using MBUtilities;
 
-using MoronBot.Utilities;
-using MoronBot.Utilities.Plugin;
 using System.Windows.Forms;
 
 namespace MoronBot
@@ -59,7 +58,6 @@ namespace MoronBot
             get { return channels; }
         }
 
-        List<IFunction> functions = new List<IFunction>();
         List<IFunction> userListFunctions = new List<IFunction>();
         List<IFunction> regexFunctions = new List<IFunction>();
         List<IFunction> commandFunctions = new List<IFunction>();
@@ -97,29 +95,9 @@ namespace MoronBot
             worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
             worker.WorkerReportsProgress = true;
 
-            string appDir = Path.GetDirectoryName(Application.ExecutablePath); //(Assembly.GetAssembly(typeof(MoronBot)).CodeBase);
-            functions.AddRange(Loader.GetPlugins<IFunction>(Path.Combine(appDir, "Functions")));
+            LoadFunctions();
 
-            functions.Add(new Functions.Commands());
-            functions.Add(new Functions.CTCP());
-
-            foreach (IFunction f in functions)
-            {
-                commandList.Add(f.Name);
-                helpLibrary.Add(f.Name, f.Help);
-                switch (f.Type)
-                {
-                    case Types.Command:
-                        commandFunctions.Add(f);
-                        break;
-                    case Types.Regex:
-                        regexFunctions.Add(f);
-                        break;
-                    case Types.UserList:
-                        userListFunctions.Add(f);
-                        break;
-                }
-            }
+            PluginLoader.WatchDirectory(Settings.Instance.FunctionPath, FuncDirChanged);
 
             if (!LoadXML("settings.xml"))
             {
@@ -571,5 +549,41 @@ namespace MoronBot
             streamWriter.Close();
         }
         #endregion settings.xml
+
+        void LoadFunctions()
+        {
+            List<IFunction> functions = new List<IFunction>();
+
+            functions.AddRange(PluginLoader.GetPlugins<IFunction>(Settings.Instance.FunctionPath));
+
+            functions.Add(new Functions.Commands());
+
+            foreach (IFunction f in functions)
+            {
+                if (!commandList.Contains(f.Name))
+                {
+                    commandList.Add(f.Name);
+                    helpLibrary.Add(f.Name, f.Help);
+                    switch (f.Type)
+                    {
+                        case Types.Command:
+                            commandFunctions.Add(f);
+                            break;
+                        case Types.Regex:
+                            regexFunctions.Add(f);
+                            break;
+                        case Types.UserList:
+                            userListFunctions.Add(f);
+                            break;
+                    }
+                }
+            }
+        }
+
+        void FuncDirChanged(object sender, FileSystemEventArgs e)
+        {
+            System.Threading.Thread.Sleep(500);
+            LoadFunctions();
+        }
     }
 }
