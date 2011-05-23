@@ -4,6 +4,7 @@ using System.IO;
 using System.Xml.Serialization;
 
 using System.Windows.Forms;
+//using System.Data.SQLite;
 
 namespace MBUtilities
 {
@@ -16,7 +17,7 @@ namespace MBUtilities
 
         Settings()
         {
-
+            //sqlite = new SQLiteConnection("Data Source=/Data/database.db");
         }
 
         public static Settings Instance
@@ -59,6 +60,8 @@ namespace MBUtilities
         [XmlIgnore]
         public string DataPath = Path.Combine(AppPath, "Data");
 
-        //public Dictionary<string, Dictionary<string, List<string>>> FunctionSettings = new Dictionary<string, Dictionary<string, List<string>>>();
+        //private SQLiteConnection sqlite;
+
+
     }
 }

@@ -58,9 +58,9 @@ namespace MoronBot
             get { return channels; }
         }
 
-        List<IFunction> userListFunctions = new List<IFunction>();
-        List<IFunction> regexFunctions = new List<IFunction>();
-        List<IFunction> commandFunctions = new List<IFunction>();
+        public List<IFunction> UserListFunctions = new List<IFunction>();
+        public List<IFunction> RegexFunctions = new List<IFunction>();
+        public List<IFunction> CommandFunctions = new List<IFunction>();
 
         List<string> commandList = new List<string>();
         public List<string> CommandList
@@ -414,19 +414,19 @@ namespace MoronBot
                         Log("<" + message.User.Name + "> " + message.MessageString, message.ReplyTo);
                     }
 
-                    ExecuteFunctionList(userListFunctions, message);
+                    ExecuteFunctionList(UserListFunctions, message);
                     SendQueue();
 
                     if (Settings.Instance.IgnoreList.Contains(message.User.Name.ToUpper()))
                         return;
 
-                    ExecuteFunctionList(regexFunctions, message);
+                    ExecuteFunctionList(RegexFunctions, message);
                     SendQueue();
 
                     Match match = Regex.Match(message.MessageString, @"^(\||" + nick + @"(,|:)?[ ])", RegexOptions.IgnoreCase);
                     if (match.Success)
                     {
-                        ExecuteFunctionList(commandFunctions, message);
+                        ExecuteFunctionList(CommandFunctions, message);
                         SendQueue();
 
                         if (Regex.IsMatch(message.Command, "^(pass)$", RegexOptions.IgnoreCase))
@@ -567,13 +567,13 @@ namespace MoronBot
                     switch (f.Type)
                     {
                         case Types.Command:
-                            commandFunctions.Add(f);
+                            CommandFunctions.Add(f);
                             break;
                         case Types.Regex:
-                            regexFunctions.Add(f);
+                            RegexFunctions.Add(f);
                             break;
                         case Types.UserList:
-                            userListFunctions.Add(f);
+                            UserListFunctions.Add(f);
                             break;
                     }
                 }
