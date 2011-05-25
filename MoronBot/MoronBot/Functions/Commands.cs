@@ -34,24 +34,24 @@ namespace MoronBot.Functions
                         // Check function has help text
                         if (moronBot.HelpLibrary[command] != null)
                         {
-                            return new List<IRCResponse>() { new IRCResponse(ResponseType.Notice, moronBot.HelpLibrary[command], message.User.Name) };
+                            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, moronBot.HelpLibrary[command], message.ReplyTo) };
                         }
-                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Notice, "\"" + command + "\" doesn't have any help text specified.", message.User.Name) };
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "\"" + command + "\" doesn't have any help text specified.", message.ReplyTo) };
                     }
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Notice, "\"" + message.ParameterList[0] + "\" not found, try \"" + message.Command + "\" without parameters to see a list of loaded functions.", message.User.Name) };
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "\"" + message.ParameterList[0] + "\" not found, try \"" + message.Command + "\" without parameters to see a list of loaded functions.", message.ReplyTo) };
                 }
                 // List of loaded functions asked for
                 else
                 {
                     List<IRCResponse> responses = new List<IRCResponse>();
-                    responses.Add(new IRCResponse(ResponseType.Notice, "Functions loaded are:", message.User.Name));
+                    responses.Add(new IRCResponse(ResponseType.Say, "Functions loaded are:", message.ReplyTo));
                     moronBot.CommandList.Sort();
                     string output = moronBot.CommandList[0];
                     for (int i = 1; i < moronBot.CommandList.Count; i++)
                     {
                         output += ", " + moronBot.CommandList[i];
                     }
-                    responses.Add(new IRCResponse(ResponseType.Notice, output, message.User.Name));
+                    responses.Add(new IRCResponse(ResponseType.Say, output, message.ReplyTo));
                     return responses;
                 }
             }

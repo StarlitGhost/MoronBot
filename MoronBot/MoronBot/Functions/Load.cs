@@ -42,10 +42,7 @@ namespace MoronBot.Functions
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Notice, "\"" + message.ParameterList[0] + "\" not found, try \"" + message.Command + "\" without parameters to see a list of loaded functions.", message.User.Name) };
                 }
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
     }
 
@@ -83,10 +80,7 @@ namespace MoronBot.Functions
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Notice, "\"" + message.ParameterList[0] + "\" not found, try \"" + message.Command + "\" without parameters to see a list of loaded functions.", message.User.Name) };
                 }
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
     }
 }
