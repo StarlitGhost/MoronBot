@@ -33,12 +33,15 @@
   <ItemGroup>
     <Reference Include="CwIRC">
       <HintPath>..\..\MoronBot\bin\CwIRC.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="GAPI">
       <HintPath>..\..\MoronBot\bin\GAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MBFunctionInterface">
       <HintPath>..\..\MoronBot\bin\MBFunctionInterface.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
