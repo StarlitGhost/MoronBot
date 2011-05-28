@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 using CwIRC;
@@ -9,6 +10,8 @@ namespace Automatic
 {
     public class Conversation : Function
     {
+        DateTime lastCheese = DateTime.Now.AddMinutes(-60);
+
         public Conversation()
         {
             Help = "A set of automatic functions that react to specific keywords/phrases in chat.";
@@ -21,8 +24,11 @@ namespace Automatic
             // Cheese in message
             if (Regex.IsMatch(message.MessageString, "cheese", RegexOptions.IgnoreCase))
             {
-                return new List<IRCResponse>() { 
-                    new IRCResponse(ResponseType.Do, "loves cheese", message.ReplyTo) };
+                if (lastCheese.AddMinutes(60).CompareTo(DateTime.Now) <= 0)
+                {
+                    lastCheese = DateTime.Now;
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Do, "loves cheese", message.ReplyTo) };
+                }
             }
 
             // Windmill in message
@@ -39,6 +45,7 @@ namespace Automatic
                 return new List<IRCResponse>() { 
                     new IRCResponse(ResponseType.Say, match.Value.Split(' ')[0] + " " + message.User.Name, message.ReplyTo) };
             }
+
             return null;
         }
     }
