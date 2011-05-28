@@ -11,7 +11,7 @@ namespace Fun
     {
         public Roll()
         {
-            Help = "roll <NdN[+N]...[v]>\t- Rolls the specified dice. Eg: 1d8+2d6+5v";
+            Help = "roll <NdN[+N]...[v]> - Rolls the specified dice. Eg: 1d8+2d6+5v";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }

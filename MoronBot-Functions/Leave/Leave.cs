@@ -11,7 +11,7 @@ namespace Bot
     {
         public Leave()
         {
-            Help = "leave/gtfo [<channel>]\t- Leaves the current channel, or the one specified.";
+            Help = "leave/gtfo [<channel>] - Leaves the current channel, or the one specified.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 

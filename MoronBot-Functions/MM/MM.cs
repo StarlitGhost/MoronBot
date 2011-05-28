@@ -17,7 +17,7 @@ namespace Fun
 
         public MM()
         {
-            Help = "MM (<number>)\t\t- Returns a random \"Thing Players can no longer do in an MM game DM'd by Xela'\", or a specific one if you add a number.";
+            Help = "MM (<number>) - Returns a random \"Thing Players can no longer do in an MM game DM'd by Xela'\", or a specific one if you add a number.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 

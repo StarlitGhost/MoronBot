@@ -16,7 +16,7 @@ namespace Fun
 
         public Welch()
         {
-            Help = "welch (<number>)\t\t- Returns a random \"Thing Mr. Welch can no longer do in an RPG\", or a specific one if you add a number.";
+            Help = "welch (<number>) - Returns a random \"Thing Mr. Welch can no longer do in an RPG\", or a specific one if you add a number.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 

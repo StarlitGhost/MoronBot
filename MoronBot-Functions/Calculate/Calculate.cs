@@ -13,7 +13,7 @@ namespace Utility
     {
         public Calculate()
         {
-            Help = "calc <expr>\t\t- Calculates the result of the given expression. " +
+            Help = "calc <expr> - Calculates the result of the given expression. " +
                 "Supported operations, in decreasing order of precedence, are: ( ), ^, % / *, - +";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;

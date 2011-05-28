@@ -31,7 +31,7 @@ namespace Utility
 
 		public Tell()
 		{
-			Help = "tell <user> <message>\t\t- Tells the specified user the specified message, when they next speak.";
+			Help = "tell <user> <message> - Tells the specified user the specified message, when they next speak.";
 			Type = Types.Command;
 			AccessLevel = AccessLevels.Anyone;
 

@@ -12,7 +12,7 @@ namespace GitHub
     {
         public Source()
         {
-            Help = "source (<function>)\t\t- Returns a link to the specified function's source on MoronBot's GitHub site. If no function is specified, then it links to the homepage instead.";
+            Help = "source (<function>) - Returns a link to the specified function's source on MoronBot's GitHub site. If no function is specified, then it links to the homepage instead.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }

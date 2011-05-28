@@ -11,7 +11,7 @@ namespace Utility
     {
         public Time()
         {
-            Help = "time (<offset>)\t\t\t- Tells you the time... roughly. You can provide an offset from the bot's standard time (UTC), if you wish.";
+            Help = "time (<offset>) - Tells you the time... roughly. You can provide an offset from the bot's standard time (UTC), if you wish.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }

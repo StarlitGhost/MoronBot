@@ -12,7 +12,7 @@ namespace Internet
     {
         public Google()
         {
-            Help = "google/search/find <terms>\t- Gives you the first google search result for a given search term.";
+            Help = "google/search/find <terms> - Gives you the first google search result for a given search term.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }

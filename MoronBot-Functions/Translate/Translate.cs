@@ -10,7 +10,7 @@ namespace Internet
     {
         public Translate()
         {
-            Help = "translate <sentence>\t- Translates the given sentence to English.";
+            Help = "translate <sentence> - Translates the given sentence to English.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }

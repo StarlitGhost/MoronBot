@@ -10,7 +10,7 @@ namespace Bot
     {
         public Say()
         {
-            Help = "say <text>\t\t- Says the given text in the current channel.";
+            Help = "say <text> - Says the given text in the current channel.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }

@@ -16,7 +16,7 @@ namespace Internet
 
         public NowPlaying()
         {
-            Help = "np (<user>)\t\t- Returns your currently playing music (from Last.fm). You can also supply a specific username to check.";
+            Help = "np (<user>) - Returns your currently playing music (from Last.fm). You can also supply a specific username to check.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
@@ -138,7 +138,7 @@ namespace Internet
     {
         public NowPlayingRegister()
         {
-            Help = "npregister/nplink <Last.fm Name>\t\t- Links the specified Last.fm account name to your IRC name.";
+            Help = "npregister/nplink <Last.fm Name> - Links the specified Last.fm account name to your IRC name.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }

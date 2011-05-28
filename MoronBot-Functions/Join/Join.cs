@@ -10,7 +10,7 @@ namespace Bot
     {
         public Join()
         {
-            Help = "join <channel>\t\t- Joins the specified channel.";
+            Help = "join <channel> - Joins the specified channel.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }

@@ -10,7 +10,7 @@ namespace Bot
     {
         public Nick()
         {
-            Help = "nick <nick>\t\t- Changes the bot's nick to the one specified.";
+            Help = "nick <nick> - Changes the bot's nick to the one specified.";
             Type = Types.Command;
             AccessLevel = AccessLevels.UserList;
 

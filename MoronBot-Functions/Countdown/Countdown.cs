@@ -58,7 +58,7 @@ namespace Utility
 
         public Countdown()
         {
-            Help = "countdown/time(un)till (<event>)\t\t- Tells you the amount of time left until the specified event. Without a parameter, it will tell you how long until the next desertbus.";
+            Help = "countdown/time(un)till (<event>) - Tells you the amount of time left until the specified event. Without a parameter, it will tell you how long until the next desertbus.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
@@ -153,7 +153,7 @@ namespace Utility
     {
         public AddEvent()
         {
-            Help = "(add/set)event <date> <event> \t\t- Adds an 'event' to the list of events used in Countdown. <date> is in dd-MM-yyyy format. You can put the date in brackets if you want to specify time and so forth.";
+            Help = "(add/set)event <date> <event>  - Adds an 'event' to the list of events used in Countdown. <date> is in dd-MM-yyyy format. You can put the date in brackets if you want to specify time and so forth.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
@@ -223,7 +223,7 @@ namespace Utility
     {
         public RemoveEvent()
         {
-            Help = "r(emove)event <event> \t\t- Removes the specified 'event' from the list of events used in Countdown.";
+            Help = "r(emove)event <event>  - Removes the specified 'event' from the list of events used in Countdown.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
@@ -269,7 +269,7 @@ namespace Utility
     {
         public Upcoming()
         {
-            Help = "upcoming/events (<days>)\t\t- Tells you all of the events coming up in the next week, or the next <days>, if you give a number parameter.";
+            Help = "upcoming/events (<days>) - Tells you all of the events coming up in the next week, or the next <days>, if you give a number parameter.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }

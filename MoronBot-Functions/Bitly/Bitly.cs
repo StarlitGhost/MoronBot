@@ -12,7 +12,7 @@ namespace Internet
     {
         public Bitly()
         {
-            Help = "bitly/shorten <url>\t\t- Gives you a shortened version of a url, via bit.ly";
+            Help = "bitly/shorten <url> - Gives you a shortened version of a url, via bit.ly";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }

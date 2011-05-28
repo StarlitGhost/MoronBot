@@ -14,7 +14,7 @@ namespace Utility
     {
         public Log()
         {
-            Help = "log\t\t- Posts the daily log to pastebin.com, and returns a link to it.";
+            Help = "log - Posts the daily log to pastebin.com, and returns a link to it.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }

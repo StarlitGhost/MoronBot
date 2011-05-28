@@ -12,7 +12,7 @@ namespace Bot
     {
         public Ignore()
         {
-            Help = "ignore <user(s)>\t\t- Tells MoronBot to ignore the specified user(s). UserList functions will still work, however (TellAuto, for instance).";
+            Help = "ignore <user(s)> - Tells MoronBot to ignore the specified user(s). UserList functions will still work, however (TellAuto, for instance).";
             Type = Types.Command;
             AccessLevel = AccessLevels.UserList;
 
@@ -43,7 +43,7 @@ namespace Bot
     {
         public Unignore()
         {
-            Help = "unignore <user(s)>\t\t- Tells MoronBot to unignore the specified user(s).";
+            Help = "unignore <user(s)> - Tells MoronBot to unignore the specified user(s).";
             Type = Types.Command;
             AccessLevel = AccessLevels.UserList;
 
