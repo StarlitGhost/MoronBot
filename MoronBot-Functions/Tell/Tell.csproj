@@ -51,6 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SentTells.cs" />
+    <Compile Include="TellAuto.cs" />
     <Compile Include="Tell.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
