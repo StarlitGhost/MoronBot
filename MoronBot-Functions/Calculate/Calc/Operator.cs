@@ -48,7 +48,7 @@ namespace Utility.Calc
                 Symbol = OperatorSymbol.Add,
                 SymbolText = "+",
                 OperandCount = 2,
-                PrecedenceLevel = 4,
+                PrecedenceLevel = 5,
                 Associativity = OperatorAssociativity.LeftToRight
             });
 
@@ -57,7 +57,7 @@ namespace Utility.Calc
                 Symbol = OperatorSymbol.Subtract,
                 SymbolText = "-",
                 OperandCount = 2,
-                PrecedenceLevel = 4,
+                PrecedenceLevel = 5,
                 Associativity = OperatorAssociativity.LeftToRight
             });
 
@@ -66,7 +66,7 @@ namespace Utility.Calc
                 Symbol = OperatorSymbol.Multiply,
                 SymbolText = "*",
                 OperandCount = 2,
-                PrecedenceLevel = 3,
+                PrecedenceLevel = 4,
                 Associativity = OperatorAssociativity.LeftToRight
             });
 
@@ -75,7 +75,7 @@ namespace Utility.Calc
                 Symbol = OperatorSymbol.Divide,
                 SymbolText = "/",
                 OperandCount = 2,
-                PrecedenceLevel = 3,
+                PrecedenceLevel = 4,
                 Associativity = OperatorAssociativity.LeftToRight
             });
 
@@ -84,7 +84,7 @@ namespace Utility.Calc
                 Symbol = OperatorSymbol.Modulus,
                 SymbolText = "%",
                 OperandCount = 2,
-                PrecedenceLevel = 3,
+                PrecedenceLevel = 4,
                 Associativity = OperatorAssociativity.LeftToRight
             });
 
@@ -93,7 +93,7 @@ namespace Utility.Calc
                 Symbol = OperatorSymbol.Exponent,
                 SymbolText = "^",
                 OperandCount = 2,
-                PrecedenceLevel = 2,
+                PrecedenceLevel = 3,
                 Associativity = OperatorAssociativity.LeftToRight
             });
 
