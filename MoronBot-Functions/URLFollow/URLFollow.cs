@@ -47,6 +47,9 @@ namespace Automatic
                     return null;
                 }
 
+                if (webPage.Domain == null)
+                    return null;
+
                 // Hunt for the title tags on the page, and grab the text between them.
                 string title;
                 match = Regex.Match(webPage.Page, @"<\s*title\s*>(.*?)</title\s*>", RegexOptions.Singleline | RegexOptions.IgnoreCase);

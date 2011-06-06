@@ -30,23 +30,28 @@ namespace MBUtilities
                 request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:2.0.1) Gecko/20100101 Firefox/4.0.1";
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-                Stream responseStream = response.GetResponseStream();
-                System.Text.Encoding encode = System.Text.Encoding.UTF8;
-                StreamReader stream = new StreamReader(responseStream, encode);
+                if (response.ContentType.StartsWith("text/"))
+                {
+                    Stream responseStream = response.GetResponseStream();
+                    System.Text.Encoding encode = System.Text.Encoding.UTF8;
+                    StreamReader stream = new StreamReader(responseStream, encode);
 
-                StringBuilder sb = new StringBuilder();
+                    StringBuilder sb = new StringBuilder();
 
-                sb.Append(stream.ReadToEnd());
+                    sb.Append(stream.ReadToEnd());
 
-                WebPage webPage = new WebPage();
+                    WebPage webPage = new WebPage();
 
-                webPage.Domain = response.ResponseUri.Scheme + "://" + response.ResponseUri.Host;
-                webPage.Page = sb.ToString();
+                    webPage.Domain = response.ResponseUri.Scheme + "://" + response.ResponseUri.Host;
+                    webPage.Page = sb.ToString();
 
-                response.Close();
-                stream.Close();
+                    response.Close();
+                    stream.Close();
 
-                return webPage;
+                    return webPage;
+                }
+
+                return new WebPage();
             }
             catch (System.Exception ex)
             {
