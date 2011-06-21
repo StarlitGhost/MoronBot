@@ -75,6 +75,7 @@ namespace MoronBot
 
         public List<IRCResponse> MessageQueue = new List<IRCResponse>();
 
+        bool showForm;
 
         #endregion Variables
 
@@ -107,6 +108,8 @@ namespace MoronBot
             nick = Settings.Instance.Nick;
             Settings.Instance.CurrentNick = nick;
 
+            showForm = Settings.Instance.ShowForm;
+
             channels = new List<Channel>();
 
             cwIRC = new CwIRC.Interface();
@@ -125,6 +128,7 @@ namespace MoronBot
         /// </summary>
         ~MoronBot()
         {
+            SaveXML("settings.xml");
             cwIRC.Disconnect();
         }
         #endregion Constructor & Destructor
@@ -215,7 +219,14 @@ namespace MoronBot
             DateTime date = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "GMT Standard Time");
 
             string timeData = date.ToString(@"[HH:mm] ") + data;
-            Program.form.txtIRC_Update(fileName + " " + timeData);
+            if (showForm)
+            {
+                Program.form.txtIRC_Update(fileName + " " + timeData);
+            }
+            else
+            {
+                Console.WriteLine(fileName + " " + timeData);
+            }
 
             string fileDate = date.ToString(@" yyyy-MM-dd");
             Logger.Write(timeData, @".\logs\" + Settings.Instance.Server + fileDate + @"\" + fileName + @".txt");
@@ -265,7 +276,8 @@ namespace MoronBot
                     Users.Sort();
                     newChannel.Users = Users;
                     channels.Add(newChannel);
-                    Program.form.RefreshListBox();
+                    if (showForm)
+                        Program.form.RefreshListBox();
                     break;
                 case "376": // Nick accepted?
                     cwIRC.JOIN(Settings.Instance.Channel);
@@ -279,9 +291,11 @@ namespace MoronBot
                     {
                         nick = parameter;
                         Settings.Instance.CurrentNick = nick;
-                        Program.form.Text = nick;
+                        if (showForm)
+                            Program.form.Text = nick;
                     }
-                    Program.form.RefreshListBox();
+                    if (showForm)
+                        Program.form.RefreshListBox();
                     Log(message.User.Name + " is now known as " + parameter, parameter);
                     break;
                 case "JOIN":
@@ -295,7 +309,8 @@ namespace MoronBot
                                     channels[i].Users.Add(message.User.Name);
                             }
                         }
-                        Program.form.RefreshListBox();
+                        if (showForm)
+                            Program.form.RefreshListBox();
                     }
                     Log(message.User.Name + " joined " + parameter, parameter);
                     break;
@@ -307,7 +322,8 @@ namespace MoronBot
                             if (channels[i].Name == parameter)
                             {
                                 channels.RemoveAt(i);
-                                //Program.form.RefreshListBox();
+                                //if (showForm)
+                                    //Program.form.RefreshListBox();
                             }
                         }
                     }
@@ -347,7 +363,8 @@ namespace MoronBot
                             if (channels[i].Name == parameter)
                             {
                                 channels.RemoveAt(i);
-                                //Program.form.RefreshListBox();
+                                //if (showForm)
+                                    //Program.form.RefreshListBox();
                             }
                         }
                         cwIRC.JOIN(message.MessageList[2]);
@@ -489,7 +506,6 @@ namespace MoronBot
                 while ((inMessage = cwIRC.GetData()) != null)
                 {
                     worker.ReportProgress(0, inMessage);
-                    Console.WriteLine(inMessage);
                 }
             }
         }
@@ -501,7 +517,8 @@ namespace MoronBot
         public void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             BotMessage message = new BotMessage(e.UserState.ToString(), Settings.Instance.CurrentNick);
-            Program.form.txtProgLog_Update(message.ToString());
+            if (showForm)
+                Program.form.txtProgLog_Update(message.ToString());
             ProcessMessage(message);
         }
         /// <summary>
