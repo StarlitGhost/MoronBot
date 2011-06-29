@@ -38,7 +38,8 @@ namespace Internet
                     var status = mpc.Status();
                     TimeSpan elapsed = TimeSpan.FromSeconds(status.TimeElapsed);
                     TimeSpan total = TimeSpan.FromSeconds(status.TimeTotal);
-                    string timeMsg = elapsed.Minutes + ":" + elapsed.Seconds.ToString("D2") + "/" + total.Minutes + ":" + total.Seconds.ToString("D2");
+                    string timeMsg = (elapsed.Hours > 0 ? elapsed.Hours + ":" : "") + elapsed.Minutes + ":" + elapsed.Seconds.ToString("D2") + "/" +
+                        (total.Hours > 0 ? total.Hours + ":" : "") + total.Minutes + ":" + total.Seconds.ToString("D2");
 
                     string output = "Playing: " + songMsg +
                         " [" + timeMsg + "] - Listen here: http://moddington.net:8000/moddtunes.ogg";

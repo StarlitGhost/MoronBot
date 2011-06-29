@@ -37,7 +37,7 @@
     </Reference>
     <Reference Include="libmpc.net">
       <HintPath>.\libmpc.net.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MBFunctionInterface">
       <HintPath>..\..\MoronBot\bin\MBFunctionInterface.dll</HintPath>
