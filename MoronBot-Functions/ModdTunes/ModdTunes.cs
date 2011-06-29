@@ -33,7 +33,18 @@ namespace Internet
                     mpc.Connection = new MpcConnection(new IPEndPoint(addresses[0], 6600));
 
                     var song = mpc.CurrentSong();
-                    string songMsg = song.Title + " - " + song.Artist;
+                    string songMsg = "";
+                    if (song.HasTitle || song.HasArtist)
+                    {
+                        if (song.HasTitle) songMsg += song.Title;
+                        else songMsg += "<Unknown Title>";
+                        if (song.HasArtist) songMsg += " - " + song.Artist;
+                        else songMsg += "<Unknown Artist>";
+                    }
+                    else
+                    {
+                        songMsg += song.File;
+                    }
 
                     var status = mpc.Status();
                     TimeSpan elapsed = TimeSpan.FromSeconds(status.TimeElapsed);
