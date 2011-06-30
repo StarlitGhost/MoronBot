@@ -15,6 +15,7 @@ namespace CwIRC
         public struct UserStruct
         {
             public string Name;
+            public string User;
             public string Hostmask;
         }
         public UserStruct User;
@@ -81,11 +82,14 @@ namespace CwIRC
                 {
                     string[] userArray = messageList[0].Split('!');
                     User.Name = userArray[0].TrimStart(':');
-                    User.Hostmask = userArray[1];
+                    string[] userHostArray = userArray[1].Split('@');
+                    User.User = userHostArray[0];
+                    User.Hostmask = userHostArray[1];
                 }
                 else
                 {
-                    User.Name = messageList[0];
+                    User.Name = messageList[0].TrimStart(':');
+                    User.User = "";
                     User.Hostmask = "";
                 }
 

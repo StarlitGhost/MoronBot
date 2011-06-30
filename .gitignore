@@ -5,3 +5,4 @@ MoronBot-Executable/*
 /*/*/obj/*
 /*/bin/*
 /*/*/bin/*
+*/debug/*

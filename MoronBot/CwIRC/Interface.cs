@@ -27,6 +27,39 @@ namespace CwIRC
     /// </summary>
     public class Interface
     {
+        #region Singleton rubbish
+        static Interface instance = null;
+        static readonly object padlock = new object();
+
+        Interface()
+        {
+            //sqlite = new SQLiteConnection("Data Source=/Data/database.db");
+        }
+
+        public static Interface Instance
+        {
+            get 
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new Interface();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public static void Assign(Interface face)
+        {
+            lock (padlock)
+            {
+                instance = face;
+            }
+        }
+        #endregion Singleton rubbish
+
         TcpClient connection;
         NetworkStream networkStream;
         StreamReader streamReader;

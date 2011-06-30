@@ -62,6 +62,7 @@
     <Reference Include="GithubSharp.Core, Version=1.0.4101.6854, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>GithubSharp.Core.dll</HintPath>
     </Reference>
+    <Reference Include="libmpc.net, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="MBUtilities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -147,12 +148,6 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Bitly.dll" />
-    <Content Include="GAPI.dll" />
-    <Content Include="GithubSharp.Core.dll" />
-    <Content Include="System.Data.SQLite.dll" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CwIRC\CwIRC.csproj">

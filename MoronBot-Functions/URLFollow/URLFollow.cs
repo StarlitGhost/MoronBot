@@ -38,11 +38,13 @@ namespace Automatic
                 }
                 catch (System.Net.WebException ex)
                 {
+                    Logger.Write(ex.ToString(), "exceptions.txt");
                     // Nothing returned when attempting to fetch the url
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Nothing found at " + match.Value, message.ReplyTo) };
                 }
                 catch (System.UriFormatException ex)
                 {
+                    Logger.Write(ex.ToString(), "exceptions.txt");
                     // Invalid url detected, don't really care though.
                     return null;
                 }

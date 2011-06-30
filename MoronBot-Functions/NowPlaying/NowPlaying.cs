@@ -65,6 +65,7 @@ namespace Internet
                 }
                 catch (System.Net.WebException ex)
                 {
+                    Logger.Write(ex.ToString(), "exceptions.txt");
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "User \"" + lastfmName + "\" not found on Last.fm", message.ReplyTo) };
                 }
 

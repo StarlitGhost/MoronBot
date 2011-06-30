@@ -19,6 +19,7 @@ using System.Xml.Serialization;
 using CwIRC;
 using MBFunctionInterface;
 using MBUtilities;
+using MBUtilities.Channel;
 
 using System.Windows.Forms;
 
@@ -34,7 +35,7 @@ namespace MoronBot
         BackgroundWorker worker;
         CwIRC.Interface cwIRC;
 
-        string desiredNick, nick;
+        string desiredNick;
         /// <summary>
         /// Nickname of the Bot
         /// </summary>
@@ -42,21 +43,15 @@ namespace MoronBot
         {
             get
             {
-                return nick;
+                return Settings.Instance.CurrentNick;
+            }
+            set 
+            {
+                Program.form.Text = value;
+                Settings.Instance.CurrentNick = value;
             }
         }
         int nickUsedCount = 0;
-
-        public struct Channel 
-        {
-            public string Name;
-            public List<string> Users;
-        }
-        List<Channel> channels;
-        public List<Channel> Channels
-        {
-            get { return channels; }
-        }
 
         public List<IFunction> UserListFunctions = new List<IFunction>();
         public List<IFunction> RegexFunctions = new List<IFunction>();
@@ -104,12 +99,9 @@ namespace MoronBot
                 SaveXML("settings.xml");
             }
             desiredNick = Settings.Instance.Nick;
-            nick = Settings.Instance.Nick;
-            Settings.Instance.CurrentNick = nick;
+            Nick = desiredNick;
 
-            channels = new List<Channel>();
-
-            cwIRC = new CwIRC.Interface();
+            cwIRC = CwIRC.Interface.Instance;
             cwIRC.Connect(Settings.Instance.Server, Settings.Instance.Port);
             cwIRC.NICK(desiredNick);
             cwIRC.USER(desiredNick, "Meh", "Whatever", "MoronBot 0.1.6");
@@ -247,79 +239,55 @@ namespace MoronBot
                     cwIRC.NICK(desiredNick);
                     cwIRC.USER(desiredNick, "Meh", "Whatever", "MoronBot 0.1.6");
                     break;
+                case "324": // Channel modes
+                    ChannelList.Parse324(message);
+                    break;
                 case "332": // Current Topic
+                    ChannelList.Parse332(message);
                     break;
                 case "333": // Who set the current topic, and when
                     break;
+                case "352":
+                    ChannelList.Parse352(message);
+                    break;
                 case "353": // User List
-                    Channel newChannel = new Channel();
-                    newChannel.Name = message.MessageList[4];
-                    List<string> Users = new List<string>();
-                    for (int i = 5; i < message.MessageList.Count; i++)
-                    {
-                        if (message.MessageList[i].Length > 0)
-                        {
-                            Users.Add(message.MessageList[i].TrimStart(':'));
-                        }
-                    }
-                    Users.Sort();
-                    newChannel.Users = Users;
-                    channels.Add(newChannel);
+                    ChannelList.Parse353(message);
                     Program.form.RefreshListBox();
                     break;
-                case "376": // Nick accepted?
+                case "376": // End of MOTD (Used as 'Nick Accepted')
+                    Nick = message.MessageList[2];
                     cwIRC.JOIN(Settings.Instance.Channel);
                     break;
                 case "433": // Nick In Use
                     nickUsedCount++;
+                    Nick = desiredNick + nickUsedCount;
                     cwIRC.NICK(desiredNick + nickUsedCount);
                     break;
                 case "NICK":
-                    if (message.User.Name == nick)
+                    if (message.User.Name == Nick)
                     {
-                        nick = parameter;
-                        Settings.Instance.CurrentNick = nick;
-                        Program.form.Text = nick;
+                        Nick = parameter;
                     }
                     Program.form.RefreshListBox();
                     Log(message.User.Name + " is now known as " + parameter, parameter);
                     break;
                 case "JOIN":
-                    if (message.User.Name != nick)
+                    ChannelList.ParseJOIN(message);
+
+                    if (message.User.Name == Nick)
                     {
-                        for (int i = 0; i < channels.Count; i++)
-                        {
-                            if (channels[i].Name == message.MessageList[2].TrimStart(':'))
-                            {
-                                if (!channels[i].Users.Contains(message.User.Name))
-                                    channels[i].Users.Add(message.User.Name);
-                            }
-                        }
-                        Program.form.RefreshListBox();
+                        cwIRC.SendData("MODE " + message.MessageList[2].TrimStart(':'));
                     }
+
+                    cwIRC.SendData("WHO " + message.MessageList[2].TrimStart(':'));
+
                     Log(message.User.Name + " joined " + parameter, parameter);
                     break;
                 case "PART":
-                    if (message.User.Name == nick)
+                    ChannelList.ParsePART(message);
+
+                    if (message.User.Name == Nick)
                     {
-                        for (int i = channels.Count - 1; i >= 0; i--)
-                        {
-                            if (channels[i].Name == parameter)
-                            {
-                                channels.RemoveAt(i);
-                                //Program.form.RefreshListBox();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (int i = 0; i < channels.Count; i++)
-                        {
-                            if (channels[i].Name == message.MessageList[2].TrimStart(':'))
-                            {
-                                channels[i].Users.Remove(message.User.Name);
-                            }
-                        }
                     }
 
                     logText = message.User.Name + " left " + parameter + " message: " + String.Join(" ", message.MessageList.ToArray(), 3, message.MessageList.Count - 3).TrimStart(':');
@@ -327,29 +295,15 @@ namespace MoronBot
                     Log(logText, parameter);
                     break;
                 case "QUIT":
-                    for (int i = 0; i < channels.Count; i++)
-                    {
-                        if (channels[i].Name == message.MessageList[2].TrimStart(':'))
-                        {
-                            channels[i].Users.Remove(message.User.Name);
-                        }
-                    }
+                    ChannelList.ParseQUIT(message);
 
                     logText = message.User.Name + " quit, message: " + String.Join(" ", message.MessageList.ToArray(), 2, message.MessageList.Count - 2);
 
                     //Log(logText, parameter);
                     break;
                 case "KICK":
-                    if (message.MessageList[3] == nick)
+                    if (message.MessageList[3] == Nick)
                     {
-                        for (int i = channels.Count - 1; i >= 0; i--)
-                        {
-                            if (channels[i].Name == parameter)
-                            {
-                                channels.RemoveAt(i);
-                                //Program.form.RefreshListBox();
-                            }
-                        }
                         cwIRC.JOIN(message.MessageList[2]);
                     }
 
@@ -423,7 +377,7 @@ namespace MoronBot
                     ExecuteFunctionList(RegexFunctions, message);
                     SendQueue();
 
-                    Match match = Regex.Match(message.MessageString, @"^(\||" + nick + @"(,|:)?[ ])", RegexOptions.IgnoreCase);
+                    Match match = Regex.Match(message.MessageString, @"^(\||" + Nick + @"(,|:)?[ ])", RegexOptions.IgnoreCase);
                     if (match.Success)
                     {
                         ExecuteFunctionList(CommandFunctions, message);
@@ -500,7 +454,7 @@ namespace MoronBot
         /// <param name="e"></param>
         public void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            BotMessage message = new BotMessage(e.UserState.ToString(), Settings.Instance.CurrentNick);
+            BotMessage message = new BotMessage(e.UserState.ToString(), Nick);
             Program.form.txtProgLog_Update(message.ToString());
             ProcessMessage(message);
         }

@@ -24,12 +24,12 @@ namespace Bot
                     string output = "";
                     foreach (string parameter in message.ParameterList)
                     {
-                        output += "JOIN ";
-                        if (!parameter.StartsWith("#"))
+                        string channel = parameter;
+                        if (!channel.StartsWith("#"))
                         {
-                            output += "#";
+                            channel = "#" + channel;
                         }
-                        output += parameter + "\r\n";
+                        output += "JOIN " + channel + "\r\n";
                     }
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Raw, output, "") };
                 }

@@ -12,6 +12,7 @@
     <AssemblyName>MBUtilities</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,8 +32,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bitly, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
-    <Reference Include="GAPI, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="Bitly">
+      <HintPath>..\bin\Bitly.dll</HintPath>
+    </Reference>
+    <Reference Include="GAPI">
+      <HintPath>..\bin\GAPI.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
@@ -43,12 +48,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Channel\Channel.cs" />
+    <Compile Include="Channel\ChannelList.cs" />
+    <Compile Include="Channel\User.cs" />
     <Compile Include="FileUtils.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="MyExtensions.cs" />
     <Compile Include="PluginLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="URL.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CwIRC\CwIRC.csproj">
+      <Project>{E4D2DC70-87EA-405A-ACDC-8E0AD3015607}</Project>
+      <Name>CwIRC</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MBFunctionInterface\MBFunctionInterface.csproj">
+      <Project>{CC33E7C5-53BF-4A3F-9B0F-F11939F61F84}</Project>
+      <Name>MBFunctionInterface</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.txtProgLog = new System.Windows.Forms.TextBox();
             this.splitPanelTextFields = new System.Windows.Forms.SplitContainer();
             this.txtIRC = new System.Windows.Forms.TextBox();
@@ -38,6 +39,7 @@
             this.splitLists = new System.Windows.Forms.SplitContainer();
             this.listChannels = new System.Windows.Forms.ListBox();
             this.listUsers = new System.Windows.Forms.ListBox();
+            this.channelListBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.splitPanelTextFields.Panel1.SuspendLayout();
             this.splitPanelTextFields.Panel2.SuspendLayout();
             this.splitPanelTextFields.SuspendLayout();
@@ -45,6 +47,7 @@
             this.splitLists.Panel1.SuspendLayout();
             this.splitLists.Panel2.SuspendLayout();
             this.splitLists.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.channelListBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // txtProgLog
@@ -211,6 +214,10 @@
             this.listUsers.TabIndex = 0;
             this.listUsers.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.listUsers_DrawItem);
             // 
+            // channelListBindingSource
+            // 
+            this.channelListBindingSource.DataSource = typeof(MBUtilities.Channel.ChannelList);
+            // 
             // formMoronBot
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -232,6 +239,7 @@
             this.splitLists.Panel1.ResumeLayout(false);
             this.splitLists.Panel2.ResumeLayout(false);
             this.splitLists.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.channelListBindingSource)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -248,6 +256,7 @@
         private System.Windows.Forms.ListBox listChannels;
         private System.Windows.Forms.SplitContainer splitLists;
         private System.Windows.Forms.ListBox listUsers;
+        private System.Windows.Forms.BindingSource channelListBindingSource;
     }
 }
 
