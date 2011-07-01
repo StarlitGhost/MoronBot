@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace MBUtilities.Channel
 {
@@ -22,5 +19,10 @@ namespace MBUtilities.Channel
         public List<char> Modes { get; set; }
 
         public string Symbols { get; set; }
+
+        public override string ToString()
+        {
+            return Symbols + Nick;
+        }
     }
 }

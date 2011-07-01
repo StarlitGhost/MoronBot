@@ -11,8 +11,8 @@ namespace MoronBot
     {
         public MoronBot moronBot;
 
-        BindingList<Channel> _bindingListChannels;
-        BindingList<User> _bindingListUsers;
+        BindingSource _bindingSourceChannels = new BindingSource();
+        BindingSource _bindingSourceUsers = new BindingSource();
 
         public formMoronBot()
         {
@@ -27,13 +27,17 @@ namespace MoronBot
 
             moronBot = new MoronBot();
 
-            _bindingListChannels = ChannelList.Channels;
-            listChannels.DataSource = _bindingListChannels;
+            _bindingSourceChannels.DataSource = ChannelList.Channels;
+            _bindingSourceChannels.ListChanged += bindingSourceChannels_ListChanged;
             listChannels.DisplayMember = "Name";
+            listChannels.DataSource = _bindingSourceChannels;
 
-            _bindingListUsers = new BindingList<User>();
-            listUsers.DataSource = _bindingListUsers;
             listUsers.DisplayMember = "Nick";
+            listUsers.DataSource = _bindingSourceUsers;
+
+            moronBot.NickChanged += moronBot_NickChanged;
+            moronBot.NewRawIRC += moronBot_NewRawIRC;
+            moronBot.NewFormattedIRC += moronBot_NewFormattedIRC;
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -44,13 +48,12 @@ namespace MoronBot
 
         private void btnExit_Click(object sender, EventArgs e)
         {
-            moronBot.SaveXML("settings.xml");
             Close();
         }
 
-        public void txtProgLog_Update(string p_text)
+        public void moronBot_NewRawIRC(object sender, string text)
         {
-            txtProgLog.Text += p_text + "\r\n";
+            txtProgLog.Text += text + "\r\n";
         }
 
         private void txtProgLog_TextChanged(object sender, EventArgs e)
@@ -59,9 +62,9 @@ namespace MoronBot
             txtProgLog.ScrollToCaret();
         }
 
-        public void txtIRC_Update(string p_text)
+        public void moronBot_NewFormattedIRC(object sender, string text)
         {
-            txtIRC.Text += p_text + "\r\n";
+            txtIRC.Text += text + "\r\n";
         }
 
         private void txtIRC_TextChanged(object sender, EventArgs e)
@@ -79,42 +82,49 @@ namespace MoronBot
             }
         }
 
-        public void RefreshListBox()
+        public void RefreshUsers()
         {
-            //_bindingListChannels.ListChanged = 
-            //_bindingListChannels.ResetBindings();
-            //_bindingListUsers.ResetBindings();
-            Refresh();
+            _bindingSourceUsers.DataSource = null;
+            _bindingSourceUsers.DataSource = ChannelList.Channels[listChannels.SelectedIndex].Users;
+        }
+
+        private void bindingSourceChannels_ListChanged(object sender, ListChangedEventArgs e)
+        {
+            RefreshUsers();
         }
 
         private void listChannels_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //_bindingListUsers = ChannelList.Channels[listChannels.SelectedIndex].Users;
-            RefreshListBox();
+            RefreshUsers();
+        }
+
+        private void moronBot_NickChanged(object sender, string nick)
+        {
+            Text = nick;
         }
 
         private void listChannels_DrawItem(object sender, DrawItemEventArgs e)
         {
-            //e.DrawBackground();
-            //e.Graphics.DrawString(
-            //    _bindingListChannels[e.Index].Name,
-            //    new Font(FontFamily.GenericMonospace, 10, FontStyle.Regular),
-            //    new SolidBrush(Color.WhiteSmoke),
-            //    e.Bounds
-            //    );
-            //e.DrawFocusRectangle();
+            e.DrawBackground();
+            e.Graphics.DrawString(
+                _bindingSourceChannels[e.Index].ToString(),
+                new Font("Segoe UI", 8, FontStyle.Regular),
+                new SolidBrush(Color.WhiteSmoke),
+                e.Bounds
+                );
+            e.DrawFocusRectangle();
         }
 
         private void listUsers_DrawItem(object sender, DrawItemEventArgs e)
         {
-            //e.DrawBackground();
-            //e.Graphics.DrawString(
-            //    _bindingListUsers[e.Index].Nick,
-            //    new Font(FontFamily.GenericMonospace, 10, FontStyle.Regular),
-            //    new SolidBrush(Color.WhiteSmoke),
-            //    e.Bounds
-            //    );
-            //e.DrawFocusRectangle();
+            e.DrawBackground();
+            e.Graphics.DrawString(
+                _bindingSourceUsers[e.Index].ToString(),
+                new Font("Segoe UI", 8, FontStyle.Regular),
+                new SolidBrush(Color.WhiteSmoke),
+                e.Bounds
+                );
+            e.DrawFocusRectangle();
         }
     }
 }

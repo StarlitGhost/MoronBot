@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 
 namespace MBUtilities.Channel
 {
@@ -23,5 +20,10 @@ namespace MBUtilities.Channel
         public BindingList<User> Users { get; set; }
 
         public List<char> Modes { get; set; }
+
+        public override string ToString()
+        {
+            return Name + " (" + Users.Count + ")";
+        }
     }
 }

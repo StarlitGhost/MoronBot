@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.txtProgLog = new System.Windows.Forms.TextBox();
             this.splitPanelTextFields = new System.Windows.Forms.SplitContainer();
             this.txtIRC = new System.Windows.Forms.TextBox();
@@ -39,7 +38,6 @@
             this.splitLists = new System.Windows.Forms.SplitContainer();
             this.listChannels = new System.Windows.Forms.ListBox();
             this.listUsers = new System.Windows.Forms.ListBox();
-            this.channelListBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.splitPanelTextFields.Panel1.SuspendLayout();
             this.splitPanelTextFields.Panel2.SuspendLayout();
             this.splitPanelTextFields.SuspendLayout();
@@ -47,7 +45,6 @@
             this.splitLists.Panel1.SuspendLayout();
             this.splitLists.Panel2.SuspendLayout();
             this.splitLists.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.channelListBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // txtProgLog
@@ -56,7 +53,7 @@
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.txtProgLog.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.txtProgLog.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtProgLog.Font = new System.Drawing.Font("Inconsolata", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtProgLog.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.txtProgLog.Location = new System.Drawing.Point(3, 3);
             this.txtProgLog.Multiline = true;
@@ -97,7 +94,7 @@
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.txtIRC.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.txtIRC.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtIRC.Font = new System.Drawing.Font("Inconsolata", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtIRC.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.txtIRC.Location = new System.Drawing.Point(3, 3);
             this.txtIRC.Multiline = true;
@@ -114,11 +111,11 @@
             this.txtInput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.txtInput.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.txtInput.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtInput.Font = new System.Drawing.Font("Inconsolata", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtInput.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.txtInput.Location = new System.Drawing.Point(4, 228);
             this.txtInput.Name = "txtInput";
-            this.txtInput.Size = new System.Drawing.Size(572, 22);
+            this.txtInput.Size = new System.Drawing.Size(572, 23);
             this.txtInput.TabIndex = 0;
             this.txtInput.Text = "<Input>";
             this.txtInput.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtInput_KeyUp);
@@ -186,7 +183,7 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.listChannels.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.listChannels.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.listChannels.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.listChannels.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listChannels.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.listChannels.FormattingEnabled = true;
             this.listChannels.ItemHeight = 14;
@@ -204,7 +201,7 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.listUsers.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.listUsers.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.listUsers.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.listUsers.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listUsers.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.listUsers.FormattingEnabled = true;
             this.listUsers.ItemHeight = 14;
@@ -213,10 +210,6 @@
             this.listUsers.Size = new System.Drawing.Size(153, 200);
             this.listUsers.TabIndex = 0;
             this.listUsers.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.listUsers_DrawItem);
-            // 
-            // channelListBindingSource
-            // 
-            this.channelListBindingSource.DataSource = typeof(MBUtilities.Channel.ChannelList);
             // 
             // formMoronBot
             // 
@@ -239,7 +232,6 @@
             this.splitLists.Panel1.ResumeLayout(false);
             this.splitLists.Panel2.ResumeLayout(false);
             this.splitLists.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.channelListBindingSource)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -256,7 +248,6 @@
         private System.Windows.Forms.ListBox listChannels;
         private System.Windows.Forms.SplitContainer splitLists;
         private System.Windows.Forms.ListBox listUsers;
-        private System.Windows.Forms.BindingSource channelListBindingSource;
     }
 }
 

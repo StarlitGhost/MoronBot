@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 using MBFunctionInterface;
@@ -13,10 +11,13 @@ namespace MBUtilities.Channel
     {
         public static BindingList<Channel> Channels { get; set; }
 
+        static ChannelList()
+        {
+            Channels = new BindingList<Channel>();
+        }
+
         static int GetChannelID(string channelName)
         {
-            if (Channels == null) Channels = new BindingList<Channel>();
-
             int channelID = Channels.FindIndex(c => c.Name == channelName);
 
             if (channelID == -1)

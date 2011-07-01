@@ -10,9 +10,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
@@ -20,8 +18,6 @@ using CwIRC;
 using MBFunctionInterface;
 using MBUtilities;
 using MBUtilities.Channel;
-
-using System.Windows.Forms;
 
 namespace MoronBot
 {
@@ -32,7 +28,6 @@ namespace MoronBot
     {
         #region Variables
 
-        BackgroundWorker worker;
         CwIRC.Interface cwIRC;
 
         string desiredNick;
@@ -41,13 +36,10 @@ namespace MoronBot
         /// </summary>
         public string Nick
         {
-            get
+            get { return Settings.Instance.CurrentNick; }
+            set
             {
-                return Settings.Instance.CurrentNick;
-            }
-            set 
-            {
-                Program.form.Text = value;
+                OnNickChanged(value);
                 Settings.Instance.CurrentNick = value;
             }
         }
@@ -70,8 +62,32 @@ namespace MoronBot
 
         public List<IRCResponse> MessageQueue = new List<IRCResponse>();
 
-
         #endregion Variables
+
+        #region Events
+
+        public event StringEventHandler NickChanged;
+        protected virtual void OnNickChanged(string nick)
+        {
+            if (NickChanged != null)
+                NickChanged(this, nick);
+        }
+
+        public event StringEventHandler NewRawIRC;
+        protected virtual void OnNewRawIRC(string text)
+        {
+            if (NewRawIRC != null)
+                NewRawIRC(this, text);
+        }
+
+        public event StringEventHandler NewFormattedIRC;
+        protected virtual void OnNewFormattedIRC(string text)
+        {
+            if (NewFormattedIRC != null)
+                NewFormattedIRC(this, text);
+        }
+
+        #endregion Events
 
         #region Constructor & Destructor
         /// <summary>
@@ -84,12 +100,6 @@ namespace MoronBot
         /// </summary>
         public MoronBot()
         {
-            worker = new BackgroundWorker();
-            worker.DoWork += new DoWorkEventHandler(worker_DoWork);
-            worker.ProgressChanged += new ProgressChangedEventHandler(worker_ProgressChanged);
-            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
-            worker.WorkerReportsProgress = true;
-
             LoadFunctions();
 
             PluginLoader.WatchDirectory(Settings.Instance.FunctionPath, FuncDirChanged);
@@ -102,14 +112,14 @@ namespace MoronBot
             Nick = desiredNick;
 
             cwIRC = CwIRC.Interface.Instance;
+
+            cwIRC.MessageReceived += CwIRC_MessageReceived;
             cwIRC.Connect(Settings.Instance.Server, Settings.Instance.Port);
             cwIRC.NICK(desiredNick);
             cwIRC.USER(desiredNick, "Meh", "Whatever", "MoronBot 0.1.6");
             cwIRC.SendData("PASS mOrOnBoTuS");
 
             cwIRC.JOIN(Settings.Instance.Channel);
-
-            worker.RunWorkerAsync();
         }
         /// <summary>
         /// Destructor for MoronBot.
@@ -117,6 +127,7 @@ namespace MoronBot
         /// </summary>
         ~MoronBot()
         {
+            SaveXML("settings.xml");
             cwIRC.Disconnect();
         }
         #endregion Constructor & Destructor
@@ -207,13 +218,14 @@ namespace MoronBot
             DateTime date = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "GMT Standard Time");
 
             string timeData = date.ToString(@"[HH:mm] ") + data;
-            Program.form.txtIRC_Update(fileName + " " + timeData);
+            OnNewFormattedIRC(fileName + " " + timeData);
 
             string fileDate = date.ToString(@" yyyy-MM-dd");
             Logger.Write(timeData, @".\logs\" + Settings.Instance.Server + fileDate + @"\" + fileName + @".txt");
         }
         #endregion Basic Operations
 
+        #region Message Processing
         /// <summary>
         /// Processes messages from the server. Most of the main 'bot' functions are in here.
         /// NOTE: Should probably be split off into separate modules, for easier modification.
@@ -252,7 +264,6 @@ namespace MoronBot
                     break;
                 case "353": // User List
                     ChannelList.Parse353(message);
-                    Program.form.RefreshListBox();
                     break;
                 case "376": // End of MOTD (Used as 'Nick Accepted')
                     Nick = message.MessageList[2];
@@ -268,7 +279,6 @@ namespace MoronBot
                     {
                         Nick = parameter;
                     }
-                    Program.form.RefreshListBox();
                     Log(message.User.Name + " is now known as " + parameter, parameter);
                     break;
                 case "JOIN":
@@ -428,48 +438,18 @@ namespace MoronBot
             }
             return false;
         }
+        #endregion Message Processing
 
-        #region Background Worker
-        /// <summary>
-        /// Gets new messages from the IRC server.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void worker_DoWork(object sender, DoWorkEventArgs e)
+        #region IRC Message Receiver
+        void CwIRC_MessageReceived(object sender, string message)
         {
-            string inMessage;
-            while (true)
-            {
-                while ((inMessage = cwIRC.GetData()) != null)
-                {
-                    worker.ReportProgress(0, inMessage);
-                    Console.WriteLine(inMessage);
-                }
-            }
+            BotMessage botMessage = new BotMessage(message, Nick);
+            OnNewRawIRC(botMessage.ToString());
+            ProcessMessage(botMessage);
         }
-        /// <summary>
-        /// Called when a new message is received.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            BotMessage message = new BotMessage(e.UserState.ToString(), Nick);
-            Program.form.txtProgLog_Update(message.ToString());
-            ProcessMessage(message);
-        }
-        /// <summary>
-        /// Called when the worker is finished... should possibly remove, can't imagine a situation where it'd be needed.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
+        #endregion IRC Message Receiver
 
-        }
-        #endregion Background Worker
-
-        #region settings.xml
+        #region Settings File
         /// <summary>
         /// Loads settings into a Settings object from an XML file
         /// </summary>
@@ -502,8 +482,9 @@ namespace MoronBot
             serializer.Serialize(streamWriter, Settings.Instance);
             streamWriter.Close();
         }
-        #endregion settings.xml
+        #endregion Settings File
 
+        #region Function Loading
         void LoadFunctions()
         {
             List<IFunction> functions = new List<IFunction>();
@@ -539,5 +520,6 @@ namespace MoronBot
             System.Threading.Thread.Sleep(500);
             LoadFunctions();
         }
+        #endregion Function Loading
     }
 }

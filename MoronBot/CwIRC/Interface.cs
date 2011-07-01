@@ -9,19 +9,14 @@
 *********************************************************************/
 #endregion File Information
 
-#region Using
-
-using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-
-#endregion Using
 
 namespace CwIRC
 {
+    public delegate void StringEventHandler(object sender, string text);
+
     /// <summary>
     /// Class to manage connections to IRC servers, and the sending and receiving of data to them.
     /// </summary>
@@ -30,11 +25,6 @@ namespace CwIRC
         #region Singleton rubbish
         static Interface instance = null;
         static readonly object padlock = new object();
-
-        Interface()
-        {
-            //sqlite = new SQLiteConnection("Data Source=/Data/database.db");
-        }
 
         public static Interface Instance
         {
@@ -65,6 +55,31 @@ namespace CwIRC
         StreamReader streamReader;
         StreamWriter streamWriter;
 
+        BackgroundWorker worker;
+
+        public event StringEventHandler MessageReceived;
+        protected virtual void OnMessageReceived(string message)
+        {
+            if (MessageReceived != null)
+                MessageReceived(this, message);
+        }
+
+        Interface()
+        {
+            worker = new BackgroundWorker();
+
+            worker.DoWork += worker_DoWork;
+            worker.ProgressChanged += worker_ProgressChanged;
+            worker.WorkerReportsProgress = true;
+
+            //sqlite = new SQLiteConnection("Data Source=/Data/database.db");
+        }
+
+        ~Interface()
+        {
+            Disconnect();
+        }
+
         /// <summary>
         /// Connects to the specified IRC server, on the specified port.
         /// </summary>
@@ -84,6 +99,9 @@ namespace CwIRC
             networkStream = connection.GetStream();
             streamReader = new StreamReader(networkStream);
             streamWriter = new StreamWriter(networkStream);
+
+            worker.RunWorkerAsync();
+
             return true;
         }
         /// <summary>
@@ -178,6 +196,32 @@ namespace CwIRC
         public void QUIT(string p_quitMessage)
         {
             SendData("QUIT :" + p_quitMessage);
+        }
+
+        /// <summary>
+        /// Gets new messages from the IRC server.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            string inMessage;
+            while (true)
+            {
+                while ((inMessage = GetData()) != null)
+                {
+                    worker.ReportProgress(0, inMessage);
+                }
+            }
+        }
+        /// <summary>
+        /// Called when a new message is received.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            OnMessageReceived(e.UserState.ToString());
         }
     }
 }
