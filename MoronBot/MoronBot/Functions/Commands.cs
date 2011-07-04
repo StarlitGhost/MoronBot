@@ -22,7 +22,7 @@ namespace MoronBot.Functions
         {
             if (Regex.IsMatch(message.Command, "^(commands?|help|functions?)$", RegexOptions.IgnoreCase))
             {
-                moronBot = Program.form.moronBot;
+                moronBot = Program.moronBot;
 
                 // Specific function asked for
                 if (message.ParameterList.Count > 0)

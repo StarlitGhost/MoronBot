@@ -22,7 +22,7 @@ namespace MoronBot.Functions
         {
             if (Regex.IsMatch(message.Command, "^(load)$", RegexOptions.IgnoreCase))
             {
-                moronBot = Program.form.moronBot;
+                moronBot = Program.moronBot;
 
                 // Specific function asked for
                 if (message.ParameterList.Count > 0)
@@ -60,7 +60,7 @@ namespace MoronBot.Functions
         {
             if (Regex.IsMatch(message.Command, "^(unload)$", RegexOptions.IgnoreCase))
             {
-                moronBot = Program.form.moronBot;
+                moronBot = Program.moronBot;
 
                 // Specific function asked for
                 if (message.ParameterList.Count > 0)

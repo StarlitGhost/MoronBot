@@ -52,6 +52,8 @@ namespace MBUtilities
         public string QuitMessage = "Quitting";
         public List<string> IgnoreList = new List<string>();
 
+        public bool ShowForm = false;
+
         [XmlIgnore]
         public static string AppPath = Path.GetDirectoryName(Application.ExecutablePath);
         [XmlIgnore]
@@ -60,7 +62,6 @@ namespace MBUtilities
         public string DataPath = Path.Combine(AppPath, "Data");
 
         //private SQLiteConnection sqlite;
-
 
     }
 }

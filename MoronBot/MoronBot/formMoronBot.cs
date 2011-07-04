@@ -25,7 +25,7 @@ namespace MoronBot
             txtProgLog.Text = "";
             txtInput.Text = "";
 
-            moronBot = new MoronBot();
+            moronBot = Program.moronBot;
 
             _bindingSourceChannels.DataSource = ChannelList.Channels;
             _bindingSourceChannels.ListChanged += bindingSourceChannels_ListChanged;
