@@ -36,12 +36,12 @@ namespace Utility
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
-            ReadMessages(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + "\\TellMessages.xml"));
+            ReadMessages(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}TellMessages.xml", Path.DirectorySeparatorChar)));
         }
 
         ~Tell()
         {
-            WriteMessages(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + "\\TellMessages.xml"));
+            WriteMessages(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}TellMessages.xml", Path.DirectorySeparatorChar)));
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)

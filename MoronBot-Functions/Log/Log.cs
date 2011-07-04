@@ -38,7 +38,7 @@ namespace Utility
                 }
 
                 string fileDate = date.ToString(@" yyyy-MM-dd");
-                string filePath = @".\logs\" + Settings.Instance.Server + fileDate + @"\" + message.ReplyTo + @".txt";
+                string filePath = string.Format(@".{0}logs{0}" + Settings.Instance.Server + fileDate + @"{0}" + message.ReplyTo + @".txt", Path.DirectorySeparatorChar);
 
                 if (File.Exists(filePath))
                 {

@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 
 using CwIRC;
 using MBFunctionInterface;
+using MBUtilities;
 
 namespace Internet
 {
@@ -29,6 +31,8 @@ namespace Internet
                     }
                     catch (Gapi.Core.GapiException ex)
                     {
+                        string filePath = string.Format(@".{0}logs{0}errors.txt", Path.DirectorySeparatorChar);
+                        Logger.Write(ex.ToString(), filePath);
                         translatedString = "Couldn't work out what language you're using.";
                     }
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, translatedString, message.ReplyTo) };

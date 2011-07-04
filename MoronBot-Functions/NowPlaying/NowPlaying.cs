@@ -20,12 +20,12 @@ namespace Internet
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
-            LoadLinks(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + "\\NowPlayingLinks.xml"));
+            LoadLinks(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}NowPlayingLinks.xml", Path.DirectorySeparatorChar)));
         }
 
         ~NowPlaying()
         {
-            SaveLinks(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + "\\NowPlayingLinks.xml"));
+            SaveLinks(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}NowPlayingLinks.xml", Path.DirectorySeparatorChar)));
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
@@ -65,7 +65,8 @@ namespace Internet
                 }
                 catch (System.Net.WebException ex)
                 {
-                    Logger.Write(ex.ToString(), "exceptions.txt");
+                    string filePath = string.Format(@".{0}logs{0}errors.txt", Path.DirectorySeparatorChar);
+                    Logger.Write(ex.ToString(), filePath);
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "User \"" + lastfmName + "\" not found on Last.fm", message.ReplyTo) };
                 }
 

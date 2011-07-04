@@ -16,6 +16,7 @@ using System.Net.Sockets;
 namespace CwIRC
 {
     public delegate void StringEventHandler(object sender, string text);
+    public delegate void VoidEventHandler(object sender);
 
     /// <summary>
     /// Class to manage connections to IRC servers, and the sending and receiving of data to them.

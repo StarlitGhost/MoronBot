@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+using CwIRC;
 using MBFunctionInterface;
 
 namespace MBUtilities.Channel
@@ -10,6 +11,22 @@ namespace MBUtilities.Channel
     public static class ChannelList
     {
         public static BindingList<Channel> Channels { get; set; }
+
+        #region Events
+        public static event VoidEventHandler ChannelListModified;
+        public static void OnChannelListModified()
+        {
+            if (ChannelListModified != null)
+                ChannelListModified(new object());
+        }
+
+        public static event VoidEventHandler UserListModified;
+        public static void OnUserListModified()
+        {
+            if (UserListModified != null)
+                UserListModified(new object());
+        }
+        #endregion Events
 
         static ChannelList()
         {
@@ -26,6 +43,8 @@ namespace MBUtilities.Channel
                 channel.Name = channelName;
                 Channels.Add(channel);
                 channelID = Channels.IndexOf(channel);
+
+                OnChannelListModified();
             }
 
             return channelID;
@@ -41,6 +60,8 @@ namespace MBUtilities.Channel
                 user.Nick = nick;
                 Channels[channelID].Users.Add(user);
                 userID = Channels[channelID].Users.IndexOf(user);
+
+                OnUserListModified();
             }
 
             return userID;
@@ -57,13 +78,20 @@ namespace MBUtilities.Channel
             int channelID, userID = GetUserID(message.User.Name, message.MessageList[2].TrimStart(':'), out channelID);
 
             Channels[channelID].Users[userID].Hostmask = message.User.Hostmask;
+            OnUserListModified();
         }
 
-        public static void ParsePART(BotMessage message)
+        public static void ParsePART(BotMessage message, bool parterIsMe)
         {
             int channelID, userID = GetUserID(message.User.Name, message.MessageList[2].TrimStart(':'), out channelID);
 
             Channels[channelID].Users.RemoveAt(userID);
+            OnUserListModified();
+            if (parterIsMe)
+            {
+                Channels.RemoveAt(channelID);
+                OnChannelListModified();
+            }
         }
 
         public static void ParseQUIT(BotMessage message)
@@ -73,6 +101,7 @@ namespace MBUtilities.Channel
                 int userID = c.Users.FindIndex(u => u.Nick == message.User.Name);
                 if (userID != -1) c.Users.RemoveAt(userID);
             }
+            OnUserListModified();
         }
 
         public static void Parse324(BotMessage message)
@@ -91,6 +120,7 @@ namespace MBUtilities.Channel
                     }
                 }
             }
+            OnChannelListModified();
         }
 
         public static void Parse332(BotMessage message)
@@ -98,6 +128,7 @@ namespace MBUtilities.Channel
             int channelID = GetChannelID(message.MessageList[3]);
 
             Channels[channelID].Topic = message.RawMessage.Substring(message.RawMessage.IndexOf(':', 1) + 1);
+            OnChannelListModified();
         }
 
         public static void Parse352(BotMessage message)
@@ -108,6 +139,7 @@ namespace MBUtilities.Channel
 
             Channels[channelID].Users[userID].Hostmask = message.MessageList[5];
             Channels[channelID].Users[userID].Symbols = message.MessageList[8].TrimStart('H', 'G');
+            OnUserListModified();
         }
 
         public static void Parse353(BotMessage message)
@@ -143,6 +175,7 @@ namespace MBUtilities.Channel
                     Channels[channelID].Users.Add(user);
                 }
             }
+            OnUserListModified();
         }
     }
 }

@@ -140,7 +140,7 @@ namespace MoronBot
         /// <param name="p_target">The channel or user to send the message to.</param>
         public void Say(string p_message, string p_target)
         {
-            Log("<" + desiredNick + "> " + p_message, p_target);
+            Log("<" + Nick + "> " + p_message, p_target);
             cwIRC.PRIVMSG(p_message, p_target);
         }
         /// <summary>
@@ -150,7 +150,7 @@ namespace MoronBot
         /// <param name="p_target">The channel or user to send the notice to.</param>
         public void Notice(string p_message, string p_target)
         {
-            Log("[" + desiredNick + "] " + p_message, p_target);
+            Log("[" + Nick + "] " + p_message, p_target);
             cwIRC.NOTICE(p_message, p_target);
         }
         /// <summary>
@@ -160,7 +160,7 @@ namespace MoronBot
         /// <param name="p_target">The channel or user to send the ACTION message to.</param>
         public void Do(string p_action, string p_target)
         {
-            Log("*" + desiredNick + " " + p_action + "*", p_target);
+            Log("*" + Nick + " " + p_action + "*", p_target);
             char ctcpChar = Convert.ToChar((byte)1);
             cwIRC.PRIVMSG(ctcpChar + "ACTION " + p_action + ctcpChar, p_target);
         }
@@ -204,24 +204,27 @@ namespace MoronBot
         {
             if (MessageQueue.Count > 0)
             {
-                foreach (IRCResponse response in MessageQueue)
+                List<IRCResponse> tempQueue = new List<IRCResponse>(MessageQueue);
+                MessageQueue.Clear();
+                foreach (IRCResponse response in tempQueue)
                 {
                     Send(response);
                     System.Threading.Thread.Sleep(1700);
                 }
-                MessageQueue.Clear();
+                tempQueue.Clear();
             }
         }
 
         void Log(string data, string fileName)
         {
-            DateTime date = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "GMT Standard Time");
+            DateTime date = DateTime.Now.IsDaylightSavingTime() ? DateTime.UtcNow.AddHours(1.0) : DateTime.UtcNow;
 
             string timeData = date.ToString(@"[HH:mm] ") + data;
             OnNewFormattedIRC(fileName + " " + timeData);
 
             string fileDate = date.ToString(@" yyyy-MM-dd");
-            Logger.Write(timeData, @".\logs\" + Settings.Instance.Server + fileDate + @"\" + fileName + @".txt");
+            string filePath = string.Format(@".{0}logs{0}" + Settings.Instance.Server + fileDate + @"{0}" + fileName + @".txt", Path.DirectorySeparatorChar);
+            Logger.Write(timeData, filePath);
         }
         #endregion Basic Operations
 
@@ -294,11 +297,7 @@ namespace MoronBot
                     Log(message.User.Name + " joined " + parameter, parameter);
                     break;
                 case "PART":
-                    ChannelList.ParsePART(message);
-
-                    if (message.User.Name == Nick)
-                    {
-                    }
+                    ChannelList.ParsePART(message, message.User.Name == Nick);
 
                     logText = message.User.Name + " left " + parameter + " message: " + String.Join(" ", message.MessageList.ToArray(), 3, message.MessageList.Count - 3).TrimStart(':');
 
@@ -312,6 +311,7 @@ namespace MoronBot
                     //Log(logText, parameter);
                     break;
                 case "KICK":
+                    ChannelList.ParsePART(message, message.MessageList[3] == Nick);
                     if (message.MessageList[3] == Nick)
                     {
                         cwIRC.JOIN(message.MessageList[2]);

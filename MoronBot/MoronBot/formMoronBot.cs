@@ -9,7 +9,7 @@ namespace MoronBot
 {
     public partial class formMoronBot : Form
     {
-        public MoronBot moronBot;
+        MoronBot moronBot;
 
         BindingSource _bindingSourceChannels = new BindingSource();
         BindingSource _bindingSourceUsers = new BindingSource();
@@ -19,7 +19,7 @@ namespace MoronBot
             InitializeComponent();
         }
 
-        private void formMoronBot_Load(object sender, EventArgs e)
+        void formMoronBot_Load(object sender, EventArgs e)
         {
             txtIRC.Text = "";
             txtProgLog.Text = "";
@@ -28,7 +28,6 @@ namespace MoronBot
             moronBot = Program.moronBot;
 
             _bindingSourceChannels.DataSource = ChannelList.Channels;
-            _bindingSourceChannels.ListChanged += bindingSourceChannels_ListChanged;
             listChannels.DisplayMember = "Name";
             listChannels.DataSource = _bindingSourceChannels;
 
@@ -38,42 +37,75 @@ namespace MoronBot
             moronBot.NickChanged += moronBot_NickChanged;
             moronBot.NewRawIRC += moronBot_NewRawIRC;
             moronBot.NewFormattedIRC += moronBot_NewFormattedIRC;
+
+            ChannelList.ChannelListModified += channelList_Modified;
+            ChannelList.UserListModified += userList_Modified;
         }
 
-        private void btnClear_Click(object sender, EventArgs e)
+        void btnClear_Click(object sender, EventArgs e)
         {
             txtIRC.Text = "";
             txtProgLog.Text = "";
         }
 
-        private void btnExit_Click(object sender, EventArgs e)
+        void btnExit_Click(object sender, EventArgs e)
         {
             Close();
         }
 
-        public void moronBot_NewRawIRC(object sender, string text)
+        void moronBot_NickChanged(object sender, string nick)
         {
+            if (InvokeRequired)
+            {
+                this.BeginInvoke(new Action<object, string>(moronBot_NickChanged), new object[] { sender, nick });
+                return;
+            }
+            Text = nick;
+        }
+
+        void moronBot_NewRawIRC(object sender, string text)
+        {
+            if (InvokeRequired)
+            {
+                this.BeginInvoke(new Action<object, string>(moronBot_NewRawIRC), new object[] { sender, text });
+                return;
+            }
             txtProgLog.Text += text + "\r\n";
         }
 
-        private void txtProgLog_TextChanged(object sender, EventArgs e)
+        void moronBot_NewFormattedIRC(object sender, string text)
+        {
+            if (InvokeRequired)
+            {
+                this.BeginInvoke(new Action<object, string>(moronBot_NewFormattedIRC), new object[] { sender, text });
+                return;
+            }
+            txtIRC.Text += text + "\r\n";
+        }
+
+        void channelList_Modified(object sender)
+        {
+            RefreshChannels();
+        }
+
+        void userList_Modified(object sender)
+        {
+            RefreshChannels();
+        }
+
+        void txtProgLog_TextChanged(object sender, EventArgs e)
         {
             txtProgLog.SelectionStart = txtProgLog.Text.Length;
             txtProgLog.ScrollToCaret();
         }
 
-        public void moronBot_NewFormattedIRC(object sender, string text)
-        {
-            txtIRC.Text += text + "\r\n";
-        }
-
-        private void txtIRC_TextChanged(object sender, EventArgs e)
+        void txtIRC_TextChanged(object sender, EventArgs e)
         {
             txtIRC.SelectionStart = txtIRC.Text.Length;
             txtIRC.ScrollToCaret();
         }
 
-        private void txtInput_KeyUp(object sender, KeyEventArgs e)
+        void txtInput_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
@@ -82,29 +114,42 @@ namespace MoronBot
             }
         }
 
-        public void RefreshUsers()
+        void RefreshChannels()
         {
+            if (InvokeRequired)
+            {
+                this.BeginInvoke(new Action(RefreshChannels));
+                return;
+            }
+            _bindingSourceChannels.DataSource = null;
+            _bindingSourceChannels.DataSource = ChannelList.Channels;
+            RefreshUsers();
+        }
+
+        void RefreshUsers()
+        {
+            if (InvokeRequired)
+            {
+                this.BeginInvoke(new Action(RefreshUsers));
+                return;
+            }
             _bindingSourceUsers.DataSource = null;
+            if (listChannels.SelectedIndex == -1)
+            {
+                return;
+            }
             _bindingSourceUsers.DataSource = ChannelList.Channels[listChannels.SelectedIndex].Users;
         }
 
-        private void bindingSourceChannels_ListChanged(object sender, ListChangedEventArgs e)
+        void listChannels_SelectedIndexChanged(object sender, EventArgs e)
         {
             RefreshUsers();
         }
 
-        private void listChannels_SelectedIndexChanged(object sender, EventArgs e)
+        void listChannels_DrawItem(object sender, DrawItemEventArgs e)
         {
-            RefreshUsers();
-        }
-
-        private void moronBot_NickChanged(object sender, string nick)
-        {
-            Text = nick;
-        }
-
-        private void listChannels_DrawItem(object sender, DrawItemEventArgs e)
-        {
+            if (e.Index == -1 || _bindingSourceChannels.Count == 0)
+                return;
             e.DrawBackground();
             e.Graphics.DrawString(
                 _bindingSourceChannels[e.Index].ToString(),
@@ -115,8 +160,10 @@ namespace MoronBot
             e.DrawFocusRectangle();
         }
 
-        private void listUsers_DrawItem(object sender, DrawItemEventArgs e)
+        void listUsers_DrawItem(object sender, DrawItemEventArgs e)
         {
+            if (e.Index == -1 || _bindingSourceUsers.Count == 0)
+                return;
             e.DrawBackground();
             e.Graphics.DrawString(
                 _bindingSourceUsers[e.Index].ToString(),

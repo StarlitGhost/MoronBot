@@ -54,12 +54,12 @@ namespace Utility
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
-            LoadEvents(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + "\\Events.xml"));
+            LoadEvents(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}Events.xml", Path.DirectorySeparatorChar)));
         }
 
         ~Countdown()
         {
-            SaveEvents(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + "\\Events.xml"));
+            SaveEvents(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}Events.xml", Path.DirectorySeparatorChar)));
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)

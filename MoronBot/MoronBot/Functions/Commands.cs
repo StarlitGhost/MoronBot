@@ -13,7 +13,7 @@ namespace MoronBot.Functions
 
         public Commands()
         {
-            Help = "command(s)/help/function(s) (<function>)\t\t- Returns a list of loaded functions, or the help text of a particular function if one is specified.";
+            Help = "command(s)/help/function(s) (<function>) - Returns a list of loaded functions, or the help text of a particular function if one is specified.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
