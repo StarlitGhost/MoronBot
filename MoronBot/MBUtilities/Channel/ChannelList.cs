@@ -33,7 +33,7 @@ namespace MBUtilities.Channel
             Channels = new BindingList<Channel>();
         }
 
-        static int GetChannelID(string channelName)
+        public static int GetChannelID(string channelName)
         {
             int channelID = Channels.FindIndex(c => c.Name == channelName);
 
@@ -67,10 +67,66 @@ namespace MBUtilities.Channel
             return userID;
         }
 
-        static int GetUserID(string nick, string channel, out int channelID)
+        public static int GetUserID(string nick, string channel, out int channelID)
         {
             channelID = GetChannelID(channel);
             return GetUserID(nick, channelID);
+        }
+
+        static string GetUserModes(string nick, string channel)
+        {
+            int channelID, userID = ChannelList.GetUserID(nick, channel, out channelID);
+
+            return ChannelList.Channels[channelID].Users[userID].Symbols;
+        }
+
+        public static bool UserIsAnyOp(string nick, string channel)
+        {
+            string userModes = GetUserModes(nick, channel);
+            if (userModes.Contains("~") || userModes.Contains("&") || userModes.Contains("@") || userModes.Contains("%"))
+                return true;
+
+            return false;
+        }
+
+        public static bool UserIsFounder(string nick, string channel)
+        {
+            if (GetUserModes(nick, channel).Contains("~"))
+                return true;
+
+            return false;
+        }
+
+        public static bool UserIsSop(string nick, string channel)
+        {
+            if (GetUserModes(nick, channel).Contains("&"))
+                return true;
+
+            return false;
+        }
+
+        public static bool UserIsOp(string nick, string channel)
+        {
+            if (GetUserModes(nick, channel).Contains("@"))
+                return true;
+
+            return false;
+        }
+
+        public static bool UserIsHop(string nick, string channel)
+        {
+            if (GetUserModes(nick, channel).Contains("%"))
+                return true;
+
+            return false;
+        }
+
+        public static bool UserIsVoiced(string nick, string channel)
+        {
+            if (GetUserModes(nick, channel).Contains("+"))
+                return true;
+
+            return false;
         }
 
         public static void ParseJOIN(BotMessage message)

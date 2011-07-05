@@ -3,8 +3,8 @@ using System.Text.RegularExpressions;
 
 using CwIRC;
 using MBFunctionInterface;
-
 using MBUtilities;
+using MBUtilities.Channel;
 
 namespace Bot
 {
@@ -14,23 +14,28 @@ namespace Bot
         {
             Help = "ignore <user(s)> - Tells MoronBot to ignore the specified user(s). UserList functions will still work, however (TellAuto, for instance).";
             Type = Types.Command;
-            AccessLevel = AccessLevels.UserList;
-
-            AccessList.Add("Tyranic-Moron");
+            AccessLevel = AccessLevels.Anyone;
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(ignore)$", RegexOptions.IgnoreCase))
             {
-                foreach (string parameter in message.ParameterList)
+                if (message.TargetType == IRCMessage.TargetTypes.CHANNEL && ChannelList.UserIsAnyOp(message.User.Name, message.ReplyTo))
                 {
-                    if (!Settings.Instance.IgnoreList.Contains(parameter.ToUpper()))
+                    foreach (string parameter in message.ParameterList)
                     {
-                        Settings.Instance.IgnoreList.Add(parameter.ToUpper());
+                        if (!Settings.Instance.IgnoreList.Contains(parameter.ToUpper()))
+                        {
+                            Settings.Instance.IgnoreList.Add(parameter.ToUpper());
+                        }
                     }
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, message.Parameters + (message.ParameterList.Count > 1 ? " are " : " is ") + "now ignored.", message.ReplyTo) };
                 }
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, message.Parameters + " are now ignored.", message.ReplyTo) };
+                else
+                {
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You need to be an operator to make me ignore people :P", message.ReplyTo) };
+                }
             }
             else
             {
@@ -45,23 +50,28 @@ namespace Bot
         {
             Help = "unignore <user(s)> - Tells MoronBot to unignore the specified user(s).";
             Type = Types.Command;
-            AccessLevel = AccessLevels.UserList;
-
-            AccessList.Add("Tyranic-Moron");
+            AccessLevel = AccessLevels.Anyone;
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(unignore)$", RegexOptions.IgnoreCase))
             {
-                foreach (string parameter in message.ParameterList)
+                if (message.TargetType == IRCMessage.TargetTypes.CHANNEL && ChannelList.UserIsAnyOp(message.User.Name, message.ReplyTo))
                 {
-                    if (Settings.Instance.IgnoreList.Contains(parameter.ToUpper()))
+                    foreach (string parameter in message.ParameterList)
                     {
-                        Settings.Instance.IgnoreList.Remove(parameter.ToUpper());
+                        if (Settings.Instance.IgnoreList.Contains(parameter.ToUpper()))
+                        {
+                            Settings.Instance.IgnoreList.Remove(parameter.ToUpper());
+                        }
                     }
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, message.Parameters + (message.ParameterList.Count > 1 ? " are " : " is ") + "no longer ignored.", message.ReplyTo) };
                 }
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, message.Parameters + " are no longer ignored.", message.ReplyTo) };
+                else
+                {
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You need to be an operator to make me unignore people :P", message.ReplyTo) };
+                }
             }
             else
             {

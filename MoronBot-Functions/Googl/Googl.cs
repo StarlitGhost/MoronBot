@@ -8,26 +8,26 @@ using MBUtilities;
 
 namespace Internet
 {
-    public class Bitly : Function
+    public class Googl : Function
     {
-        public Bitly()
+        public Googl()
         {
-            Help = "bitly/shorten <url> - Gives you a shortened version of a url, via bit.ly";
+            Help = "googl/shorten <url> - Gives you a shortened version of a url, via Goo.gl";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, @"^(bit\.?ly|shorten)$", RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(message.Command, @"^(goo\.?gl|shorten)$", RegexOptions.IgnoreCase))
             {
                 // URL given
                 if (message.ParameterList.Count > 0)
                 {
-                    string bitlyURL = URL.Shorten(message.Parameters);
-                    if (bitlyURL != null)
+                    string shortURL = URL.Shorten(message.Parameters);
+                    if (shortURL != null)
                     {
-                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, bitlyURL, message.ReplyTo) };
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, shortURL, message.ReplyTo) };
                     }
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No URL detected in your message.", message.ReplyTo) };
                 }

@@ -35,7 +35,7 @@ namespace Internet
 
             Feed homestuck = new Feed();
             homestuck.URL = "http://www.mspaintadventures.com/rss/rss.xml";
-            homestuck.LastUpdate = DateTime.Now.AddDays(-2);
+            homestuck.LastUpdate = DateTime.Now;
             FeedMap.Add("Homestuck", homestuck);
 
             //LoadFeeds(Settings.Instance.Server + ".Feeds.xml");
