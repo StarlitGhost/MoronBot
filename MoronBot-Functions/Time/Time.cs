@@ -20,7 +20,7 @@ namespace Utility
         {
             if (Regex.IsMatch(message.Command, "^(time)$", RegexOptions.IgnoreCase))
             {
-                DateTime date = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, "GMT Standard Time");
+                DateTime date = DateTime.Now.IsDaylightSavingTime() ? DateTime.UtcNow.AddHours(1.0) : DateTime.UtcNow;
 
                 if (message.ParameterList.Count > 0)
                 {
