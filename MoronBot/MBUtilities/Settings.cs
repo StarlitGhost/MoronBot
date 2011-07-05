@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-//using System.Data.SQLite;
 
 namespace MBUtilities
 {
@@ -14,10 +13,7 @@ namespace MBUtilities
         static Settings instance = null;
         static readonly object padlock = new object();
 
-        Settings()
-        {
-            //sqlite = new SQLiteConnection("Data Source=/Data/database.db");
-        }
+        Settings() {}
 
         public static Settings Instance
         {
@@ -43,25 +39,22 @@ namespace MBUtilities
         }
         #endregion Singleton rubbish
 
-        public string Server = /*"irc.editingarchive.com";*//*"irc.freeside.co.uk";*//*"irc.slashnet.org"*/"c.ustream.tv";
+        public string Server = /*"irc.editingarchive.com";*//*"irc.freeside.co.uk";*//*"irc.slashnet.org"*/"c.ustream.tv"/*"127.0.0.1"*/;
         public int Port = 6667;
         public string Channel = "#tyranic-moron";
         public string Nick = "MoronBot";
-        public string CurrentNick = "MoronBot";
         public string LeaveMessage = "Leaving";
         public string QuitMessage = "Quitting";
         public List<string> IgnoreList = new List<string>();
-
         public bool ShowForm = false;
 
+        [XmlIgnore]
+        public string CurrentNick = "MoronBot";
         [XmlIgnore]
         public static string AppPath = Path.GetDirectoryName(Application.ExecutablePath);
         [XmlIgnore]
         public string FunctionPath = Path.Combine(AppPath, "Functions");
         [XmlIgnore]
         public string DataPath = Path.Combine(AppPath, "Data");
-
-        //private SQLiteConnection sqlite;
-
     }
 }

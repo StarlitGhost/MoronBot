@@ -30,11 +30,10 @@ namespace MoronBot
 
         CwIRC.Interface cwIRC;
 
-        string desiredNick;
         /// <summary>
         /// Nickname of the Bot
         /// </summary>
-        public string Nick
+        string Nick
         {
             get { return Settings.Instance.CurrentNick; }
             set
@@ -45,9 +44,9 @@ namespace MoronBot
         }
         int nickUsedCount = 0;
 
-        public List<IFunction> UserListFunctions = new List<IFunction>();
-        public List<IFunction> RegexFunctions = new List<IFunction>();
-        public List<IFunction> CommandFunctions = new List<IFunction>();
+        List<IFunction> UserListFunctions = new List<IFunction>();
+        List<IFunction> RegexFunctions = new List<IFunction>();
+        List<IFunction> CommandFunctions = new List<IFunction>();
 
         List<string> commandList = new List<string>();
         public List<string> CommandList
@@ -60,7 +59,7 @@ namespace MoronBot
             get { return helpLibrary; }
         }
 
-        public List<IRCResponse> MessageQueue = new List<IRCResponse>();
+        List<IRCResponse> MessageQueue = new List<IRCResponse>();
 
         #endregion Variables
 
@@ -93,10 +92,9 @@ namespace MoronBot
         /// <summary>
         /// Constructor for MoronBot.
         /// This is where: 
-        ///  - The server-listening process starts (BackgroundWorker).
-        ///  - All of the Bot's Functions are loaded (so add new ones in here).
+        ///  - All of the Bot's Functions are loaded.
         ///  - Settings is initialized from xml.
-        ///  - The initial connection to the server is done.
+        ///  - The initial connection to the server is made.
         /// </summary>
         public MoronBot()
         {
@@ -108,15 +106,14 @@ namespace MoronBot
             {
                 SaveXML("settings.xml");
             }
-            desiredNick = Settings.Instance.Nick;
-            Nick = desiredNick;
+            Nick = Settings.Instance.Nick;
 
             cwIRC = CwIRC.Interface.Instance;
 
             cwIRC.MessageReceived += CwIRC_MessageReceived;
             cwIRC.Connect(Settings.Instance.Server, Settings.Instance.Port);
-            cwIRC.NICK(desiredNick);
-            cwIRC.USER(desiredNick, "Meh", "Whatever", "MoronBot 0.1.6");
+            cwIRC.NICK(Nick);
+            cwIRC.USER(Nick, "Meh", "Whatever", "MoronBot 0.1.6");
             cwIRC.SendData("PASS mOrOnBoTuS");
 
             cwIRC.JOIN(Settings.Instance.Channel);
@@ -170,7 +167,7 @@ namespace MoronBot
         /// </summary>
         /// <param name="response">The IRCResponse to send to the server.</param>
         /// <returns>Whether or not the send was successful (actually whether or not the given response is valid).</returns>
-        public bool Send(IRCResponse response)
+        bool Send(IRCResponse response)
         {
             if (response != null)
             {
@@ -235,7 +232,7 @@ namespace MoronBot
         /// FURTHER-NOTE: Have now split off all of the bot's main functions (the ones listed by |commands), should maybe continue with the rest.
         /// </summary>
         /// <param name="p_message">The message received from the server.</param>
-        public void ProcessMessage(BotMessage message)
+        void ProcessMessage(BotMessage message)
         {
             if (message.Type == "PING")
             {
@@ -251,8 +248,8 @@ namespace MoronBot
             {
                 case "010": // Server full, connect to another
                     cwIRC.Connect(message.MessageList[3], Int32.Parse(message.MessageList[4]));
-                    cwIRC.NICK(desiredNick);
-                    cwIRC.USER(desiredNick, "Meh", "Whatever", "MoronBot 0.1.6");
+                    cwIRC.NICK(Nick);
+                    cwIRC.USER(Nick, "Meh", "Whatever", "MoronBot 0.1.6");
                     break;
                 case "324": // Channel modes
                     ChannelList.Parse324(message);
@@ -274,8 +271,8 @@ namespace MoronBot
                     break;
                 case "433": // Nick In Use
                     nickUsedCount++;
-                    Nick = desiredNick + nickUsedCount;
-                    cwIRC.NICK(desiredNick + nickUsedCount);
+                    Nick = Settings.Instance.Nick + nickUsedCount;
+                    cwIRC.NICK(Nick);
                     break;
                 case "NICK":
                     if (message.User.Name == Nick)
@@ -456,7 +453,7 @@ namespace MoronBot
         /// <param name="p_fileLocation">The location of the settings file to load from</param>
         /// <param name="p_settings">The Settings object to load the settings into</param>
         /// <returns>true if load succeeded, false if it failed</returns>
-        public bool LoadXML(string fileLocation)
+        bool LoadXML(string fileLocation)
         {
             if (File.Exists(fileLocation))
             {
@@ -475,7 +472,7 @@ namespace MoronBot
         /// </summary>
         /// <param name="p_fileLocation">The location of the settings file to save to</param>
         /// <param name="settings">The Settings object to save the settings from</param>
-        public void SaveXML(string fileLocation)
+        void SaveXML(string fileLocation)
         {
             XmlSerializer serializer = new XmlSerializer(Settings.Instance.GetType());
             StreamWriter streamWriter = new StreamWriter(fileLocation);
