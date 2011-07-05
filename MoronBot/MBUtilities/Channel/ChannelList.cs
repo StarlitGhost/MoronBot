@@ -160,13 +160,66 @@ namespace MBUtilities.Channel
             OnUserListModified();
         }
 
-        public static void Parse324(BotMessage message)
+        public static void ParseMODE(BotMessage message)
         {
-            int channelID = GetChannelID(message.MessageList[3]);
+            string modeString = message.MessageList[3];
+            if (message.MessageList.Count > 4) // User mode change
+            {
+                int channelID, userID = GetUserID(message.MessageList[4], message.MessageList[2], out channelID);
 
-            string modeString = message.MessageList[4].TrimStart('+');
+                bool addModes = modeString.StartsWith("+");
+                modeString = modeString.TrimStart('+', '-');
 
-            if (modeString != "")
+                if (modeString.Contains("b")) return; // Ban message, ignore
+
+                if (addModes)
+                {
+                    foreach (char mode in modeString)
+                    {
+                        if (!Channels[channelID].Users[userID].Modes.Contains(mode))
+                        {
+                            Channels[channelID].Users[userID].Modes.Add(mode);
+                        }
+
+                        if (mode == 'o') Channels[channelID].Users[userID].Symbols += "@";
+                        if (mode == 'h') Channels[channelID].Users[userID].Symbols += "%";
+                        if (mode == 'v') Channels[channelID].Users[userID].Symbols += "+";
+                    }
+                }
+                else
+                {
+                    foreach (char mode in modeString)
+                    {
+                        if (Channels[channelID].Users[userID].Modes.Contains(mode))
+                        {
+                            Channels[channelID].Users[userID].Modes.Remove(mode);
+                        }
+
+                        if (mode == 'o') Channels[channelID].Users[userID].Symbols.Replace("@", "");
+                        if (mode == 'h') Channels[channelID].Users[userID].Symbols.Replace("%", "");
+                        if (mode == 'v') Channels[channelID].Users[userID].Symbols.Replace("+", "");
+                    }
+                }
+                OnUserListModified();
+            }
+            else // Channel mode change
+            {
+                int channelID = GetChannelID(message.MessageList[2]);
+
+                ParseChannelModeString(modeString, channelID);
+
+                OnChannelListModified();
+            }
+        }
+
+        static void ParseChannelModeString(string modeString, int channelID)
+        {
+            bool addModes = modeString.StartsWith("+");
+            modeString = modeString.TrimStart('+', '-');
+
+            if (modeString == "") return;
+
+            if (addModes)
             {
                 foreach (char mode in modeString)
                 {
@@ -176,6 +229,24 @@ namespace MBUtilities.Channel
                     }
                 }
             }
+            else
+            {
+                foreach (char mode in modeString)
+                {
+                    if (Channels[channelID].Modes.Contains(mode))
+                    {
+                        Channels[channelID].Modes.Remove(mode);
+                    }
+                }
+            }
+        }
+
+        public static void Parse324(BotMessage message)
+        {
+            int channelID = GetChannelID(message.MessageList[3]);
+
+            ParseChannelModeString(message.MessageList[4], channelID);
+
             OnChannelListModified();
         }
 

@@ -319,6 +319,8 @@ namespace MoronBot
                     Log(logText, parameter);
                     break;
                 case "MODE":
+                    ChannelList.ParseMODE(message);
+
                     string setter = message.User.Name.TrimStart(':');
                     string modes = message.MessageList[3].TrimStart(':');
                     string targets = "";
