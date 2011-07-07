@@ -7,6 +7,7 @@ using CwIRC;
 using MBFunctionInterface;
 
 using MBUtilities;
+using MBUtilities.Channel;
 
 namespace Internet
 {
@@ -16,7 +17,7 @@ namespace Internet
 
         public NowPlaying()
         {
-            Help = "np (<user>) - Returns your currently playing music (from Last.fm). You can also supply a specific username to check.";
+            Help = "np (<user>) - Returns your currently playing music (from LastFM). You can also supply a specific username to check.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
@@ -67,7 +68,7 @@ namespace Internet
                 {
                     string filePath = string.Format(@".{0}logs{0}errors.txt", Path.DirectorySeparatorChar);
                     Logger.Write(ex.ToString(), filePath);
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "User \"" + lastfmName + "\" not found on Last.fm", message.ReplyTo) };
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "User \"" + lastfmName + "\" not found on LastFM", message.ReplyTo) };
                 }
 
                 Match track = Regex.Match(recentFeed.Page, @"<item>\s*?<title>(?<band>.+?)–(?<song>.+?)</title>\s*?<link>(?<link>.+?)</link>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
@@ -75,13 +76,16 @@ namespace Internet
                 {
                     string band = track.Groups["band"].Value;
                     string song = track.Groups["song"].Value;
-                    string link = URL.Shorten(track.Groups["link"].Value);
 
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "\"" + song.Trim() + "\" by " + band.Trim() + " (" + link + ")", message.ReplyTo) };
+                    string songMessage = "\"" + song.Trim() + "\" by " + band.Trim();
+
+                    songMessage += " (" + ChannelList.EvadeChannelLinkBlock(message, URL.Shorten(track.Groups["link"].Value)) + ")";
+
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, songMessage, message.ReplyTo) };
                 }
                 else
                 {
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "User \"" + lastfmName + "\" exists on Last.fm, but hasn't scrobbled any music to it", message.ReplyTo) };
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "User \"" + lastfmName + "\" exists on LastFM, but hasn't scrobbled any music to it", message.ReplyTo) };
                 }
             }
             else
@@ -140,7 +144,7 @@ namespace Internet
     {
         public NowPlayingRegister()
         {
-            Help = "npregister/nplink <Last.fm Name> - Links the specified Last.fm account name to your IRC name.";
+            Help = "npregister/nplink <LastFM Name> - Links the specified LastFM account name to your IRC name.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
@@ -159,11 +163,11 @@ namespace Internet
                     {
                         NowPlaying.AccountMap.Add(message.User.Name.ToUpper(), message.ParameterList[0]);
                     }
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Last.fm account \"" + message.ParameterList[0] + "\" is now linked to IRC name \"" + message.User.Name + "\"", message.ReplyTo) };
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "LastFM account \"" + message.ParameterList[0] + "\" is now linked to IRC name \"" + message.User.Name + "\"", message.ReplyTo) };
                 }
                 else
                 {
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't specify a Last.fm account name! Format is \"" + message.Command + " <Last.fm Account>\"", message.ReplyTo) };
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't specify a LastFM account name! Format is \"" + message.Command + " <LastFM Account>\"", message.ReplyTo) };
                 }
             }
             else

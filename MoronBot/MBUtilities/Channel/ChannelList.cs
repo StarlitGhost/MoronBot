@@ -73,7 +73,30 @@ namespace MBUtilities.Channel
             return GetUserID(nick, channelID);
         }
 
-        static string GetUserModes(string nick, string channel)
+        static List<char> GetChannelModes(string channel)
+        {
+            int channelID = GetChannelID(channel);
+            return Channels[channelID].Modes;
+        }
+
+        public static bool ChannelHasMode(string channel, char mode)
+        {
+            List<char> modes = GetChannelModes(channel);
+
+            return modes.Contains(mode);
+        }
+
+        static string EvadeLinkBlock(string url)
+        {
+            return url.Replace("//", "// ").Replace(".", " .");
+        }
+
+        public static string EvadeChannelLinkBlock(BotMessage message, string link)
+        {
+            return (message.TargetType == IRCMessage.TargetTypes.CHANNEL && ChannelList.ChannelHasMode(message.ReplyTo, 'U')) ? EvadeLinkBlock(link) : link;
+        }
+
+        public static string GetUserModes(string nick, string channel)
         {
             int channelID, userID = ChannelList.GetUserID(nick, channel, out channelID);
 

@@ -9,6 +9,7 @@ using CwIRC;
 using MBFunctionInterface;
 
 using Libmpc;
+using MBUtilities.Channel;
 
 namespace Internet
 {
@@ -53,13 +54,13 @@ namespace Internet
                         (total.Hours > 0 ? total.Hours + ":" : "") + total.Minutes + ":" + total.Seconds.ToString("D2");
 
                     string output = "Playing: " + songMsg +
-                        " [" + timeMsg + "] - Listen here: http://moddington.net:8000/moddtunes.ogg";
+                        " [" + timeMsg + "] - Listen here: " + ChannelList.EvadeChannelLinkBlock(message, "http://moddington.net:8000/moddtunes.ogg");
 
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, output, message.ReplyTo) };
                 }
                 else
                 {
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "moddington.net seems to be down", message.ReplyTo) };
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Moddington's internet radio seems to be down", message.ReplyTo) };
                 }
             }
             

@@ -8,6 +8,7 @@ using System.Xml;
 using CwIRC;
 using MBFunctionInterface;
 using MBUtilities;
+using MBUtilities.Channel;
 
 namespace Internet
 {
@@ -88,7 +89,7 @@ namespace Internet
                 FeedMap["Homestuck"] = new Feed(FeedMap["Homestuck"].URL, newestDate);
 
                 string itemTitle = oldestNew.SelectSingleNode("title").FirstChild.Value;
-                string itemLink = oldestNew.SelectSingleNode("link").FirstChild.Value;
+                string itemLink = ChannelList.EvadeChannelLinkBlock(message, oldestNew.SelectSingleNode("link").FirstChild.Value);
 
                 return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Homestuck has updated, " + numUpdates + " new pages! New ones start here: " + itemTitle + " (" + itemLink + ")", message.ReplyTo) };
             }
