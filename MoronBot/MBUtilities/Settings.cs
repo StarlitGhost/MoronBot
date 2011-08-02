@@ -13,7 +13,10 @@ namespace MBUtilities
         static Settings instance = null;
         static readonly object padlock = new object();
 
-        Settings() {}
+        Settings()
+        {
+            FileUtils.CreateDirIfNotExists(DataPath);
+        }
 
         public static Settings Instance
         {

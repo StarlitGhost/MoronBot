@@ -6,3 +6,4 @@ MoronBot-Executable/*
 /*/bin/*
 /*/*/bin/*
 */debug/*
+*.sdf

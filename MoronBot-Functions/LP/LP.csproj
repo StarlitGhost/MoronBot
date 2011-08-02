@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{05E8C267-4CF0-4A9C-B8F5-F5A9762D9982}</ProjectGuid>
+    <ProjectGuid>{073C8A26-2EDE-4C99-A99A-B6F5067261C6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MBUtilities</RootNamespace>
-    <AssemblyName>MBUtilities</AssemblyName>
+    <RootNamespace>LP</RootNamespace>
+    <AssemblyName>LP</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,59 +26,36 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\</OutputPath>
+    <OutputPath>..\..\MoronBot\bin\Functions\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bitly">
-      <HintPath>..\MoronBot\Bitly.dll</HintPath>
+    <Reference Include="CwIRC">
+      <HintPath>..\..\MoronBot\bin\CwIRC.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="GAPI">
-      <HintPath>..\MoronBot\GAPI.dll</HintPath>
+    <Reference Include="MBFunctionInterface">
+      <HintPath>..\..\MoronBot\bin\MBFunctionInterface.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MBUtilities">
+      <HintPath>..\..\MoronBot\bin\MBUtilities.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.SQLite, Version=1.0.74.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
-      <HintPath>..\MoronBot\System.Data.SQLite.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Channel\Channel.cs" />
-    <Compile Include="Channel\ChannelList.cs" />
-    <Compile Include="Channel\User.cs" />
-    <Compile Include="FileUtils.cs" />
-    <Compile Include="Logger.cs" />
-    <Compile Include="MyExtensions.cs" />
-    <Compile Include="PluginLoader.cs" />
+    <Compile Include="LP.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings.cs" />
-    <Compile Include="SQLiteInterface.cs" />
-    <Compile Include="URL.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CwIRC\CwIRC.csproj">
-      <Project>{E4D2DC70-87EA-405A-ACDC-8E0AD3015607}</Project>
-      <Name>CwIRC</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MBFunctionInterface\MBFunctionInterface.csproj">
-      <Project>{CC33E7C5-53BF-4A3F-9B0F-F11939F61F84}</Project>
-      <Name>MBFunctionInterface</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <ProjectExtensions>
-    <VisualStudio>
-      <UserProperties BuildVersion_UpdateAssemblyVersion="False" BuildVersion_AssemblyInfoFilename="" BuildVersion_ConfigurationName="Any" BuildVersion_BuildAction="Both" BuildVersion_BuildVersioningStyle="None.None.None.None" BuildVersion_UseGlobalSettings="False" />
-    </VisualStudio>
-  </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
