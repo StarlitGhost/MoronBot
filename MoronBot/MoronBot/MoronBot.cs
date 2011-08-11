@@ -1,12 +1,10 @@
-﻿#region File Information
-/********************************************************************
+﻿/********************************************************************
     Name:		MoronBot
     Author:		Matthew Cox
     Created:	9/12/2009
     
     Purpose:	The main class for MoronBot.
 *********************************************************************/
-#endregion File Information
 
 using System;
 using System.Collections.Generic;
@@ -130,6 +128,7 @@ namespace MoronBot
         #endregion Constructor & Destructor
 
         #region Basic Operations
+		
         /// <summary>
         /// Sends the specified message to the specified channel or user (Sends the PRIVMSG message).
         /// </summary>
@@ -223,9 +222,11 @@ namespace MoronBot
             string filePath = string.Format(@".{0}logs{0}" + Settings.Instance.Server + fileDate + @"{0}" + fileName + @".txt", Path.DirectorySeparatorChar);
             Logger.Write(timeData, filePath);
         }
+		
         #endregion Basic Operations
 
         #region Message Processing
+		
         /// <summary>
         /// Processes messages from the server. Most of the main 'bot' functions are in here.
         /// NOTE: Should probably be split off into separate modules, for easier modification.
@@ -291,19 +292,19 @@ namespace MoronBot
 
                     cwIRC.SendData("WHO " + message.MessageList[2].TrimStart(':'));
 
-                    Log(message.User.Name + " joined " + parameter, parameter);
+                    Log(message.User.Name + " joined " + parameter, parameter.ToLowerInvariant());
                     break;
                 case "PART":
                     ChannelList.ParsePART(message, message.User.Name == Nick);
 
                     logText = message.User.Name + " left " + parameter + " message: " + String.Join(" ", message.MessageList.ToArray(), 3, message.MessageList.Count - 3).TrimStart(':');
 
-                    Log(logText, parameter);
+                    Log(logText, parameter.ToLowerInvariant());
                     break;
                 case "QUIT":
                     ChannelList.ParseQUIT(message);
 
-                    logText = message.User.Name + " quit, message: " + String.Join(" ", message.MessageList.ToArray(), 2, message.MessageList.Count - 2);
+                    //logText = message.User.Name + " quit, message: " + String.Join(" ", message.MessageList.ToArray(), 2, message.MessageList.Count - 2);
 
                     //Log(logText, parameter);
                     break;
@@ -316,7 +317,7 @@ namespace MoronBot
 
                     logText = message.User.Name + " kicked " + message.MessageList[3];
 
-                    Log(logText, parameter);
+                    Log(logText, parameter.ToLowerInvariant());
                     break;
                 case "MODE":
                     ChannelList.ParseMODE(message);
@@ -342,7 +343,7 @@ namespace MoronBot
                     {
                         targets = message.MessageList[2];
                     }
-                    string channel = message.MessageList[2];
+                    string channel = message.MessageList[2].ToLowerInvariant();
                     Log("# " + setter + " set mode: " + modes + " " + targets, channel);
                     break;
                 case "TOPIC":
@@ -437,6 +438,7 @@ namespace MoronBot
             }
             return false;
         }
+		
         #endregion Message Processing
 
         #region IRC Message Receiver
@@ -449,6 +451,7 @@ namespace MoronBot
         #endregion IRC Message Receiver
 
         #region Settings File
+		
         /// <summary>
         /// Loads settings into a Settings object from an XML file
         /// </summary>
@@ -484,6 +487,7 @@ namespace MoronBot
         #endregion Settings File
 
         #region Function Loading
+		
         void LoadFunctions()
         {
             List<IFunction> functions = new List<IFunction>();

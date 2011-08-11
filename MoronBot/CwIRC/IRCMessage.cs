@@ -98,12 +98,12 @@ namespace CwIRC
                     if (messageList[2].TrimStart(':').StartsWith("#"))
                     {
                         TargetType = TargetTypes.CHANNEL;
-                        replyTo = messageList[2].TrimStart(':');
+                        replyTo = messageList[2].TrimStart(':').ToLowerInvariant();
                     }
                     else
                     {
                         TargetType = TargetTypes.USER;
-                        replyTo = User.Name;
+                        replyTo = User.Name.ToLowerInvariant();
                     }
 
                     messageString = String.Join(" ", messageList.ToArray(), 3, messageList.Count - 3);
