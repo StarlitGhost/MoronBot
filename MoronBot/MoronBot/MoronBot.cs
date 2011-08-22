@@ -128,7 +128,7 @@ namespace MoronBot
         #endregion Constructor & Destructor
 
         #region Basic Operations
-		
+        
         /// <summary>
         /// Sends the specified message to the specified channel or user (Sends the PRIVMSG message).
         /// </summary>
@@ -222,11 +222,11 @@ namespace MoronBot
             string filePath = string.Format(@".{0}logs{0}" + Settings.Instance.Server + fileDate + @"{0}" + fileName + @".txt", Path.DirectorySeparatorChar);
             Logger.Write(timeData, filePath);
         }
-		
+        
         #endregion Basic Operations
 
         #region Message Processing
-		
+        
         /// <summary>
         /// Processes messages from the server. Most of the main 'bot' functions are in here.
         /// NOTE: Should probably be split off into separate modules, for easier modification.
@@ -247,6 +247,28 @@ namespace MoronBot
 
             switch (message.Type)
             {
+                // First, a load of message types we don't care about
+                case "NOTICE":
+                case "001": // Welcome
+                case "002": // Server you're on, IRC server software version
+                case "003": // Server creation date
+                case "004": // Server name, version, user modes, channel modes
+                case "005": // Stuff supported by the server
+                case "251": // Number of users on the servers
+                case "252": // Number of OPs on the servers
+                case "253": // Number of unregistered connections
+                case "254": // Number of channels formed
+                case "255": // Number of local connections, I think
+                case "265": // Number of local users
+                case "266": // Number of global users
+                case "315": // End of WHO reply
+                case "329": // Channel creation time
+                case "333": // Who set the current topic, and when
+                case "366": // End of NAMES reply
+                case "372": // MOTD line
+                case "375": // Start of MOTD
+                case "451": // Bot not marked as registered yet
+                    break;
                 case "010": // Server full, connect to another
                     cwIRC.Connect(message.MessageList[3], Int32.Parse(message.MessageList[4]));
                     cwIRC.NICK(Nick);
@@ -255,15 +277,13 @@ namespace MoronBot
                 case "324": // Channel modes
                     ChannelList.Parse324(message);
                     break;
-                case "332": // Current Topic
+                case "332": // Current topic
                     ChannelList.Parse332(message);
                     break;
-                case "333": // Who set the current topic, and when
-                    break;
-                case "352":
+                case "352": // WHO reply
                     ChannelList.Parse352(message);
                     break;
-                case "353": // User List
+                case "353": // NAMES reply
                     ChannelList.Parse353(message);
                     break;
                 case "376": // End of MOTD (Used as 'Nick Accepted')
@@ -291,6 +311,7 @@ namespace MoronBot
                     }
 
                     cwIRC.SendData("WHO " + message.MessageList[2].TrimStart(':'));
+                    cwIRC.SendData("NAMES " + message.MessageList[2].TrimStart(':'));
 
                     Log(message.User.Name + " joined " + parameter, parameter.ToLowerInvariant());
                     break;
@@ -302,11 +323,11 @@ namespace MoronBot
                     Log(logText, parameter.ToLowerInvariant());
                     break;
                 case "QUIT":
-                    ChannelList.ParseQUIT(message);
+                    List<string> quittedChannels = ChannelList.ParseQUIT(message);
 
-                    //logText = message.User.Name + " quit, message: " + String.Join(" ", message.MessageList.ToArray(), 2, message.MessageList.Count - 2);
-
-                    //Log(logText, parameter);
+                    logText = message.User.Name + " quit, message: " + String.Join(" ", message.MessageList.ToArray(), 2, message.MessageList.Count - 2).Substring(1);
+                    foreach (string chan in quittedChannels)
+                        Log(logText, chan.ToLowerInvariant());
                     break;
                 case "KICK":
                     ChannelList.ParsePART(message, message.MessageList[3] == Nick);
@@ -321,50 +342,37 @@ namespace MoronBot
                     break;
                 case "MODE":
                     ChannelList.ParseMODE(message);
-
-                    string setter = message.User.Name.TrimStart(':');
-                    string modes = message.MessageList[3].TrimStart(':');
-                    string targets = "";
-                    if (message.MessageList.Count > 4)
+                    
+                    string channel = message.MessageList[2].ToLowerInvariant();
+                    if (channel.StartsWith("#"))
                     {
-                        for (int i = 4; i < message.MessageList.Count; ++i)
+                        string setter = message.User.Name.TrimStart(':');
+                        string modes = message.MessageList[3].TrimStart(':');
+                        string targets = "";
+                        if (message.MessageList.Count > 4)
                         {
-                            if (i < message.MessageList.Count - 1)
+                            for (int i = 4; i < message.MessageList.Count; ++i)
                             {
-                                targets += message.MessageList[i] + " ";
-                            }
-                            else
-                            {
-                                targets += message.MessageList[i];
+                                if (i < message.MessageList.Count - 1)
+                                {
+                                    targets += message.MessageList[i] + " ";
+                                }
+                                else
+                                {
+                                    targets += message.MessageList[i];
+                                }
                             }
                         }
+                        else
+                        {
+                            targets = message.MessageList[2];
+                        }
+
+                        Log("# " + setter + " set mode: " + modes + " " + targets, channel);
                     }
-                    else
-                    {
-                        targets = message.MessageList[2];
-                    }
-                    string channel = message.MessageList[2].ToLowerInvariant();
-                    Log("# " + setter + " set mode: " + modes + " " + targets, channel);
                     break;
                 case "TOPIC":
                     Log("# " + message.User.Name + " changed the topic to: " + message.MessageString, message.ReplyTo);
-                    break;
-                case "NOTICE":
-                case "001":
-                case "002":
-                case "003":
-                case "004":
-                case "005":
-                case "251":
-                case "252":
-                case "253":
-                case "254":
-                case "255":
-                case "265":
-                case "266":
-                case "375":
-                case "372":
-                case "366":
                     break;
                 case "PRIVMSG": // User messages
                     char ctcpChar = Convert.ToChar((byte)1);
@@ -438,7 +446,7 @@ namespace MoronBot
             }
             return false;
         }
-		
+        
         #endregion Message Processing
 
         #region IRC Message Receiver
@@ -451,7 +459,7 @@ namespace MoronBot
         #endregion IRC Message Receiver
 
         #region Settings File
-		
+        
         /// <summary>
         /// Loads settings into a Settings object from an XML file
         /// </summary>
@@ -487,7 +495,7 @@ namespace MoronBot
         #endregion Settings File
 
         #region Function Loading
-		
+        
         void LoadFunctions()
         {
             List<IFunction> functions = new List<IFunction>();

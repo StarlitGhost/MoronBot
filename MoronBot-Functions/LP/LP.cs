@@ -21,9 +21,6 @@ namespace Fun
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
-            // Read lp.txt into lpList
-            // I copied the public class from Welch.cs
-
             string path = Path.Combine(Settings.Instance.DataPath, "lp.txt");
 
             StreamReader lpFile;

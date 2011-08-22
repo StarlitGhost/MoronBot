@@ -173,14 +173,22 @@ namespace MBUtilities.Channel
             }
         }
 
-        public static void ParseQUIT(BotMessage message)
+        public static List<string> ParseQUIT(BotMessage message)
         {
+            List<string> quittedChannels = new List<string>();
+
             foreach (Channel c in Channels)
             {
                 int userID = c.Users.FindIndex(u => u.Nick == message.User.Name);
-                if (userID != -1) c.Users.RemoveAt(userID);
+                if (userID != -1)
+                {
+                    c.Users.RemoveAt(userID);
+                    quittedChannels.Add(c.Name);
+                }
             }
             OnUserListModified();
+
+            return quittedChannels;
         }
 
         public static void ParseMODE(BotMessage message)
@@ -204,6 +212,7 @@ namespace MBUtilities.Channel
                             Channels[channelID].Users[userID].Modes.Add(mode);
                         }
 
+                        if (mode == 'q') Channels[channelID].Users[userID].Symbols += "~";
                         if (mode == 'o') Channels[channelID].Users[userID].Symbols += "@";
                         if (mode == 'h') Channels[channelID].Users[userID].Symbols += "%";
                         if (mode == 'v') Channels[channelID].Users[userID].Symbols += "+";
@@ -218,6 +227,7 @@ namespace MBUtilities.Channel
                             Channels[channelID].Users[userID].Modes.Remove(mode);
                         }
 
+                        if (mode == 'q') Channels[channelID].Users[userID].Symbols.Replace("~", "");
                         if (mode == 'o') Channels[channelID].Users[userID].Symbols.Replace("@", "");
                         if (mode == 'h') Channels[channelID].Users[userID].Symbols.Replace("%", "");
                         if (mode == 'v') Channels[channelID].Users[userID].Symbols.Replace("+", "");
@@ -264,6 +274,10 @@ namespace MBUtilities.Channel
             }
         }
 
+        /// <summary>
+        /// Channel modes
+        /// </summary>
+        /// <param name="message"></param>
         public static void Parse324(BotMessage message)
         {
             int channelID = GetChannelID(message.MessageList[3]);
@@ -273,6 +287,10 @@ namespace MBUtilities.Channel
             OnChannelListModified();
         }
 
+        /// <summary>
+        /// Channel topic
+        /// </summary>
+        /// <param name="message"></param>
         public static void Parse332(BotMessage message)
         {
             int channelID = GetChannelID(message.MessageList[3]);
@@ -281,6 +299,10 @@ namespace MBUtilities.Channel
             OnChannelListModified();
         }
 
+        /// <summary>
+        /// WHO reply
+        /// </summary>
+        /// <param name="message"></param>
         public static void Parse352(BotMessage message)
         {
             int channelID = GetChannelID(message.MessageList[3]);
@@ -288,10 +310,15 @@ namespace MBUtilities.Channel
             int userID = GetUserID(message.MessageList[7], channelID);
 
             Channels[channelID].Users[userID].Hostmask = message.MessageList[5];
-            Channels[channelID].Users[userID].Symbols = message.MessageList[8].TrimStart('H', 'G');
+            Channels[channelID].Users[userID].Symbols = Regex.Replace(message.MessageList[8], @"[a-zA-Z]+", "");
+            
             OnUserListModified();
         }
 
+        /// <summary>
+        /// NAMES reply
+        /// </summary>
+        /// <param name="message"></param>
         public static void Parse353(BotMessage message)
         {
             int channelID = GetChannelID(message.MessageList[4]);

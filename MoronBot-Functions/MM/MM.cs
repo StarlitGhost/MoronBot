@@ -21,26 +21,12 @@ namespace Fun
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
-            // Read mm.txt into mmList
-            // I copied th  public class from Welch.cs
-            StreamReader mmFile = new StreamReader(File.OpenRead(Path.Combine(Settings.Instance.DataPath, "mm.txt")));
-
-            while (!mmFile.EndOfStream)
-            {
-                mmList.Add(mmFile.ReadLine());
-            }
-
-            mmFile.Close();
+            LoadList();
         }
 
         ~MM()
         {
-            StreamWriter mmFile = new StreamWriter(File.OpenWrite(Path.Combine(Settings.Instance.DataPath, "mm.txt")));
-            foreach (string s in mmList)
-            {
-                mmFile.Write(s + "\n");
-            }
-            mmFile.Close();
+            SaveList();
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
@@ -55,6 +41,7 @@ namespace Fun
                         string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
                         int index = mmList.Count + 1;
                         mmList.Add(index + ". " + msg);
+                        SaveList();
                         return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Message added at index " + index, message.ReplyTo) };
                     }
                     else if (message.ParameterList[0] == "list") // Post the list to pastebin, give link
@@ -93,6 +80,16 @@ namespace Fun
             {
                 return null;
             }
+        }
+
+        void LoadList()
+        {
+            mmList.AddRange(File.ReadAllLines(Path.Combine(Settings.Instance.DataPath, "mm.txt")));
+        }
+
+        void SaveList()
+        {
+            File.WriteAllLines(Path.Combine(Settings.Instance.DataPath, "mm.txt"), mmList.ToArray());
         }
     }
 }

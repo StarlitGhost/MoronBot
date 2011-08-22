@@ -22,20 +22,22 @@ namespace Fun
 
             // Read welch.txt into welchList
             // I copied the list directly from http://theglen.livejournal.com/16735.html, had to find-replace fancy quotes with normal ones.
-            StreamReader welchFile = new StreamReader(File.OpenRead(Path.Combine(Settings.Instance.DataPath, "welch.txt")));
 
-            while (!welchFile.EndOfStream)
-            {
-                welchList.Add(welchFile.ReadLine());
-            }
+            LoadList();
+        }
 
-            welchFile.Close();
+        ~Welch()
+        {
+            SaveList();
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(welch)$", RegexOptions.IgnoreCase))
             {
+                if (welchList.Count == 0)
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Welch list failed to load, is welch.txt in the data directory?", message.ReplyTo) };
+
                 // Specific thing requested
                 if (message.ParameterList.Count > 0)
                 {
@@ -62,6 +64,16 @@ namespace Fun
             {
                 return null;
             }
+        }
+
+        void LoadList()
+        {
+            welchList.AddRange(File.ReadAllLines(Path.Combine(Settings.Instance.DataPath, "welch.txt")));
+        }
+
+        void SaveList()
+        {
+            File.WriteAllLines(Path.Combine(Settings.Instance.DataPath, "welch.txt"), welchList.ToArray());
         }
     }
 }

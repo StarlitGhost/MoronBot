@@ -79,7 +79,7 @@ namespace Internet
 
                     string songMessage = "\"" + song.Trim() + "\" by " + band.Trim();
 
-                    songMessage += " (" + ChannelList.EvadeChannelLinkBlock(message, URL.Shorten(track.Groups["link"].Value)) + ")";
+                    songMessage += " (" + /*ChannelList.EvadeChannelLinkBlock(message, URL.Shorten(*/track.Groups["link"].Value/*))*/ + ")";
 
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, songMessage, message.ReplyTo) };
                 }
