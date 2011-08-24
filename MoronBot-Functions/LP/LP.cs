@@ -21,33 +21,12 @@ namespace Fun
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
-            string path = Path.Combine(Settings.Instance.DataPath, "lp.txt");
-
-            StreamReader lpFile;
-
-            FileUtils.CreateDirIfNotExists(path);
-
-            if (!File.Exists(path))
-                File.CreateText(path);
-
-            lpFile = new StreamReader(File.OpenRead(path));
-
-            while (!lpFile.EndOfStream)
-            {
-                lpList.Add(lpFile.ReadLine());
-            }
-
-            lpFile.Close();
+            LoadList();
         }
 
         ~LP()
         {
-            StreamWriter lpFile = new StreamWriter(File.OpenWrite(Path.Combine(Settings.Instance.DataPath, "lp.txt")));
-            foreach (string s in lpList)
-            {
-                lpFile.Write(s + "\n");
-            }
-            lpFile.Close();
+            SaveList();
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
@@ -62,6 +41,7 @@ namespace Fun
                         string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
                         int index = lpList.Count + 1;
                         lpList.Add(index + ". " + msg);
+                        SaveList();
                         return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Message added at index " + index, message.ReplyTo) };
                     }
                     else if (message.ParameterList[0] == "list") // Post the list to pastebin, give link
@@ -107,6 +87,16 @@ namespace Fun
             {
                 return null;
             }
+        }
+
+        void LoadList()
+        {
+            lpList.AddRange(File.ReadAllLines(Path.Combine(Settings.Instance.DataPath, "lp.txt")));
+        }
+
+        void SaveList()
+        {
+            File.WriteAllLines(Path.Combine(Settings.Instance.DataPath, "lp.txt"), lpList.ToArray());
         }
     }
 }

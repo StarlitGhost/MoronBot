@@ -54,12 +54,12 @@ namespace Utility
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
-            LoadEvents(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}Events.xml", Path.DirectorySeparatorChar)));
+            LoadEvents();
         }
 
         ~Countdown()
         {
-            SaveEvents(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}Events.xml", Path.DirectorySeparatorChar)));
+            SaveEvents();
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
@@ -93,8 +93,10 @@ namespace Utility
             }
         }
 
-        public void SaveEvents(string fileName)
+        public static void SaveEvents()
         {
+            string fileName = Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}Events.xml", Path.DirectorySeparatorChar));
+            
             FileUtils.CreateDirIfNotExists(fileName);
 
             XmlWriterSettings xws = new XmlWriterSettings();
@@ -121,8 +123,9 @@ namespace Utility
             }
         }
 
-        public void LoadEvents(string fileName)
+        public void LoadEvents()
         {
+            string fileName = Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}Events.xml", Path.DirectorySeparatorChar));
             if (!File.Exists(fileName))
                 return;
 

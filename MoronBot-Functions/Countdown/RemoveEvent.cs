@@ -40,6 +40,7 @@ namespace Utility
                         List<IRCResponse> response = new List<IRCResponse>();
                         response.Add(new IRCResponse(ResponseType.Say, "Event \"" + Countdown.eventList[index].EventName + "\", with date \"" + Countdown.eventList[index].EventDate.ToString() + "\" removed from the event list!", message.ReplyTo));
                         Countdown.eventList.RemoveAt(index);
+                        Countdown.SaveEvents();
                         return response;
                     }
                 }

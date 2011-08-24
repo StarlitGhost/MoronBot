@@ -21,12 +21,12 @@ namespace Internet
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
-            LoadLinks(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}NowPlayingLinks.xml", Path.DirectorySeparatorChar)));
+            LoadLinks();
         }
 
         ~NowPlaying()
         {
-            SaveLinks(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}NowPlayingLinks.xml", Path.DirectorySeparatorChar)));
+            SaveLinks();
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
@@ -94,8 +94,10 @@ namespace Internet
             }
         }
 
-        public void SaveLinks(string fileName)
+        public static void SaveLinks()
         {
+            string fileName = Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}NowPlayingLinks.xml", Path.DirectorySeparatorChar));
+
             FileUtils.CreateDirIfNotExists(fileName);
 
             XmlWriterSettings xws = new XmlWriterSettings();
@@ -121,8 +123,10 @@ namespace Internet
             }
         }
 
-        public void LoadLinks(string fileName)
+        public void LoadLinks()
         {
+            string fileName = Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}NowPlayingLinks.xml", Path.DirectorySeparatorChar));
+
             if (!File.Exists(fileName))
                 return;
 
@@ -163,6 +167,7 @@ namespace Internet
                     {
                         NowPlaying.AccountMap.Add(message.User.Name.ToUpper(), message.ParameterList[0]);
                     }
+                    NowPlaying.SaveLinks();
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "LastFM account \"" + message.ParameterList[0] + "\" is now linked to IRC name \"" + message.User.Name + "\"", message.ReplyTo) };
                 }
                 else

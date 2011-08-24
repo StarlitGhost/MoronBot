@@ -44,6 +44,7 @@ namespace Utility
 
             if (responses.Count > 0)
             {
+                Tell.WriteMessages();
                 return responses;
             }
             else

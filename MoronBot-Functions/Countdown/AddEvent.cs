@@ -50,6 +50,7 @@ namespace Utility
                         {
                             Countdown.eventList.Add(eventStruct);
                             Countdown.eventList.Sort(Countdown.EventStruct.CompareEventStructsByDate);
+                            Countdown.SaveEvents();
                             return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm"), message.ReplyTo) };
                         }
                         else

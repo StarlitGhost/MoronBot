@@ -36,12 +36,12 @@ namespace Utility
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
-            ReadMessages(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}TellMessages.xml", Path.DirectorySeparatorChar)));
+            ReadMessages();
         }
 
         ~Tell()
         {
-            WriteMessages(Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}TellMessages.xml", Path.DirectorySeparatorChar)));
+            WriteMessages();
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
@@ -92,6 +92,7 @@ namespace Utility
                         tellMessage.SentDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss (UTC zz)");
                         tellMessage.Message = msg;
                         MessageMap[to].Add(tellMessage);
+                        WriteMessages();
                         return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Ok, I'll tell " + message.ParameterList[0] + " that when they next speak.", message.ReplyTo) };
                     }
                 }
@@ -105,8 +106,10 @@ namespace Utility
             return null;
         }
 
-        void WriteMessages(string fileName)
+        public static void WriteMessages()
         {
+            string fileName = Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}TellMessages.xml", Path.DirectorySeparatorChar));
+
             FileUtils.CreateDirIfNotExists(fileName);
 
             XmlWriterSettings xws = new XmlWriterSettings();
@@ -143,8 +146,10 @@ namespace Utility
             }
         }
 
-        void ReadMessages(string fileName)
+        void ReadMessages()
         {
+            string fileName = Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}TellMessages.xml", Path.DirectorySeparatorChar));
+
             if (!File.Exists(fileName))
                 return;
 
