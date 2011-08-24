@@ -204,7 +204,7 @@ namespace MBUtilities.Channel
             {
                 foreach (Channel c in Channels)
                 {
-                    int userID = c.Users.FindIndex(u => u.Nick == message.User.Name);
+                    int userID = c.Users.FindIndex(u => u.Nick == message.User.Name.ToLowerInvariant());
                     if (userID != -1)
                     {
                         c.Users.RemoveAt(userID);
@@ -269,7 +269,7 @@ namespace MBUtilities.Channel
             }
             else // Channel mode change
             {
-                if (message.MessageList[2].ToLowerInvariant() == message.User.Name)
+                if (message.MessageList[2].ToLowerInvariant() == message.User.Name.ToLowerInvariant())
                     return;
 
                 int channelID = GetChannelID(message.MessageList[2]);

@@ -12,14 +12,50 @@ namespace MBUtilities
             {
                 FileUtils.CreateDirIfNotExists(fileName);
 
-                while (FileUtils.FileUsedByAnotherProcess(fileName))
-                    System.Threading.Thread.Sleep(50);
-
-                using (StreamWriter log = new StreamWriter(fileName, true))
+                bool fileInUse = true;
+                while (fileInUse)
                 {
-                    log.WriteLine(data);
+                    try
+                    {
+                        using (StreamWriter log = File.AppendText(fileName))
+                        {
+                            log.WriteLine(data);
+                        }
+                        fileInUse = false;
+                    }
+                    catch (System.IO.IOException ex)
+                    {
+                        fileInUse = true;
+                    }
                 }
             }
+        }
+
+        public static string ReadFileToString(string fileName)
+        {
+            string logText = "";
+
+            lock (logSync)
+            {
+                bool fileInUse = true;
+                while (fileInUse)
+                {
+                    try
+                    {
+                        using (StreamReader reader = new StreamReader(fileName))
+                        {
+                            logText = reader.ReadToEnd();
+                        }
+                        fileInUse = false;
+                    }
+                    catch (System.IO.IOException ex)
+                    {
+                        fileInUse = true;
+                    }
+                }
+            }
+
+            return logText;
         }
     }
 }

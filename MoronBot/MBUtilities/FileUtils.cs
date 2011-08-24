@@ -11,18 +11,5 @@ namespace MBUtilities
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
         }
-
-        public static bool FileUsedByAnotherProcess(string fileName)
-        {
-            try
-            {
-                File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.None);
-            }
-            catch (System.IO.IOException)
-            {
-                return true;
-            }
-            return false;
-        }
     }
 }

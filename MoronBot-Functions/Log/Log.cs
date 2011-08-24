@@ -42,14 +42,11 @@ namespace Utility
 
                 if (File.Exists(filePath))
                 {
-                    using (StreamReader reader = new StreamReader(filePath))
-                    {
-                        string logText = reader.ReadToEnd();
+                    string logText = Logger.ReadFileToString(filePath);
 
-                        string logLink = URL.Pastebin(logText, message.ReplyTo + " Log" + fileDate, "10M", "text", "1");
+                    string logLink = URL.Pastebin(logText, message.ReplyTo + " Log" + fileDate, "10M", "text", "1");
 
-                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Log for" + fileDate + " posted: " + logLink + " (link expires in 10 mins)", message.ReplyTo) };
-                    }
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Log for" + fileDate + " posted: " + logLink + " (link expires in 10 mins)", message.ReplyTo) };
                 }
                 else
                 {

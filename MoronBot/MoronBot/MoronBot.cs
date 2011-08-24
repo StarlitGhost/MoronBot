@@ -222,7 +222,7 @@ namespace MoronBot
 
             string fileDate = date.ToString(@" yyyy-MM-dd");
             string filePath = string.Format(@".{0}logs{0}" + Settings.Instance.Server + fileDate + @"{0}" + fileName + @".txt", Path.DirectorySeparatorChar);
-            Logger.Write(timeData, filePath);
+            Logger.Write(timeData, filePath.ToLowerInvariant());
         }
         
         #endregion Basic Operations
@@ -426,6 +426,7 @@ namespace MoronBot
         /// <returns>Whether or not any of the functions generated IRCResponses.</returns>
         bool ExecuteFunctionList(List<IFunction> funcList, BotMessage message)
         {
+            bool response = false;
             foreach (IFunction f in funcList)
             {
                 List<IRCResponse> responses = null;
@@ -435,7 +436,7 @@ namespace MoronBot
                         responses = f.GetResponse(message);
                         break;
                     case AccessLevels.UserList:
-                        if (f.AccessList.Contains(message.User.Name))
+                        if (f.AccessList.Contains(message.User.Name.ToLowerInvariant()))
                         {
                             responses = f.GetResponse(message);
                         }
@@ -445,9 +446,11 @@ namespace MoronBot
                 {
                     lock(queueSync)
                         MessageQueue.AddRange(responses);
+
+                    response = true;
                 }
             }
-            return false;
+            return response;
         }
         
         #endregion Message Processing
