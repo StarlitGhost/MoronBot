@@ -447,6 +447,9 @@ namespace MoronBot
                     lock(queueSync)
                         MessageQueue.AddRange(responses);
 
+                    if (MessageQueue[MessageQueue.Count - 1] == null)
+                        return true;
+
                     response = true;
                 }
             }
