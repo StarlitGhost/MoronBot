@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{05E8C267-4CF0-4A9C-B8F5-F5A9762D9982}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MBUtilities</RootNamespace>
+    <AssemblyName>MBUtilities</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\MoronBot\debug</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\MoronBot\bin</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="CwIRC.csproj">
+      <Project>{E4D2DC70-87EA-405A-ACDC-8E0AD3015607}</Project>
+      <Name>CwIRC</Name>
+    </ProjectReference>
+    <ProjectReference Include="MBFunctionInterface.csproj">
+      <Project>{CC33E7C5-53BF-4A3F-9B0F-F11939F61F84}</Project>
+      <Name>MBFunctionInterface</Name>
+    </ProjectReference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Web" />
+    <Reference Include="..\MoronBot\MoronBot\Bitly.dll" />
+    <Reference Include="..\MoronBot\MoronBot\GAPI.dll" />
+    <Reference Include="..\MoronBot\MoronBot\System.Data.SQLite.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\MoronBot\MBUtilities\Channel\Channel.cs" />
+    <Compile Include="..\..\..\MoronBot\MBUtilities\Channel\ChannelList.cs" />
+    <Compile Include="..\..\..\MoronBot\MBUtilities\Channel\User.cs" />
+    <Compile Include="..\..\..\MoronBot\MBUtilities\FileUtils.cs" />
+    <Compile Include="..\..\..\MoronBot\MBUtilities\Logger.cs" />
+    <Compile Include="..\..\..\MoronBot\MBUtilities\MyExtensions.cs" />
+    <Compile Include="..\..\..\MoronBot\MBUtilities\PluginLoader.cs" />
+    <Compile Include="..\..\..\MoronBot\MBUtilities\Properties\AssemblyInfo.cs" />
+    <Compile Include="..\..\..\MoronBot\MBUtilities\SQLiteInterface.cs" />
+    <Compile Include="..\..\..\MoronBot\MBUtilities\Settings.cs" />
+    <Compile Include="..\..\..\MoronBot\MBUtilities\URL.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

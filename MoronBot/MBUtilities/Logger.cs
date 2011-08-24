@@ -4,13 +4,21 @@ namespace MBUtilities
 {
     public static class Logger
     {
+        private static readonly object logSync = new object();
+
         public static void Write(string data, string fileName)
         {
-            FileUtils.CreateDirIfNotExists(fileName);
-
-            using (StreamWriter log = new StreamWriter(fileName, true))
+            lock (logSync)
             {
-                log.WriteLine(data);
+                FileUtils.CreateDirIfNotExists(fileName);
+
+                while (FileUtils.FileUsedByAnotherProcess(fileName))
+                    System.Threading.Thread.Sleep(50);
+
+                using (StreamWriter log = new StreamWriter(fileName, true))
+                {
+                    log.WriteLine(data);
+                }
             }
         }
     }

@@ -58,6 +58,7 @@ namespace MoronBot
         }
 
         List<IRCResponse> MessageQueue = new List<IRCResponse>();
+        readonly object queueSync = new object();
 
         #endregion Variables
 
@@ -200,14 +201,15 @@ namespace MoronBot
         {
             if (MessageQueue.Count > 0)
             {
-                List<IRCResponse> tempQueue = new List<IRCResponse>(MessageQueue);
-                MessageQueue.Clear();
-                foreach (IRCResponse response in tempQueue)
+                lock (queueSync)
                 {
-                    Send(response);
-                    System.Threading.Thread.Sleep(1700);
+                    foreach (IRCResponse response in MessageQueue)
+                    {
+                        Send(response);
+                        System.Threading.Thread.Sleep(1700);
+                    }
+                    MessageQueue.Clear();
                 }
-                tempQueue.Clear();
             }
         }
 
@@ -368,7 +370,7 @@ namespace MoronBot
                             targets = message.MessageList[2];
                         }
 
-                        Log("# " + setter + " set mode: " + modes + " " + targets, channel);
+                        Log("# " + setter + " set mode: " + modes + " " + targets, channel.ToLowerInvariant());
                     }
                     break;
                 case "TOPIC":
@@ -441,7 +443,8 @@ namespace MoronBot
                 }
                 if (responses != null && responses.Count > 0)
                 {
-                    MessageQueue.AddRange(responses);
+                    lock(queueSync)
+                        MessageQueue.AddRange(responses);
                 }
             }
             return false;

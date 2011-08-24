@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CwIRC", "CwIRC.csproj", "{E4D2DC70-87EA-405A-ACDC-8E0AD3015607}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MBFunctionInterface", "MBFunctionInterface.csproj", "{CC33E7C5-53BF-4A3F-9B0F-F11939F61F84}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E4D2DC70-87EA-405A-ACDC-8E0AD3015607} = {E4D2DC70-87EA-405A-ACDC-8E0AD3015607}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MBUtilities", "MBUtilities.csproj", "{05E8C267-4CF0-4A9C-B8F5-F5A9762D9982}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E4D2DC70-87EA-405A-ACDC-8E0AD3015607} = {E4D2DC70-87EA-405A-ACDC-8E0AD3015607}
+		{CC33E7C5-53BF-4A3F-9B0F-F11939F61F84} = {CC33E7C5-53BF-4A3F-9B0F-F11939F61F84}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoronBot", "MoronBot.csproj", "{814409D2-DE90-4E1B-BE9F-3B83D3F81F5D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E4D2DC70-87EA-405A-ACDC-8E0AD3015607} = {E4D2DC70-87EA-405A-ACDC-8E0AD3015607}
+		{CC33E7C5-53BF-4A3F-9B0F-F11939F61F84} = {CC33E7C5-53BF-4A3F-9B0F-F11939F61F84}
+		{05E8C267-4CF0-4A9C-B8F5-F5A9762D9982} = {05E8C267-4CF0-4A9C-B8F5-F5A9762D9982}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Win32 = Debug|Win32
+		Release|Any CPU = Release|Any CPU
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E4D2DC70-87EA-405A-ACDC-8E0AD3015607}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4D2DC70-87EA-405A-ACDC-8E0AD3015607}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4D2DC70-87EA-405A-ACDC-8E0AD3015607}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{E4D2DC70-87EA-405A-ACDC-8E0AD3015607}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4D2DC70-87EA-405A-ACDC-8E0AD3015607}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4D2DC70-87EA-405A-ACDC-8E0AD3015607}.Release|Win32.ActiveCfg = Release|Any CPU
+		{CC33E7C5-53BF-4A3F-9B0F-F11939F61F84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC33E7C5-53BF-4A3F-9B0F-F11939F61F84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC33E7C5-53BF-4A3F-9B0F-F11939F61F84}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{CC33E7C5-53BF-4A3F-9B0F-F11939F61F84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC33E7C5-53BF-4A3F-9B0F-F11939F61F84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC33E7C5-53BF-4A3F-9B0F-F11939F61F84}.Release|Win32.ActiveCfg = Release|Any CPU
+		{05E8C267-4CF0-4A9C-B8F5-F5A9762D9982}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05E8C267-4CF0-4A9C-B8F5-F5A9762D9982}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05E8C267-4CF0-4A9C-B8F5-F5A9762D9982}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{05E8C267-4CF0-4A9C-B8F5-F5A9762D9982}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05E8C267-4CF0-4A9C-B8F5-F5A9762D9982}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05E8C267-4CF0-4A9C-B8F5-F5A9762D9982}.Release|Win32.ActiveCfg = Release|Any CPU
+		{814409D2-DE90-4E1B-BE9F-3B83D3F81F5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{814409D2-DE90-4E1B-BE9F-3B83D3F81F5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{814409D2-DE90-4E1B-BE9F-3B83D3F81F5D}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{814409D2-DE90-4E1B-BE9F-3B83D3F81F5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{814409D2-DE90-4E1B-BE9F-3B83D3F81F5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{814409D2-DE90-4E1B-BE9F-3B83D3F81F5D}.Release|Win32.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

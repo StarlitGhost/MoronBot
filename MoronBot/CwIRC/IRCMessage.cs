@@ -81,14 +81,14 @@ namespace CwIRC
                 if (messageList[0].Contains('!'))
                 {
                     string[] userArray = messageList[0].Split('!');
-                    User.Name = userArray[0].TrimStart(':');
+                    User.Name = userArray[0].TrimStart(':').ToLowerInvariant();
                     string[] userHostArray = userArray[1].Split('@');
                     User.User = userHostArray[0];
                     User.Hostmask = userHostArray[1];
                 }
                 else
                 {
-                    User.Name = messageList[0].TrimStart(':');
+                    User.Name = messageList[0].TrimStart(':').ToLowerInvariant();
                     User.User = "";
                     User.Hostmask = "";
                 }

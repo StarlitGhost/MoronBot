@@ -10,6 +10,9 @@ namespace MBUtilities.Channel
 {
     public static class ChannelList
     {
+        static readonly object channelSync = new object();
+        static readonly object userSync = new object();
+
         public static BindingList<Channel> Channels { get; set; }
 
         #region Events
@@ -35,16 +38,23 @@ namespace MBUtilities.Channel
 
         public static int GetChannelID(string channelName)
         {
-            int channelID = Channels.FindIndex(c => c.Name == channelName);
+            channelName = channelName.ToLowerInvariant();
 
-            if (channelID == -1)
+            int channelID;
+
+            lock (channelSync)
             {
-                Channel channel = new Channel();
-                channel.Name = channelName;
-                Channels.Add(channel);
-                channelID = Channels.IndexOf(channel);
+                channelID = Channels.FindIndex(c => c.Name == channelName);
 
-                OnChannelListModified();
+                if (channelID == -1)
+                {
+                    Channel channel = new Channel();
+                    channel.Name = channelName;
+                    Channels.Add(channel);
+                    channelID = Channels.IndexOf(channel);
+
+                    OnChannelListModified();
+                }
             }
 
             return channelID;
@@ -52,16 +62,23 @@ namespace MBUtilities.Channel
 
         static int GetUserID(string nick, int channelID)
         {
-            int userID = Channels[channelID].Users.FindIndex(u => u.Nick == nick);
+            nick = nick.ToLowerInvariant();
 
-            if (userID == -1)
+            int userID;
+
+            lock (channelSync)
             {
-                User user = new User();
-                user.Nick = nick;
-                Channels[channelID].Users.Add(user);
-                userID = Channels[channelID].Users.IndexOf(user);
+                userID = Channels[channelID].Users.FindIndex(u => u.Nick == nick);
 
-                OnUserListModified();
+                if (userID == -1)
+                {
+                    User user = new User();
+                    user.Nick = nick;
+                    Channels[channelID].Users.Add(user);
+                    userID = Channels[channelID].Users.IndexOf(user);
+
+                    OnUserListModified();
+                }
             }
 
             return userID;
@@ -156,7 +173,9 @@ namespace MBUtilities.Channel
         {
             int channelID, userID = GetUserID(message.User.Name, message.MessageList[2].TrimStart(':'), out channelID);
 
-            Channels[channelID].Users[userID].Hostmask = message.User.Hostmask;
+            lock (channelSync)
+                Channels[channelID].Users[userID].Hostmask = message.User.Hostmask;
+
             OnUserListModified();
         }
 
@@ -164,11 +183,15 @@ namespace MBUtilities.Channel
         {
             int channelID, userID = GetUserID(message.User.Name, message.MessageList[2].TrimStart(':'), out channelID);
 
-            Channels[channelID].Users.RemoveAt(userID);
+            lock (channelSync)
+                Channels[channelID].Users.RemoveAt(userID);
+
             OnUserListModified();
             if (parterIsMe)
             {
-                Channels.RemoveAt(channelID);
+                lock (channelSync)
+                    Channels.RemoveAt(channelID);
+
                 OnChannelListModified();
             }
         }
@@ -177,13 +200,16 @@ namespace MBUtilities.Channel
         {
             List<string> quittedChannels = new List<string>();
 
-            foreach (Channel c in Channels)
+            lock (channelSync)
             {
-                int userID = c.Users.FindIndex(u => u.Nick == message.User.Name);
-                if (userID != -1)
+                foreach (Channel c in Channels)
                 {
-                    c.Users.RemoveAt(userID);
-                    quittedChannels.Add(c.Name);
+                    int userID = c.Users.FindIndex(u => u.Nick == message.User.Name);
+                    if (userID != -1)
+                    {
+                        c.Users.RemoveAt(userID);
+                        quittedChannels.Add(c.Name);
+                    }
                 }
             }
             OnUserListModified();
@@ -205,38 +231,47 @@ namespace MBUtilities.Channel
 
                 if (addModes)
                 {
-                    foreach (char mode in modeString)
+                    lock (channelSync)
                     {
-                        if (!Channels[channelID].Users[userID].Modes.Contains(mode))
+                        foreach (char mode in modeString)
                         {
-                            Channels[channelID].Users[userID].Modes.Add(mode);
-                        }
+                            if (!Channels[channelID].Users[userID].Modes.Contains(mode))
+                            {
+                                Channels[channelID].Users[userID].Modes.Add(mode);
+                            }
 
-                        if (mode == 'q') Channels[channelID].Users[userID].Symbols += "~";
-                        if (mode == 'o') Channels[channelID].Users[userID].Symbols += "@";
-                        if (mode == 'h') Channels[channelID].Users[userID].Symbols += "%";
-                        if (mode == 'v') Channels[channelID].Users[userID].Symbols += "+";
+                            if (mode == 'q') Channels[channelID].Users[userID].Symbols += "~";
+                            if (mode == 'o') Channels[channelID].Users[userID].Symbols += "@";
+                            if (mode == 'h') Channels[channelID].Users[userID].Symbols += "%";
+                            if (mode == 'v') Channels[channelID].Users[userID].Symbols += "+";
+                        }
                     }
                 }
                 else
                 {
-                    foreach (char mode in modeString)
+                    lock (channelSync)
                     {
-                        if (Channels[channelID].Users[userID].Modes.Contains(mode))
+                        foreach (char mode in modeString)
                         {
-                            Channels[channelID].Users[userID].Modes.Remove(mode);
-                        }
+                            if (Channels[channelID].Users[userID].Modes.Contains(mode))
+                            {
+                                Channels[channelID].Users[userID].Modes.Remove(mode);
+                            }
 
-                        if (mode == 'q') Channels[channelID].Users[userID].Symbols.Replace("~", "");
-                        if (mode == 'o') Channels[channelID].Users[userID].Symbols.Replace("@", "");
-                        if (mode == 'h') Channels[channelID].Users[userID].Symbols.Replace("%", "");
-                        if (mode == 'v') Channels[channelID].Users[userID].Symbols.Replace("+", "");
+                            if (mode == 'q') Channels[channelID].Users[userID].Symbols.Replace("~", "");
+                            if (mode == 'o') Channels[channelID].Users[userID].Symbols.Replace("@", "");
+                            if (mode == 'h') Channels[channelID].Users[userID].Symbols.Replace("%", "");
+                            if (mode == 'v') Channels[channelID].Users[userID].Symbols.Replace("+", "");
+                        }
                     }
                 }
                 OnUserListModified();
             }
             else // Channel mode change
             {
+                if (message.MessageList[2].ToLowerInvariant() == message.User.Name)
+                    return;
+
                 int channelID = GetChannelID(message.MessageList[2]);
 
                 ParseChannelModeString(modeString, channelID);
@@ -254,21 +289,27 @@ namespace MBUtilities.Channel
 
             if (addModes)
             {
-                foreach (char mode in modeString)
+                lock (channelSync)
                 {
-                    if (!Channels[channelID].Modes.Contains(mode))
+                    foreach (char mode in modeString)
                     {
-                        Channels[channelID].Modes.Add(mode);
+                        if (!Channels[channelID].Modes.Contains(mode))
+                        {
+                            Channels[channelID].Modes.Add(mode);
+                        }
                     }
                 }
             }
             else
             {
-                foreach (char mode in modeString)
+                lock (channelSync)
                 {
-                    if (Channels[channelID].Modes.Contains(mode))
+                    foreach (char mode in modeString)
                     {
-                        Channels[channelID].Modes.Remove(mode);
+                        if (Channels[channelID].Modes.Contains(mode))
+                        {
+                            Channels[channelID].Modes.Remove(mode);
+                        }
                     }
                 }
             }
@@ -295,7 +336,9 @@ namespace MBUtilities.Channel
         {
             int channelID = GetChannelID(message.MessageList[3]);
 
-            Channels[channelID].Topic = message.RawMessage.Substring(message.RawMessage.IndexOf(':', 1) + 1);
+            lock (channelSync)
+                Channels[channelID].Topic = message.RawMessage.Substring(message.RawMessage.IndexOf(':', 1) + 1);
+
             OnChannelListModified();
         }
 
@@ -309,8 +352,9 @@ namespace MBUtilities.Channel
 
             int userID = GetUserID(message.MessageList[7], channelID);
 
-            Channels[channelID].Users[userID].Hostmask = message.MessageList[5];
-            Channels[channelID].Users[userID].Symbols = Regex.Replace(message.MessageList[8], @"[a-zA-Z]+", "");
+            lock (channelSync)
+                Channels[channelID].Users[userID].Hostmask = message.MessageList[5];
+            //Channels[channelID].Users[userID].Symbols = Regex.Replace(message.MessageList[8], @"[a-zA-Z]+", "");
             
             OnUserListModified();
         }
@@ -336,20 +380,23 @@ namespace MBUtilities.Channel
                 if (match.Groups.Count > 2)
                 {
                     symbols = match.Groups[1].Value;
-                    nick = match.Groups[2].Value;
+                    nick = match.Groups[2].Value.ToLowerInvariant();
                 }
                 else
                 {
-                    nick = match.Groups[1].Value;
+                    nick = match.Groups[1].Value.ToLowerInvariant();
                 }
 
-                if (Channels[channelID].Users.FindIndex(u => u.Nick == nick) == -1)
+                lock (channelSync)
                 {
-                    User user = new User();
-                    user.Nick = nick;
-                    user.Symbols = symbols;
+                    if (Channels[channelID].Users.FindIndex(u => u.Nick == nick) == -1)
+                    {
+                        User user = new User();
+                        user.Nick = nick;
+                        user.Symbols = symbols;
 
-                    Channels[channelID].Users.Add(user);
+                        Channels[channelID].Users.Add(user);
+                    }
                 }
             }
             OnUserListModified();

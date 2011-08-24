@@ -2,7 +2,7 @@ solution "MoronBot"
 
 	language "C#"
 	framework "3.5"
-	location ( _ACTION )
+	location ( "MoronBot/" .. _ACTION )
 	flags { "ExtraWarnings" }
 	defines { "TRACE" }
 		

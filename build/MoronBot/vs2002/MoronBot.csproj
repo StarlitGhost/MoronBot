@@ -1,0 +1,162 @@
+<VisualStudioProject>
+	<CSHARP
+		ProjectType = "Local"
+		ProductVersion = "7.0.9254"
+		SchemaVersion = "1.0"
+		ProjectGuid = "{814409D2-DE90-4E1B-BE9F-3B83D3F81F5D}"
+	>
+		<Build>
+			<Settings
+				ApplicationIcon = ""
+				AssemblyKeyContainerName = ""
+				AssemblyName = "MoronBot"
+				AssemblyOriginatorKeyFile = ""
+				DefaultClientScript = "JScript"
+				DefaultHTMLPageLayout = "Grid"
+				DefaultTargetSchema = "IE50"
+				DelaySign = "false"
+				NoStandardLibraries = "false"
+				OutputType = "Exe"
+				RootNamespace = "MoronBot"
+				StartupObject = ""
+			>
+				<Config
+					Name = "Debug"
+					AllowUnsafeBlocks = "false"
+					BaseAddress = "285212672"
+					CheckForOverflowUnderflow = "false"
+					ConfigurationOverrideFile = ""
+					DefineConstants = "TRACE;DEBUG"
+					DocumentationFile = ""
+					DebugSymbols = "true"
+					FileAlignment = "4096"
+					IncrementalBuild = "false"
+					Optimize = "false"
+					OutputPath = "..\..\..\MoronBot\debug"
+					RegisterForComInterop = "false"
+					RemoveIntegerChecks = "false"
+					TreatWarningsAsErrors = "false"
+					WarningLevel = "4"
+				/>
+				<Config
+					Name = "Release"
+					AllowUnsafeBlocks = "false"
+					BaseAddress = "285212672"
+					CheckForOverflowUnderflow = "false"
+					ConfigurationOverrideFile = ""
+					DefineConstants = "TRACE"
+					DocumentationFile = ""
+					DebugSymbols = "false"
+					FileAlignment = "4096"
+					IncrementalBuild = "false"
+					Optimize = "true"
+					OutputPath = "..\..\..\MoronBot\bin"
+					RegisterForComInterop = "false"
+					RemoveIntegerChecks = "false"
+					TreatWarningsAsErrors = "false"
+					WarningLevel = "4"
+				/>
+			</Settings>
+			<References>
+				<Reference
+					Name = "CwIRC"
+					Project = "{E4D2DC70-87EA-405A-ACDC-8E0AD3015607}"
+					Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
+				/>
+				<Reference
+					Name = "MBFunctionInterface"
+					Project = "{CC33E7C5-53BF-4A3F-9B0F-F11939F61F84}"
+					Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
+				/>
+				<Reference
+					Name = "MBUtilities"
+					Project = "{05E8C267-4CF0-4A9C-B8F5-F5A9762D9982}"
+					Package = "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"
+				/>
+				<Reference
+					Name = "System"
+					AssemblyName = "System.dll"
+				/>
+				<Reference
+					Name = "System.Core"
+					AssemblyName = "System.Core.dll"
+				/>
+				<Reference
+					Name = "System.Xml.Linq"
+					AssemblyName = "System.Xml.Linq.dll"
+				/>
+				<Reference
+					Name = "System.Data.DataSetExtensions"
+					AssemblyName = "System.Data.DataSetExtensions.dll"
+				/>
+				<Reference
+					Name = "System.Data"
+					AssemblyName = "System.Data.dll"
+				/>
+				<Reference
+					Name = "System.Xml"
+					AssemblyName = "System.Xml.dll"
+				/>
+			</References>
+		</Build>
+		<Files>
+			<Include>
+				<File
+					RelPath = "..\..\..\MoronBot\MoronBot\ConsoleStarter.cs"
+					BuildAction = "Compile"
+					SubType = "Code"
+				/>
+				<File
+					RelPath = "..\..\..\MoronBot\MoronBot\FormStarter.cs"
+					BuildAction = "Compile"
+					SubType = "Code"
+				/>
+				<File
+					RelPath = "..\..\..\MoronBot\MoronBot\Functions\Commands.cs"
+					BuildAction = "Compile"
+					SubType = "Code"
+				/>
+				<File
+					RelPath = "..\..\..\MoronBot\MoronBot\Functions\Load.cs"
+					BuildAction = "Compile"
+					SubType = "Code"
+				/>
+				<File
+					RelPath = "..\..\..\MoronBot\MoronBot\MoronBot.cs"
+					BuildAction = "Compile"
+					SubType = "Code"
+				/>
+				<File
+					RelPath = "..\..\..\MoronBot\MoronBot\Program.cs"
+					BuildAction = "Compile"
+					SubType = "Code"
+				/>
+				<File
+					RelPath = "..\..\..\MoronBot\MoronBot\Properties\AssemblyInfo.cs"
+					BuildAction = "Compile"
+					SubType = "Code"
+				/>
+				<File
+					RelPath = "..\..\..\MoronBot\MoronBot\Properties\Resources.Designer.cs"
+					BuildAction = "Compile"
+					SubType = "Code"
+				/>
+				<File
+					RelPath = "..\..\..\MoronBot\MoronBot\Properties\Settings.Designer.cs"
+					BuildAction = "Compile"
+					SubType = "Code"
+				/>
+				<File
+					RelPath = "..\..\..\MoronBot\MoronBot\formMoronBot.Designer.cs"
+					BuildAction = "Compile"
+					SubType = "Code"
+				/>
+				<File
+					RelPath = "..\..\..\MoronBot\MoronBot\formMoronBot.cs"
+					BuildAction = "Compile"
+					SubType = "Code"
+				/>
+			</Include>
+		</Files>
+	</CSHARP>
+</VisualStudioProject>

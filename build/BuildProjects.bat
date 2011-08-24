@@ -1,3 +1,4 @@
+premake4 clean
 premake4 codeblocks
 premake4 codelite
 premake4 gmake
