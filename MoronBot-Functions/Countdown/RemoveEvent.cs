@@ -26,10 +26,10 @@ namespace Utility
 
                 if (message.ParameterList.Count > 0)
                 {
-                    index = Countdown.eventList.FindIndex(s => s.EventName == message.Parameters);
+                    index = TimeTill.EventList.FindIndex(s => s.EventName == message.Parameters);
                     if (index < 0)
                     {
-                        index = Countdown.eventList.FindIndex(s => Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
+                        index = TimeTill.EventList.FindIndex(s => Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
                     }
                     if (index < 0)
                     {
@@ -38,9 +38,9 @@ namespace Utility
                     else
                     {
                         List<IRCResponse> response = new List<IRCResponse>();
-                        response.Add(new IRCResponse(ResponseType.Say, "Event \"" + Countdown.eventList[index].EventName + "\", with date \"" + Countdown.eventList[index].EventDate.ToString() + "\" removed from the event list!", message.ReplyTo));
-                        Countdown.eventList.RemoveAt(index);
-                        Countdown.SaveEvents();
+                        response.Add(new IRCResponse(ResponseType.Say, "Event \"" + TimeTill.EventList[index].EventName + "\", with date \"" + TimeTill.EventList[index].EventDate.ToString() + "\" removed from the event list!", message.ReplyTo));
+                        TimeTill.EventList.RemoveAt(index);
+                        TimeTill.SaveEvents();
                         return response;
                     }
                 }

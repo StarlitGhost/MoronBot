@@ -11,7 +11,7 @@ using MBUtilities;
 
 namespace Utility
 {
-    public class Countdown : Function
+    public class TimeTill : Function
     {
         public struct EventStruct
         {
@@ -46,44 +46,55 @@ namespace Utility
             }
         }
 
-        public static List<EventStruct> eventList = new List<EventStruct>();
+        public static List<EventStruct> EventList = new List<EventStruct>();
 
-        public Countdown()
+        public TimeTill()
         {
-            Help = "countdown/time(un)till (<event>) - Tells you the amount of time left until the specified event. Without a parameter, it will tell you how long until the next desertbus.";
+            Help = "time(un)till/countdown (<event>) - Tells you the amount of time left until the specified event. Without a parameter, it will tell you how long until the next Desert Bus.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
             LoadEvents();
         }
 
-        ~Countdown()
+        ~TimeTill()
         {
             SaveEvents();
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^(countdown|time(un)?till)$", RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(message.Command, "^(time(un)?till|countdown)$", RegexOptions.IgnoreCase))
             {
                 EventStruct eventStruct;
                 TimeSpan timeSpan;
-                if (message.ParameterList.Count > 0)
+
+                if (message.ParameterList.Count > 0) // Parameters given
                 {
-                    eventStruct = eventList.Find(s => s.EventName == message.Parameters);
+                    // If an event in EventList is in the future, and the event name and command parameters match exactly,
+                    // assign to eventStruct
+                    eventStruct = EventList.Find(s =>
+                       s.EventDate > DateTime.UtcNow &&
+                       s.EventName == message.Parameters);
+
+                    // If no matching message found
                     if (eventStruct.EventName == null)
                     {
-                        eventStruct = eventList.Find(s => Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
+                        // Same search as above, but using regex to match messages this time.
+                        eventStruct = EventList.Find(s =>
+                            s.EventDate > DateTime.UtcNow &&
+                            Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
                     }
+
+                    // No matching events found
                     if (eventStruct.EventName == null)
-                    {
-                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in event list!", message.ReplyTo) };
-                    }
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in the future events list!", message.ReplyTo) };
                 }
-                else
+                else // Parameters not given, assign next Desert Bus to eventStruct.
                 {
-                    eventStruct = eventList.Find(s => s.EventName == "Desert Bus 5");
+                    eventStruct = EventList.Find(s => s.EventName == "Desert Bus 5");
                 }
+
                 timeSpan = eventStruct.EventDate - DateTime.UtcNow;
                 return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, eventStruct.EventName + " will occur in " + timeSpan.Days + " day(s) " + timeSpan.Hours + " hour(s) " + timeSpan.Minutes + " minute(s)", message.ReplyTo) };
             }
@@ -108,7 +119,7 @@ namespace Utility
                 writer.WriteStartDocument();
                 writer.WriteStartElement("Events");
 
-                foreach (Countdown.EventStruct eventStruct in Countdown.eventList)
+                foreach (TimeTill.EventStruct eventStruct in TimeTill.EventList)
                 {
                     writer.WriteStartElement("Event");
 
@@ -123,7 +134,7 @@ namespace Utility
             }
         }
 
-        public void LoadEvents()
+        static void LoadEvents()
         {
             string fileName = Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}Events.xml", Path.DirectorySeparatorChar));
             if (!File.Exists(fileName))
@@ -139,7 +150,7 @@ namespace Utility
                 eventStruct.EventName = eventNode.SelectSingleNode("EventName").FirstChild.Value;
                 eventStruct.EventDate = DateTime.Parse(eventNode.SelectSingleNode("EventDate").FirstChild.Value, CultureInfo.InvariantCulture.DateTimeFormat);
 
-                Countdown.eventList.Add(eventStruct);
+                TimeTill.EventList.Add(eventStruct);
             }
         }
     }

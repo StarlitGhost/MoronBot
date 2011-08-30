@@ -24,7 +24,7 @@ namespace Utility
             {
                 if (message.ParameterList.Count > 1)
                 {
-                    Countdown.EventStruct eventStruct = new Countdown.EventStruct();
+                    TimeTill.EventStruct eventStruct = new TimeTill.EventStruct();
                     bool parseSuccess = false;
 
                     if (message.ParameterList[0].StartsWith("("))
@@ -46,11 +46,11 @@ namespace Utility
 
                     if (parseSuccess)
                     {
-                        if (Countdown.eventList.FindIndex(s => s.EventName == eventStruct.EventName) < 0)
+                        if (TimeTill.EventList.FindIndex(s => s.EventName == eventStruct.EventName) < 0)
                         {
-                            Countdown.eventList.Add(eventStruct);
-                            Countdown.eventList.Sort(Countdown.EventStruct.CompareEventStructsByDate);
-                            Countdown.SaveEvents();
+                            TimeTill.EventList.Add(eventStruct);
+                            TimeTill.EventList.Sort(TimeTill.EventStruct.CompareEventStructsByDate);
+                            TimeTill.SaveEvents();
                             return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm"), message.ReplyTo) };
                         }
                         else

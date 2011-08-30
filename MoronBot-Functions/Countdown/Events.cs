@@ -10,18 +10,18 @@ using MBUtilities;
 namespace Utility
 {
 
-    public class Upcoming : Function
+    public class Events : Function
     {
-        public Upcoming()
+        public Events()
         {
-            Help = "upcoming/events (<days>) - Tells you all of the events coming up in the next week, or the next <days>, if you give a number parameter.";
+            Help = "events/upcoming (<days>) - Tells you all of the events coming up in the next week, or the next <days>, if you give a number parameter.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^(upcoming|events)$", RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(message.Command, "^(events|upcoming)$", RegexOptions.IgnoreCase))
             {
                 double daysAhead = 7;
                 if (message.ParameterList.Count > 0)
@@ -32,7 +32,7 @@ namespace Utility
                     }
                 }
                 List<string> weekEvents = new List<string>();
-                foreach (Countdown.EventStruct weekEvent in Countdown.eventList)
+                foreach (TimeTill.EventStruct weekEvent in TimeTill.EventList)
                 {
                     if (weekEvent.EventDate > DateTime.UtcNow && weekEvent.EventDate < DateTime.UtcNow.AddDays(daysAhead))
                     {
