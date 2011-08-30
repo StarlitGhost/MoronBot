@@ -27,11 +27,13 @@ namespace MBUtilities
         {
             try
             {
+                ServicePointManager.ServerCertificateValidationCallback = CheckValidationResult;
+
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
                 request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:2.0.1) Gecko/20100101 Firefox/4.0.1";
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-                if (response.ContentType.StartsWith("text/"))
+                if (Regex.IsMatch(response.ContentType, @"^(text/.*|application/((rss|atom|rdf)\+)?xml(;.*)?)$"))
                 {
                     Stream responseStream = response.GetResponseStream();
                     System.Text.Encoding encode = System.Text.Encoding.UTF8;
@@ -59,6 +61,15 @@ namespace MBUtilities
                 // Propagate exceptions upwards
                 throw ex;
             }
+        }
+
+        static bool CheckValidationResult(
+            object sender,
+            System.Security.Cryptography.X509Certificates.X509Certificate certificate,
+            System.Security.Cryptography.X509Certificates.X509Chain chain,
+            System.Net.Security.SslPolicyErrors sslPolicyErrors)
+        {
+            return true;
         }
 
         public static string Shorten(string url)

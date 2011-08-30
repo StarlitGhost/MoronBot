@@ -59,5 +59,9 @@ namespace MBUtilities
         public string FunctionPath = Path.Combine(AppPath, "Functions");
         [XmlIgnore]
         public string DataPath = Path.Combine(AppPath, "Data");
+        [XmlIgnore]
+        public string LogPath = Path.Combine(AppPath, "logs");
+        [XmlIgnore]
+        public string ErrorFile = Path.Combine(AppPath, string.Format("logs{0}errors.txt", Path.DirectorySeparatorChar));
     }
 }

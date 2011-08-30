@@ -221,7 +221,8 @@ namespace MoronBot
             OnNewFormattedIRC(fileName + " " + timeData);
 
             string fileDate = date.ToString(@" yyyy-MM-dd");
-            string filePath = string.Format(@".{0}logs{0}" + Settings.Instance.Server + fileDate + @"{0}" + fileName + @".txt", Path.DirectorySeparatorChar);
+            string filePath = Path.Combine(Settings.Instance.LogPath,
+                string.Format(Settings.Instance.Server + fileDate + @"{0}" + fileName + @".txt", Path.DirectorySeparatorChar));
             Logger.Write(timeData, filePath.ToLowerInvariant());
         }
         

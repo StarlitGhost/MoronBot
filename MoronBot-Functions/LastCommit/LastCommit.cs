@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Net;
 using System.Text.RegularExpressions;
 
 using CwIRC;
@@ -12,7 +14,7 @@ namespace GitHub
     {
         public LastCommit()
         {
-            Help = "(last)commit/(last)change <url> - Gives you a shortened version of a url, via bit.ly";
+            Help = "(last)commit/(last)change <url> - Tells you what the last changes to MoronBot were.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
@@ -21,20 +23,21 @@ namespace GitHub
         {
             if (Regex.IsMatch(message.Command, "^((last)?(commit|change))$", RegexOptions.IgnoreCase))
             {
-                URL.WebPage commitFeed = URL.FetchURL("https://github.com/Tyranic-Moron/MoronBot/commits/master.atom");
+                URL.WebPage commitFeed = URL.FetchURL("https://github.com/MatthewCox/MoronBot/commits/master.atom");
 
-                MatchCollection commitMessages = Regex.Matches(commitFeed.Page, @"width:81ex'>(.+)?\&lt;/pre>", RegexOptions.IgnoreCase);
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Last Commit Message: " + commitMessages[0].Groups[1].Value.Replace("\n", " | "), message.ReplyTo) };
+                if (commitFeed.Page != null)
+                {
+                    MatchCollection commitMessages = Regex.Matches(commitFeed.Page, @"width:81ex'>(.+)?\&lt;/pre>", RegexOptions.IgnoreCase);
 
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Last Commit Message: " + commitMessages[0].Groups[1].Value.Replace("\n", " | "), message.ReplyTo) };
+                }
+                else
+                {
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Couldn't fetch the commit feed, GitHub may be down?", message.ReplyTo) };
+                }
             }
-            else
-            {
-                return null;
-            }
-        }
 
-        public void FetchCommit(string url)
-        {
+            return null;
         }
     }
 }

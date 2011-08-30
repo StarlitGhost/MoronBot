@@ -43,15 +43,13 @@ namespace Automatic
                     }
                     catch (System.Net.WebException ex)
                     {
-                        string filePath = string.Format(@".{0}logs{0}errors.txt", Path.DirectorySeparatorChar);
-                        Logger.Write(ex.ToString() + "\r\nURL: " + match.Value, filePath);
+                        Logger.Write(ex.ToString() + "\r\nURL: " + match.Value, Settings.Instance.ErrorFile);
                         // Nothing returned when attempting to fetch the url
                         //return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Nothing found at " + match.Value, message.ReplyTo) };
                     }
                     catch (System.UriFormatException ex)
                     {
-                        string filePath = string.Format(@".{0}logs{0}errors.txt", Path.DirectorySeparatorChar);
-                        Logger.Write(ex.ToString() + "\r\nURL: " + match.Value, filePath);
+                        Logger.Write(ex.ToString() + "\r\nURL: " + match.Value, Settings.Instance.ErrorFile);
                         // Invalid url detected, don't really care though.
                         return null;
                     }

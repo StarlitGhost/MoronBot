@@ -35,8 +35,7 @@ namespace MBUtilities
                 }
                 catch (Exception ex)
                 {
-                    string filePath = string.Format(@".{0}logs{0}errors.txt", Path.DirectorySeparatorChar);
-                    Logger.Write(ex.ToString(), filePath);
+                    Logger.Write(ex.ToString(), Settings.Instance.ErrorFile);
                 }
             }
 
