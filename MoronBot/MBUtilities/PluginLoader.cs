@@ -10,7 +10,9 @@ namespace MBUtilities
     {
         public static List<T> GetPlugins<T>(string folder)
         {
-            string[] files = Directory.GetFiles(folder, "*.dll");
+            List<string> files = new List<string>(Directory.GetFiles(folder, "*.dll"));
+            files.Sort();
+
             List<T> tList = new List<T>();
             Debug.Assert(typeof(T).IsInterface);
 
@@ -33,7 +35,7 @@ namespace MBUtilities
                 }
                 catch (Exception ex)
                 {
-					string filePath = string.Format(@".{0}logs{0}errors.txt", Path.DirectorySeparatorChar);
+                    string filePath = string.Format(@".{0}logs{0}errors.txt", Path.DirectorySeparatorChar);
                     Logger.Write(ex.ToString(), filePath);
                 }
             }

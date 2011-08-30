@@ -270,6 +270,7 @@ namespace MoronBot
                 case "372": // MOTD line
                 case "375": // Start of MOTD
                 case "451": // Bot not marked as registered yet
+                case "474": // Bot banned from channel
                     break;
                 case "010": // Server full, connect to another
                     cwIRC.Connect(message.MessageList[3], Int32.Parse(message.MessageList[4]));
@@ -298,11 +299,16 @@ namespace MoronBot
                     cwIRC.NICK(Nick);
                     break;
                 case "NICK":
+                    List<string> channels = ChannelList.ParseNICK(message);
+
                     if (message.User.Name == Nick)
                     {
                         Nick = parameter;
                     }
-                    Log(message.User.Name + " is now known as " + parameter, parameter);
+
+                    logText = message.User.Name + " is now known as " + parameter;
+                    foreach (string chan in channels)
+                        Log(logText, chan.ToLowerInvariant());
                     break;
                 case "JOIN":
                     ChannelList.ParseJOIN(message);
@@ -374,6 +380,8 @@ namespace MoronBot
                     }
                     break;
                 case "TOPIC":
+                    ChannelList.ParseTOPIC(message);
+
                     Log("# " + message.User.Name + " changed the topic to: " + message.MessageString, message.ReplyTo);
                     break;
                 case "PRIVMSG": // User messages

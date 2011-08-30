@@ -169,6 +169,27 @@ namespace MBUtilities.Channel
             return false;
         }
 
+        public static List<string> ParseNICK(BotMessage message)
+        {
+            List<string> channels = new List<string>();
+
+            lock (channelSync)
+            {
+                foreach (Channel c in Channels)
+                {
+                    int userID = c.Users.FindIndex(u => u.Nick == message.User.Name.ToLowerInvariant());
+                    if (userID != -1)
+                    {
+                        c.Users[userID].Nick = message.MessageList[2].TrimStart(':').ToLowerInvariant();
+                        channels.Add(c.Name);
+                    }
+                }
+            }
+            OnUserListModified();
+
+            return channels;
+        }
+
         public static void ParseJOIN(BotMessage message)
         {
             int channelID, userID = GetUserID(message.User.Name, message.MessageList[2].TrimStart(':'), out channelID);
@@ -324,6 +345,16 @@ namespace MBUtilities.Channel
             int channelID = GetChannelID(message.MessageList[3]);
 
             ParseChannelModeString(message.MessageList[4], channelID);
+
+            OnChannelListModified();
+        }
+
+        public static void ParseTOPIC(BotMessage message)
+        {
+            int channelID = GetChannelID(message.ReplyTo);
+
+            lock (channelSync)
+                Channels[channelID].Topic = message.MessageString;
 
             OnChannelListModified();
         }
