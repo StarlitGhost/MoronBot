@@ -16,7 +16,7 @@ namespace Fun
 
         public Welch()
         {
-            Help = "welch (<number>) - Returns a random \"Thing Mr. Welch can no longer do in an RPG\", or a specific one if you add a number.";
+            Help = "welch (<number> / list) - Returns a random \"Thing Mr. Welch can no longer do in an RPG\", a specific one if you add a number, or posts the list to pastebin.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
@@ -41,17 +41,30 @@ namespace Fun
                 // Specific thing requested
                 if (message.ParameterList.Count > 0)
                 {
-                    int number = 0;
-                    if (Int32.TryParse(message.ParameterList[0], out number))
+                    if (message.ParameterList[0] == "list") // Post the list to pastebin, give link
                     {
-                        number -= 1;
-                        if (number >= 0 && number < welchList.Count)
+                        string list = "";
+                        foreach (string item in welchList)
                         {
-                            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, welchList[number], message.ReplyTo) };
+                            list += item + "\n";
                         }
+                        string url = URL.Pastebin(list, "Welch List", "10M", "text", "1");
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Welch list posted: " + url + " (link expires in 10 mins)", message.ReplyTo) };
                     }
-                    // Number too large or small, or not a number at all
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Invalid number, range is 1-" + welchList.Count, message.ReplyTo) };
+                    else
+                    {
+                        int number = 0;
+                        if (Int32.TryParse(message.ParameterList[0], out number))
+                        {
+                            number -= 1;
+                            if (number >= 0 && number < welchList.Count)
+                            {
+                                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, welchList[number], message.ReplyTo) };
+                            }
+                        }
+                        // Number too large or small, or not a number at all
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Invalid number, range is 1-" + welchList.Count, message.ReplyTo) };
+                    }
                 }
                 // No specific thing requested
                 else

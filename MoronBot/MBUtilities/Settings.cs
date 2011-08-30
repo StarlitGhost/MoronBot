@@ -54,7 +54,7 @@ namespace MBUtilities
         [XmlIgnore]
         public string CurrentNick = "MoronBot";
         [XmlIgnore]
-        public static string AppPath = Path.GetDirectoryName(Application.ExecutablePath);
+        public static string AppPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         [XmlIgnore]
         public string FunctionPath = Path.Combine(AppPath, "Functions");
         [XmlIgnore]

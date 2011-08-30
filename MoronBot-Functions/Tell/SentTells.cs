@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 using CwIRC;
@@ -28,7 +27,7 @@ namespace Utility
                     bool fromUser = false;
                     foreach (Tell.TellMessage msg in kvp.Value)
                     {
-                        if (msg.From == message.User.Name)
+                        if (msg.From.ToLowerInvariant() == message.User.Name.ToLowerInvariant())
                         {
                             if (!fromUser)
                             {

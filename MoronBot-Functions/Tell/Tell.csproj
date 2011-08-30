@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RemoveTell.cs" />
     <Compile Include="SentTells.cs" />
     <Compile Include="TellAuto.cs" />
     <Compile Include="Tell.cs" />
