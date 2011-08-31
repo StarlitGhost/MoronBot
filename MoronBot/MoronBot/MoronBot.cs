@@ -42,9 +42,9 @@ namespace MoronBot
         }
         int nickUsedCount = 0;
 
-        List<IFunction> UserListFunctions = new List<IFunction>();
-        List<IFunction> RegexFunctions = new List<IFunction>();
-        List<IFunction> CommandFunctions = new List<IFunction>();
+        internal List<IFunction> UserListFunctions = new List<IFunction>();
+        internal List<IFunction> RegexFunctions = new List<IFunction>();
+        internal List<IFunction> CommandFunctions = new List<IFunction>();
 
         List<string> commandList = new List<string>();
         public List<string> CommandList
@@ -322,19 +322,19 @@ namespace MoronBot
                     cwIRC.SendData("WHO " + message.MessageList[2].TrimStart(':'));
                     cwIRC.SendData("NAMES " + message.MessageList[2].TrimStart(':'));
 
-                    Log(message.User.Name + " joined " + parameter, parameter.ToLowerInvariant());
+                    Log(" >> " + message.User.Name + " joined " + parameter, parameter.ToLowerInvariant());
                     break;
                 case "PART":
                     ChannelList.ParsePART(message, message.User.Name == Nick);
 
-                    logText = message.User.Name + " left " + parameter + " message: " + String.Join(" ", message.MessageList.ToArray(), 3, message.MessageList.Count - 3).TrimStart(':');
+                    logText = " << " + message.User.Name + " left " + parameter + " message: " + String.Join(" ", message.MessageList.ToArray(), 3, message.MessageList.Count - 3).Substring(1);
 
                     Log(logText, parameter.ToLowerInvariant());
                     break;
                 case "QUIT":
                     List<string> quittedChannels = ChannelList.ParseQUIT(message);
 
-                    logText = message.User.Name + " quit, message: " + String.Join(" ", message.MessageList.ToArray(), 2, message.MessageList.Count - 2).Substring(1);
+                    logText = " << " + message.User.Name + " quit, message: " + String.Join(" ", message.MessageList.ToArray(), 2, message.MessageList.Count - 2).Substring(1);
                     foreach (string chan in quittedChannels)
                         Log(logText, chan.ToLowerInvariant());
                     break;
@@ -345,7 +345,7 @@ namespace MoronBot
                         cwIRC.JOIN(message.MessageList[2]);
                     }
 
-                    logText = message.User.Name + " kicked " + message.MessageList[3];
+                    logText = "!<< " + message.User.Name + " kicked " + message.MessageList[3] + ", message: " + String.Join(" ", message.MessageList.ToArray(), 4, message.MessageList.Count - 4).Substring(1);
 
                     Log(logText, parameter.ToLowerInvariant());
                     break;
@@ -516,11 +516,16 @@ namespace MoronBot
         
         void LoadFunctions()
         {
+            CommandFunctions.Clear();
+            RegexFunctions.Clear();
+            UserListFunctions.Clear();
+
             List<IFunction> functions = new List<IFunction>();
 
             functions.AddRange(PluginLoader.GetPlugins<IFunction>(Settings.Instance.FunctionPath));
 
             functions.Add(new Functions.Commands());
+            functions.Add(new Functions.Unload());
 
             foreach (IFunction f in functions)
             {
@@ -546,7 +551,6 @@ namespace MoronBot
 
         void FuncDirChanged(object sender, FileSystemEventArgs e)
         {
-            System.Threading.Thread.Sleep(500);
             LoadFunctions();
         }
         #endregion Function Loading
