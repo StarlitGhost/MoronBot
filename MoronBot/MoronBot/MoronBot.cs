@@ -51,6 +51,9 @@ namespace MoronBot
         {
             get { return commandList; }
         }
+
+        List<string> unloadedList = new List<string>();
+
         Dictionary<string, string> helpLibrary = new Dictionary<string, string>();
         public Dictionary<string, string> HelpLibrary
         {
@@ -412,9 +415,16 @@ namespace MoronBot
                         ExecuteFunctionList(CommandFunctions, message);
                         SendQueue();
 
+                        // Intrinsic functions
+                        // These are here because they are either too linked with the bot to extract,
+                        // or too simple to be worth making a Function dll for.
                         if (Regex.IsMatch(message.Command, "^(pass)$", RegexOptions.IgnoreCase))
                         {
                             cwIRC.SendData("PASS mOrOnBoTuS");
+                        }
+                        else if (Regex.IsMatch(message.Command, "^(unload)$", RegexOptions.IgnoreCase))
+                        {
+                            UnloadFunction(message);
                         }
                     }
 
@@ -551,6 +561,36 @@ namespace MoronBot
         void FuncDirChanged(object sender, FileSystemEventArgs e)
         {
             LoadFunctions();
+        }
+
+        void UnloadFunction(BotMessage message)
+        {
+            string funcName = message.ParameterList[0];
+
+            if (message.ParameterList.Count > 0)
+                if (UnloadFromFunctionList(funcName, CommandFunctions) ||
+                    UnloadFromFunctionList(funcName, RegexFunctions) ||
+                    UnloadFromFunctionList(funcName, UserListFunctions))
+                    MessageQueue.Add(new IRCResponse(ResponseType.Say, "Function \"" + funcName + "\" unloaded!", message.ReplyTo));
+                else
+                    MessageQueue.Add(new IRCResponse(ResponseType.Say, "Function \"" + funcName + "\" not found!", message.ReplyTo));
+            else
+                MessageQueue.Add(new IRCResponse(ResponseType.Say, "You didn't specify a function to unload!", message.ReplyTo));
+        }
+
+        bool UnloadFromFunctionList(string funcName, List<IFunction> funcList)
+        {
+            int index = funcList.FindIndex(cf => cf.Name.ToLowerInvariant() == funcName.ToLowerInvariant());
+            if (index >= 0)
+            {
+                funcList.RemoveAt(index);
+                string actualName = commandList.Find(s => s.IndexOf(funcName, StringComparison.InvariantCultureIgnoreCase) == 0);
+                commandList.Remove(actualName);
+                helpLibrary.Remove(actualName);
+                unloadedList.Add(actualName);
+                return true;
+            }
+            return false;
         }
         #endregion Function Loading
     }
