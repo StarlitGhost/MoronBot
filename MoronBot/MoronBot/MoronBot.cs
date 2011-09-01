@@ -525,7 +525,6 @@ namespace MoronBot
             functions.AddRange(PluginLoader.GetPlugins<IFunction>(Settings.Instance.FunctionPath));
 
             functions.Add(new Functions.Commands());
-            functions.Add(new Functions.Unload());
 
             foreach (IFunction f in functions)
             {
