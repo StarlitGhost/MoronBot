@@ -52,7 +52,7 @@ namespace MoronBot
             get { return commandList; }
         }
 
-        List<string> unloadedList = new List<string>();
+        List<IFunction> unloadedList = new List<IFunction>();
 
         Dictionary<string, string> helpLibrary = new Dictionary<string, string>();
         public Dictionary<string, string> HelpLibrary
@@ -426,6 +426,10 @@ namespace MoronBot
                         {
                             UnloadFunction(message);
                         }
+                        else if (Regex.IsMatch(message.Command, "^(load)$", RegexOptions.IgnoreCase))
+                        {
+                            LoadFunction(message);
+                        }
                     }
 
                     SendQueue();
@@ -538,23 +542,16 @@ namespace MoronBot
 
             foreach (IFunction f in functions)
             {
-                if (!commandList.Contains(f.Name))
+                if (Settings.Instance.ExcludedFunctions.FindIndex(s => s.ToLowerInvariant() == f.Name.ToLowerInvariant()) >= 0)
                 {
-                    commandList.Add(f.Name);
-                    helpLibrary.Add(f.Name, f.Help);
-                    switch (f.Type)
-                    {
-                        case Types.Command:
-                            CommandFunctions.Add(f);
-                            break;
-                        case Types.Regex:
-                            RegexFunctions.Add(f);
-                            break;
-                        case Types.UserList:
-                            UserListFunctions.Add(f);
-                            break;
-                    }
+                    unloadedList.Add(f);
+                    continue;
                 }
+
+                if (commandList.Contains(f.Name))
+                    continue;
+
+                LoadFunction(f);
             }
         }
 
@@ -563,17 +560,57 @@ namespace MoronBot
             LoadFunctions();
         }
 
+        void LoadFunction(IFunction func)
+        {
+            commandList.Add(func.Name);
+            helpLibrary.Add(func.Name, func.Help);
+            switch (func.Type)
+            {
+                case Types.Command:
+                    CommandFunctions.Add(func);
+                    break;
+                case Types.Regex:
+                    RegexFunctions.Add(func);
+                    break;
+                case Types.UserList:
+                    UserListFunctions.Add(func);
+                    break;
+            }
+        }
+
+        void LoadFunction(BotMessage message)
+        {
+            if (message.ParameterList.Count > 0)
+                foreach (string funcName in message.ParameterList)
+                {
+                    int index = unloadedList.FindIndex(f => f.Name.ToLowerInvariant() == funcName.ToLowerInvariant());
+                    if (index >= 0)
+                    {
+                        LoadFunction(unloadedList[index]);
+                        unloadedList.RemoveAt(index);
+                        MessageQueue.Add(new IRCResponse(ResponseType.Say, "Function \"" + funcName + "\" loaded!", message.ReplyTo));
+                    }
+                    else
+                    {
+                        MessageQueue.Add(new IRCResponse(ResponseType.Say, "Function \"" + funcName + "\" not found!", message.ReplyTo));
+                    }
+                }
+            else
+                MessageQueue.Add(new IRCResponse(ResponseType.Say, "You didn't specify a function to load!", message.ReplyTo));
+        }
+
         void UnloadFunction(BotMessage message)
         {
-            string funcName = message.ParameterList[0];
-
             if (message.ParameterList.Count > 0)
-                if (UnloadFromFunctionList(funcName, CommandFunctions) ||
-                    UnloadFromFunctionList(funcName, RegexFunctions) ||
-                    UnloadFromFunctionList(funcName, UserListFunctions))
-                    MessageQueue.Add(new IRCResponse(ResponseType.Say, "Function \"" + funcName + "\" unloaded!", message.ReplyTo));
-                else
-                    MessageQueue.Add(new IRCResponse(ResponseType.Say, "Function \"" + funcName + "\" not found!", message.ReplyTo));
+                foreach (string funcName in message.ParameterList)
+                {
+                    if (UnloadFromFunctionList(funcName, CommandFunctions) ||
+                        UnloadFromFunctionList(funcName, RegexFunctions) ||
+                        UnloadFromFunctionList(funcName, UserListFunctions))
+                        MessageQueue.Add(new IRCResponse(ResponseType.Say, "Function \"" + funcName + "\" unloaded!", message.ReplyTo));
+                    else
+                        MessageQueue.Add(new IRCResponse(ResponseType.Say, "Function \"" + funcName + "\" not found!", message.ReplyTo));
+                }
             else
                 MessageQueue.Add(new IRCResponse(ResponseType.Say, "You didn't specify a function to unload!", message.ReplyTo));
         }
@@ -583,11 +620,11 @@ namespace MoronBot
             int index = funcList.FindIndex(cf => cf.Name.ToLowerInvariant() == funcName.ToLowerInvariant());
             if (index >= 0)
             {
+                unloadedList.Add(funcList[index]);
                 funcList.RemoveAt(index);
                 string actualName = commandList.Find(s => s.IndexOf(funcName, StringComparison.InvariantCultureIgnoreCase) == 0);
                 commandList.Remove(actualName);
                 helpLibrary.Remove(actualName);
-                unloadedList.Add(actualName);
                 return true;
             }
             return false;

@@ -51,6 +51,8 @@ namespace MBUtilities
         public List<string> IgnoreList = new List<string>();
         public bool ShowForm = false;
 
+        public List<string> ExcludedFunctions = new List<string>();
+
         [XmlIgnore]
         public string CurrentNick = "MoronBot";
         [XmlIgnore]
