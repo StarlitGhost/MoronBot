@@ -421,17 +421,20 @@ namespace MoronBot
                         // Intrinsic functions
                         // These are here because they are either too linked with the bot to extract,
                         // or too simple to be worth making a Function dll for.
-                        if (Regex.IsMatch(message.Command, "^(pass)$", RegexOptions.IgnoreCase))
+                        if (message.User.Name == Settings.Instance.Owner)
                         {
-                            cwIRC.SendData("PASS mOrOnBoTuS");
-                        }
-                        else if (Regex.IsMatch(message.Command, "^(unload)$", RegexOptions.IgnoreCase))
-                        {
-                            UnloadFunction(message);
-                        }
-                        else if (Regex.IsMatch(message.Command, "^(load)$", RegexOptions.IgnoreCase))
-                        {
-                            LoadFunction(message);
+                            if (Regex.IsMatch(message.Command, "^(pass)$", RegexOptions.IgnoreCase))
+                            {
+                                cwIRC.SendData("PASS mOrOnBoTuS");
+                            }
+                            else if (Regex.IsMatch(message.Command, "^(unload)$", RegexOptions.IgnoreCase))
+                            {
+                                UnloadFunction(message);
+                            }
+                            else if (Regex.IsMatch(message.Command, "^(load)$", RegexOptions.IgnoreCase))
+                            {
+                                LoadFunction(message);
+                            }
                         }
                     }
 

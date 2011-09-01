@@ -48,6 +48,7 @@ namespace MBUtilities
         public string Nick = "MoronBot";
         public string LeaveMessage = "Leaving";
         public string QuitMessage = "Quitting";
+        public string Owner = "Tyranic-Moron";
         public List<string> IgnoreList = new List<string>();
         public bool ShowForm = false;
 
