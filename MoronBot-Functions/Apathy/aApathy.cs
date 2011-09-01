@@ -65,7 +65,7 @@ namespace Automatic
             AddInsult("I don't feel like it right now, NICK", ResponseType.Say);
             AddInsult("It's always 'do this', 'do that' with you NICK :|", ResponseType.Say);
             AddInsult("That command NICK? Really?", ResponseType.Say);
-            AddInsult("There's a time and place for everything, NICK. But not now.", ResponseType.Say);
+            AddInsult("There's a time and place for everything, NICK, but not now.", ResponseType.Say);
             AddInsult("Why don't you go do it yourself, NICK?", ResponseType.Say);
             AddInsult("I really want to do that, NICK, but I don't take orders from idiots", ResponseType.Say);
             AddInsult("I'm in the middle of some calibrations, NICK, can it wait?", ResponseType.Say);

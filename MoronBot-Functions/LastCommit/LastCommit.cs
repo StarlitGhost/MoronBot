@@ -27,7 +27,7 @@ namespace GitHub
 
                 if (commitFeed.Page != null)
                 {
-                    MatchCollection commitMessages = Regex.Matches(commitFeed.Page, @"width:81ex'>(.+)?\&lt;/pre>", RegexOptions.IgnoreCase);
+                    MatchCollection commitMessages = Regex.Matches(commitFeed.Page, @"width:81ex'>(.+)?\&lt;/pre>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Last Commit Message: " + commitMessages[0].Groups[1].Value.Replace("\n", " | "), message.ReplyTo) };
                 }
