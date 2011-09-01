@@ -100,14 +100,15 @@ namespace MoronBot
         /// </summary>
         public MoronBot()
         {
-            LoadFunctions();
-
-            PluginLoader.WatchDirectory(Settings.Instance.FunctionPath, FuncDirChanged);
-
             if (!LoadXML("settings.xml"))
             {
                 SaveXML("settings.xml");
             }
+
+            LoadFunctions();
+
+            PluginLoader.WatchDirectory(Settings.Instance.FunctionPath, FuncDirChanged);
+
             Nick = Settings.Instance.Nick;
 
             cwIRC = CwIRC.Interface.Instance;

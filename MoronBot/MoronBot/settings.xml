@@ -4,8 +4,15 @@
   <Port>6667</Port>
   <Channel>#tyranic-moron</Channel>
   <Nick>MoronBot</Nick>
-  <CurrentNick>MoronBot</CurrentNick>
   <LeaveMessage>Leaving</LeaveMessage>
   <QuitMessage>Quitting</QuitMessage>
-  <IgnoreList />
+  <Owner>Tyranic-Moron</Owner>
+  <IgnoreList>
+    <string>MORONBOT</string>
+  </IgnoreList>
+  <ShowForm>false</ShowForm>
+  <ExcludedFunctions>
+    <string>KrozeStalker</string>
+    <string>RandomKicker</string>
+  </ExcludedFunctions>
 </Settings>
