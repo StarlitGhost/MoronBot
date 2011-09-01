@@ -115,7 +115,7 @@ namespace MoronBot
             cwIRC.MessageReceived += CwIRC_MessageReceived;
             cwIRC.Connect(Settings.Instance.Server, Settings.Instance.Port);
             cwIRC.NICK(Nick);
-            cwIRC.USER(Nick, "Meh", "Whatever", "MoronBot 0.1.6");
+            cwIRC.USER(Nick, "Nope", "Whatever", "MoronBot 0.1.6");
             cwIRC.SendData("PASS mOrOnBoTuS");
 
             cwIRC.JOIN(Settings.Instance.Channel);
@@ -279,7 +279,7 @@ namespace MoronBot
                 case "010": // Server full, connect to another
                     cwIRC.Connect(message.MessageList[3], Int32.Parse(message.MessageList[4]));
                     cwIRC.NICK(Nick);
-                    cwIRC.USER(Nick, "Meh", "Whatever", "MoronBot 0.1.6");
+                    cwIRC.USER(Nick, "Nope", "Whatever", "MoronBot 0.1.6");
                     break;
                 case "324": // Channel modes
                     ChannelList.Parse324(message);
@@ -330,14 +330,16 @@ namespace MoronBot
                 case "PART":
                     ChannelList.ParsePART(message, message.User.Name == Nick);
 
-                    logText = " << " + message.User.Name + " left " + parameter + " message: " + String.Join(" ", message.MessageList.ToArray(), 3, message.MessageList.Count - 3).Substring(1);
+                    string partMsg = (message.MessageList.Count > 3 ? ", message: " + String.Join(" ", message.MessageList.ToArray(), 3, message.MessageList.Count - 3).Substring(1) : "");
+                    logText = " << " + message.User.Name + " left " + parameter + partMsg;
 
                     Log(logText, parameter.ToLowerInvariant());
                     break;
                 case "QUIT":
                     List<string> quittedChannels = ChannelList.ParseQUIT(message);
 
-                    logText = " << " + message.User.Name + " quit, message: " + String.Join(" ", message.MessageList.ToArray(), 2, message.MessageList.Count - 2).Substring(1);
+                    string quitMsg = (message.MessageList.Count > 2 ? ", message: " + String.Join(" ", message.MessageList.ToArray(), 2, message.MessageList.Count - 2).Substring(1) : "");
+                    logText = " << " + message.User.Name + " quit" + quitMsg;
                     foreach (string chan in quittedChannels)
                         Log(logText, chan.ToLowerInvariant());
                     break;
@@ -348,7 +350,8 @@ namespace MoronBot
                         cwIRC.JOIN(message.MessageList[2]);
                     }
 
-                    logText = "!<< " + message.User.Name + " kicked " + message.MessageList[3] + ", message: " + String.Join(" ", message.MessageList.ToArray(), 4, message.MessageList.Count - 4).Substring(1);
+                    string kickMsg = (message.MessageList.Count > 4 ? ", message: " + String.Join(" ", message.MessageList.ToArray(), 4, message.MessageList.Count - 4).Substring(1) : "");
+                    logText = "!<< " + message.User.Name + " kicked " + message.MessageList[3] + kickMsg;
 
                     Log(logText, parameter.ToLowerInvariant());
                     break;
@@ -531,7 +534,6 @@ namespace MoronBot
             UserListFunctions.Clear();
 
             List<IFunction> functions = new List<IFunction>();
-
             functions.AddRange(PluginLoader.GetPlugins<IFunction>(Settings.Instance.FunctionPath));
 
             functions.Add(new Functions.Commands());

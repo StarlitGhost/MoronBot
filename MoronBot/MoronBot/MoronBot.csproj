@@ -94,7 +94,6 @@
       <DependentUpon>formMoronBot.cs</DependentUpon>
     </Compile>
     <Compile Include="Functions\Commands.cs" />
-    <Compile Include="Functions\Load.cs" />
     <Compile Include="MoronBot.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
