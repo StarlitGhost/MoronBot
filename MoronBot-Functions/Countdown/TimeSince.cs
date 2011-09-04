@@ -27,11 +27,14 @@ namespace Utility
                 TimeTill.EventStruct eventStruct;
                 TimeSpan timeSpan;
 
+                List<TimeTill.EventStruct> reversedList = new List<TimeTill.EventStruct>(TimeTill.EventList);
+                reversedList.Reverse();
+
                 if (message.ParameterList.Count > 0) // Parameters given
                 {
                     // If an event in EventList is in the past, and the event name and command parameters match exactly,
                     // assign to eventStruct
-                    eventStruct = TimeTill.EventList.Find(s =>
+                    eventStruct = reversedList.Find(s =>
                        s.EventDate <= DateTime.UtcNow &&
                        s.EventName == message.Parameters);
 
@@ -39,7 +42,7 @@ namespace Utility
                     if (eventStruct.EventName == null)
                     {
                         // Same search as above, but using regex to match messages this time.
-                        eventStruct = TimeTill.EventList.Find(s =>
+                        eventStruct = reversedList.Find(s =>
                             s.EventDate <= DateTime.UtcNow &&
                             Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
                     }
@@ -50,7 +53,7 @@ namespace Utility
                 }
                 else // Parameters not given, assign last Desert Bus to eventStruct.
                 {
-                    eventStruct = TimeTill.EventList.Find(s => s.EventName == "DB4 Ended");
+                    eventStruct = reversedList.Find(s => s.EventName == "DB4 Ended");
                 }
 
                 timeSpan = DateTime.UtcNow - eventStruct.EventDate;
