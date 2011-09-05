@@ -276,79 +276,115 @@ namespace Fun
 
         void IncrementCorrect(string user, int amount)
         {
-            using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+            try
             {
-                cmd.CommandText =
-                    "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
-                    "UPDATE hangman SET correct = correct + @amount WHERE user LIKE @user;";
-                cmd.Parameters.Add("@user", user.ToLowerInvariant());
-                cmd.Parameters.Add("@amount", amount);
-                cmd.ExecuteNonQuery();
+                using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+                {
+                    cmd.CommandText =
+                        "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
+                        "UPDATE hangman SET correct = correct + @amount WHERE user LIKE @user;";
+                    cmd.Parameters.Add("@user", user.ToLowerInvariant());
+                    cmd.Parameters.Add("@amount", amount);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Logger.Write(ex.Message, Settings.Instance.ErrorFile);
             }
         }
 
         void IncrementIncorrect(string user, int amount)
         {
-            using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+            try
             {
-                cmd.CommandText =
-                    "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
-                    "UPDATE hangman SET incorrect = incorrect + @amount WHERE user LIKE @user;";
-                cmd.Parameters.Add("@user", user.ToLowerInvariant());
-                cmd.Parameters.Add("@amount", amount);
-                cmd.ExecuteNonQuery();
+                using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+                {
+                    cmd.CommandText =
+                        "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
+                        "UPDATE hangman SET incorrect = incorrect + @amount WHERE user LIKE @user;";
+                    cmd.Parameters.Add("@user", user.ToLowerInvariant());
+                    cmd.Parameters.Add("@amount", amount);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Logger.Write(ex.Message, Settings.Instance.ErrorFile);
             }
         }
 
         void IncrementWord(string user, int amount)
         {
-            using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+            try
             {
-                cmd.CommandText =
-                    "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
-                    "UPDATE hangman SET word = word + @amount WHERE user LIKE @user;";
-                cmd.Parameters.Add("@user", user.ToLowerInvariant());
-                cmd.Parameters.Add("@amount", amount);
-                cmd.ExecuteNonQuery();
+                using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+                {
+                    cmd.CommandText =
+                        "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
+                        "UPDATE hangman SET word = word + @amount WHERE user LIKE @user;";
+                    cmd.Parameters.Add("@user", user.ToLowerInvariant());
+                    cmd.Parameters.Add("@amount", amount);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Logger.Write(ex.Message, Settings.Instance.ErrorFile);
             }
         }
 
         void IncrementFinalLetter(string user, int amount)
         {
-            using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+            try
             {
-                cmd.CommandText =
-                    "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
-                    "UPDATE hangman SET finalLetter = finalLetter + @amount WHERE user LIKE @user;";
-                cmd.Parameters.Add("@user", user.ToLowerInvariant());
-                cmd.Parameters.Add("@amount", amount);
-                cmd.ExecuteNonQuery();
+                using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+                {
+                    cmd.CommandText =
+                        "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
+                        "UPDATE hangman SET finalLetter = finalLetter + @amount WHERE user LIKE @user;";
+                    cmd.Parameters.Add("@user", user.ToLowerInvariant());
+                    cmd.Parameters.Add("@amount", amount);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Logger.Write(ex.Message, Settings.Instance.ErrorFile);
             }
         }
 
         string GetScore(string user)
         {
-            using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+            try
             {
-                cmd.CommandText =
-                    "SELECT correct, incorrect, word, finalLetter FROM hangman WHERE user LIKE @user";
-                cmd.Parameters.Add("@user", user.ToLowerInvariant());
-                SqliteDataReader reader = cmd.ExecuteReader();
+                using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+                {
+                    cmd.CommandText =
+                        "SELECT correct, incorrect, word, finalLetter FROM hangman WHERE user LIKE @user";
+                    cmd.Parameters.Add("@user", user.ToLowerInvariant());
+                    SqliteDataReader reader = cmd.ExecuteReader();
 
-                if (!reader.HasRows)
-                    return "No scores held for " + user;
+                    if (!reader.HasRows)
+                        return "No scores held for " + user;
 
-                reader.Read();
+                    reader.Read();
 
-                int correct = reader.GetInt32(reader.GetOrdinal("correct"));
-                int incorrect = reader.GetInt32(reader.GetOrdinal("incorrect"));
-                int guessedWord = reader.GetInt32(reader.GetOrdinal("word"));
-                int finalLetter = reader.GetInt32(reader.GetOrdinal("finalLetter"));
+                    int correct = reader.GetInt32(reader.GetOrdinal("correct"));
+                    int incorrect = reader.GetInt32(reader.GetOrdinal("incorrect"));
+                    int guessedWord = reader.GetInt32(reader.GetOrdinal("word"));
+                    int finalLetter = reader.GetInt32(reader.GetOrdinal("finalLetter"));
 
-                string ratio = (incorrect > 0 ? ((float)correct / (float)incorrect).ToString() : "Infinity!");
+                    string ratio = (incorrect > 0 ? ((float)correct / (float)incorrect).ToString() : "Infinity!");
 
-                return "Scores for " + user + " - Correct: " + correct + " Incorrect: " + incorrect + " Ratio: " + ratio + " Final Letter: " + finalLetter + " Whole Word: " + guessedWord;
+                    return "Scores for " + user + " - Correct: " + correct + " Incorrect: " + incorrect + " Ratio: " + ratio + " Final Letter: " + finalLetter + " Whole Word: " + guessedWord;
+                }
             }
+            catch (System.Exception ex)
+            {
+                Logger.Write(ex.Message, Settings.Instance.ErrorFile);
+            }
+            return "Couldn't open the database, sorry :(";
         }
 
         void LoadWords()
