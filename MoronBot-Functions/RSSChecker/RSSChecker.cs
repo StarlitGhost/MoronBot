@@ -53,7 +53,16 @@ namespace Internet
             //{
 
 
-            URL.WebPage feedPage = URL.FetchURL(FeedMap["Homestuck"].URL);
+            URL.WebPage feedPage;
+            try
+            {
+                feedPage = URL.FetchURL(FeedMap["Homestuck"].URL);
+            }
+            catch (System.Exception ex)
+            {
+                Logger.Write(ex.Message, Settings.Instance.ErrorFile);
+                return null;
+            }
 
             XmlDocument feedDoc = new XmlDocument();
 
