@@ -23,10 +23,10 @@ namespace Fun
                 if (message.ParameterList.Count > 0)
                 {
                     string diceString = message.Parameters.Replace(" ", "");
-                    Match diceMatch = Regex.Match(diceString, "(\\+|\\-)?[0-9]+d[0-9]+");
+                    Match diceMatch = Regex.Match(diceString, "(\\+|\\-)?[0-9]+d[0-9%]+");
                     if (diceMatch.Success)
                     {
-                        Match modMatch = Regex.Match(diceString, "(\\+|\\-)[0-9]+(?!(d|[0-9]))");
+                        Match modMatch = Regex.Match(diceString, "(\\+|\\-)[0-9]+(?!(d|[0-9%]))");
                         int modTotal = 0;
                         while (modMatch.Success)
                         {
@@ -76,7 +76,11 @@ namespace Fun
                             int diceSides = 0;
                             if (dice[1].Length < 4)
                             {
-                                diceSides = Convert.ToInt32(dice[1]);
+                                if (dice[1] == "%")
+                                    diceSides = 100;
+                                else
+                                    diceSides = Convert.ToInt32(dice[1]);
+
                                 if (diceSides > 100)
                                 {
                                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No dice can have more than 100 sides.", message.ReplyTo) };
