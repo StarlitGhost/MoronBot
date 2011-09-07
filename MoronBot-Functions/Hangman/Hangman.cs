@@ -22,6 +22,13 @@ namespace Fun
         int badGuesses = 0;
         int maxBadGuesses = 5;
 
+        class LastRound
+        {
+            public int correct = 0;
+            public int incorrect = 0;
+        }
+        Dictionary<string, LastRound> lastRound = new Dictionary<string, LastRound>();
+
         public Hangman()
         {
             Help = "h(ang)m(an) <command> (<params>) - A game of hangman. Sub-commands are as follows: start, stop, max, score (<user>), <guess>";
@@ -124,8 +131,11 @@ namespace Fun
 
                                 responses.Add(new IRCResponse(
                                     ResponseType.Say,
-                                    "Congratulations " + message.User.Name + "! The " + WordOrPhrase(word) + " was: " + word,
+                                    "Congratulations " + message.User.Name + "! The " + WordOrPhrase(word) + " was: " + word + " " + LastRoundSummary(message.User.Name),
                                     message.ReplyTo));
+
+                                StoreLastRound();
+
                                 Stop();
                             }
                             else
@@ -140,6 +150,9 @@ namespace Fun
                                         ResponseType.Say,
                                         "You have failed! The " + WordOrPhrase(word) + " was: " + word,
                                         message.ReplyTo));
+
+                                    StoreLastRound();
+
                                     Stop();
                                 }
                             }
@@ -199,6 +212,16 @@ namespace Fun
             return guessString + "]";
         }
 
+        string LastRoundSummary(string user)
+        {
+            int c = lastRound[user.ToLowerInvariant()].correct;
+            int i = lastRound[user.ToLowerInvariant()].incorrect;
+            string ratio = (i == 0 ? "Infinity!" : ((float)c / (float)i).ToString());
+            int s = (c * 2) - i;
+
+            return "(Score Change: " + (s >= 0 ? "+" + s.ToString() : s.ToString()) + " | Ratio: " + ratio + " | C/I: " + c + "/" + i + ")";
+        }
+
         void Start()
         {
             if (++index == words.Count)
@@ -210,6 +233,8 @@ namespace Fun
             word = words[index];
             guesses.Clear();
             playing = true;
+
+            lastRound.Clear();
         }
 
         void Stop()
@@ -218,6 +243,8 @@ namespace Fun
             guesses.Clear();
             playing = false;
             badGuesses = 0;
+
+            lastRound.Clear();
         }
 
         string Guess(BotMessage message)
@@ -252,9 +279,22 @@ namespace Fun
 
         string GuessWord(string guess, string user)
         {
+            if (guess.Length != word.Length)
+                return "Invalid " + WordOrPhrase(word) + " guess '" + guess + "', " + user;
+
+            string visibleWord = VisibleWord(word, guesses);
+            for (int i = 0; i < word.Length; i++)
+            {
+                if (visibleWord[i] == '_')
+                    continue;
+
+                if (guess[i] != visibleWord[i])
+                    return "Invalid " + WordOrPhrase(word) + " guess '" + guess + "', " + user;
+            }
+
+            List<char> unknowns = new List<char>();
             if (word == guess)
             {
-                List<char> unknowns = new List<char>();
                 int correct = 0;
                 foreach (char c in word)
                 {
@@ -265,12 +305,23 @@ namespace Fun
                     }
                 }
 
-                IncrementCorrect(user, correct);
+                IncrementCorrect(user, correct + 1);
                 return null;
             }
             else
             {
-                IncrementIncorrect(user, 1);
+                int incorrect = 0;
+                foreach (char c in guess)
+                {
+                    if (!guesses.Contains(c) && !unknowns.Contains(c))
+                    {
+                        unknowns.Add(c);
+                        ++incorrect;
+                    }
+                }
+
+                IncrementIncorrect(user, incorrect);
+
                 return "The " + WordOrPhrase(word) + " is not '" + guess + "'";
             }
         }
@@ -287,7 +338,7 @@ namespace Fun
                 using (DbCommand cmd = SQLiteInterface.Instance.Command)
                 {
                     cmd.CommandText =
-                        "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
+                        "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0, 'no data');" +
                         "UPDATE hangman SET correct = correct + @amount WHERE user LIKE @user;";
 
                     DbParameter paramUser = cmd.CreateParameter();
@@ -309,8 +360,13 @@ namespace Fun
             }
             catch (System.Exception ex)
             {
-                Logger.Write("Correct: " + ex.Message, Settings.Instance.ErrorFile);
+                Logger.Write("Correct: " + ex.Message + ex.StackTrace, Settings.Instance.ErrorFile);
             }
+
+            if (!lastRound.ContainsKey(user.ToLowerInvariant()))
+                lastRound.Add(user.ToLowerInvariant(), new LastRound());
+
+            lastRound[user.ToLowerInvariant()].correct += amount;
         }
 
         void IncrementIncorrect(string user, int amount)
@@ -320,7 +376,7 @@ namespace Fun
                 using (DbCommand cmd = SQLiteInterface.Instance.Command)
                 {
                     cmd.CommandText =
-                        "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
+                        "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0, 'no data');" +
                         "UPDATE hangman SET incorrect = incorrect + @amount WHERE user LIKE @user;";
 
                     DbParameter paramUser = cmd.CreateParameter();
@@ -342,8 +398,13 @@ namespace Fun
             }
             catch (System.Exception ex)
             {
-                Logger.Write("Incorrect: " + ex.Message, Settings.Instance.ErrorFile);
+                Logger.Write("Incorrect: " + ex.Message + ex.StackTrace, Settings.Instance.ErrorFile);
             }
+
+            if (!lastRound.ContainsKey(user.ToLowerInvariant()))
+                lastRound.Add(user.ToLowerInvariant(), new LastRound());
+
+            lastRound[user.ToLowerInvariant()].incorrect++;
         }
 
         void IncrementWord(string user, int amount)
@@ -353,7 +414,7 @@ namespace Fun
                 using (DbCommand cmd = SQLiteInterface.Instance.Command)
                 {
                     cmd.CommandText =
-                        "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
+                        "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0, 'no data');" +
                         "UPDATE hangman SET word = word + @amount WHERE user LIKE @user;";
 
                     DbParameter paramUser = cmd.CreateParameter();
@@ -375,7 +436,7 @@ namespace Fun
             }
             catch (System.Exception ex)
             {
-                Logger.Write("Word: " + ex.Message, Settings.Instance.ErrorFile);
+                Logger.Write("Word: " + ex.Message + ex.StackTrace, Settings.Instance.ErrorFile);
             }
         }
 
@@ -386,7 +447,7 @@ namespace Fun
                 using (DbCommand cmd = SQLiteInterface.Instance.Command)
                 {
                     cmd.CommandText =
-                        "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
+                        "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0, 'no data');" +
                         "UPDATE hangman SET finalLetter = finalLetter + @amount WHERE user LIKE @user;";
 
                     DbParameter paramUser = cmd.CreateParameter();
@@ -408,7 +469,42 @@ namespace Fun
             }
             catch (System.Exception ex)
             {
-                Logger.Write("Final Letter: " + ex.Message, Settings.Instance.ErrorFile);
+                Logger.Write("Final Letter: " + ex.Message + ex.StackTrace, Settings.Instance.ErrorFile);
+            }
+        }
+
+        void StoreLastRound()
+        {
+            try
+            {
+                foreach (var user in lastRound)
+                {
+                    using (DbCommand cmd = SQLiteInterface.Instance.Command)
+                    {
+                        cmd.CommandText =
+                            "UPDATE hangman SET lastRound = @lastRound WHERE user LIKE @user;";
+
+                        DbParameter paramUser = cmd.CreateParameter();
+                        paramUser.ParameterName = "@user";
+                        paramUser.DbType = DbType.String;
+                        paramUser.Direction = ParameterDirection.Input;
+                        paramUser.Value = user.Key;
+                        cmd.Parameters.Add(paramUser);
+
+                        DbParameter paramLastRound = cmd.CreateParameter();
+                        paramLastRound.ParameterName = "@lastRound";
+                        paramLastRound.DbType = DbType.String;
+                        paramLastRound.Direction = ParameterDirection.Input;
+                        paramLastRound.Value = LastRoundSummary(user.Key);
+                        cmd.Parameters.Add(paramLastRound);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Logger.Write("Last Round: " + ex.Message + ex.StackTrace, Settings.Instance.ErrorFile);
             }
         }
 
@@ -419,7 +515,7 @@ namespace Fun
                 using (DbCommand cmd = SQLiteInterface.Instance.Command)
                 {
                     cmd.CommandText =
-                        "SELECT correct, incorrect, word, finalLetter FROM hangman WHERE user LIKE @user";
+                        "SELECT correct, incorrect, word, finalLetter, lastRound FROM hangman WHERE user LIKE @user";
 
                     DbParameter param = SQLiteInterface.Instance.Parameter;
 
@@ -441,14 +537,21 @@ namespace Fun
                     int guessedWord = reader.GetInt32(reader.GetOrdinal("word"));
                     int finalLetter = reader.GetInt32(reader.GetOrdinal("finalLetter"));
 
-                    string ratio = (incorrect > 0 ? ((float)correct / (float)incorrect).ToString() : "Infinity!");
+                    string lastRoundMessage;
+                    if (reader.IsDBNull(reader.GetOrdinal("lastRound")))
+                        lastRoundMessage = "no data";
+                    else
+                        lastRoundMessage = reader.GetString(reader.GetOrdinal("lastRound"));
 
-                    return "Scores for " + user + " - Correct/Incorrect: " + correct + "/" + incorrect + " Ratio: " + ratio + " Final Letter: " + finalLetter + " Whole Word: " + guessedWord;
+                    string ratio = (incorrect > 0 ? ((float)correct / (float)incorrect).ToString() : "Infinity!");
+                    string score = ((correct * 2) - incorrect).ToString();
+
+                    return user + " - Score: " + score + " | Ratio: " + ratio + " | Correct/Incorrect: " + correct + "/" + incorrect + " | Last Letter: " + finalLetter + " | Whole Word: " + guessedWord + " | Last Round: " + lastRoundMessage;
                 }
             }
             catch (System.Exception ex)
             {
-                Logger.Write(ex.Message, Settings.Instance.ErrorFile);
+                Logger.Write("Get Score: " + ex.Message + ex.StackTrace, Settings.Instance.ErrorFile);
             }
             return "Couldn't open the database, sorry :(";
         }
