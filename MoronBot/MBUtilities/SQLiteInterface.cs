@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-using Community.CsharpSqlite;
-using Community.CsharpSqlite.SQLiteClient;
-using System.Data.Common;
+using Mono.Data.Sqlite;
 
 namespace MBUtilities
 {
@@ -17,25 +16,18 @@ namespace MBUtilities
         {
             get { return conn; }
         }
+        public DbCommand Command
+        {
+            get { return conn.CreateCommand(); }
+        }
+        public DbParameter Parameter
+        {
+            get { return new SqliteParameter(); }
+        }
 
         #region Singleton rubbish
         static SQLiteInterface instance = null;
         static readonly object padlock = new object();
-
-        SQLiteInterface()
-        {
-            string path = Path.Combine(Settings.Instance.DataPath, "mbdata.sqlite");
-            try
-            {
-                conn = new SqliteConnection();
-                conn.ConnectionString = "Data Source=file:" + path;
-                conn.Open();
-            }
-            catch (System.Exception ex)
-            {
-                Logger.Write(ex.Message, Settings.Instance.ErrorFile);
-            }
-        }
 
         public static SQLiteInterface Instance
         {
@@ -60,6 +52,23 @@ namespace MBUtilities
             }
         }
         #endregion Singleton rubbish
+
+        SQLiteInterface()
+        {
+            string path = Path.Combine(Settings.Instance.DataPath, "mbdata.sqlite");
+            try
+            {
+                conn = new SqliteConnection();
+                conn.ConnectionString = "Data Source=" + path;
+                conn.Open();
+            }
+            catch (System.Exception ex)
+            {
+                Logger.Write(ex.Message, Settings.Instance.ErrorFile);
+                Logger.Write(ex.StackTrace, Settings.Instance.ErrorFile);
+                Logger.Write(conn.ConnectionString, Settings.Instance.ErrorFile);
+            }
+        }
 
         ~SQLiteInterface()
         {

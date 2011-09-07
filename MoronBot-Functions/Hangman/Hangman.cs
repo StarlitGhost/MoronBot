@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.IO;
 using System.Text.RegularExpressions;
-
-using Community.CsharpSqlite.SQLiteClient;
 
 using CwIRC;
 using MBFunctionInterface;
@@ -14,7 +14,7 @@ namespace Fun
 {
     public class Hangman : Function
     {
-        Random rand = new Random();
+        int index = 0;
         List<string> words = new List<string>();
         string word = "";
         List<char> guesses = new List<char>();
@@ -73,7 +73,7 @@ namespace Fun
                         {
                             int temp;
                             if (message.ParameterList.Count > 1 && Int32.TryParse(message.ParameterList[1], out temp))
-                                maxBadGuesses = (temp < 50 ? (temp >= 0 ? temp : 0) : 50);
+                                maxBadGuesses = (temp < 25 ? (temp >= 1 ? temp : 1) : 25);
                             else
                                 responses.Add(new IRCResponse(ResponseType.Say, "You didn't give a number! |hm max <0-50>", message.ReplyTo));
 
@@ -201,7 +201,13 @@ namespace Fun
 
         void Start()
         {
-            word = words[rand.Next(words.Count)];
+            if (++index == words.Count)
+            {
+                index = 0;
+                words.Shuffle();
+            }
+
+            word = words[index];
             guesses.Clear();
             playing = true;
         }
@@ -278,13 +284,26 @@ namespace Fun
         {
             try
             {
-                using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+                using (DbCommand cmd = SQLiteInterface.Instance.Command)
                 {
                     cmd.CommandText =
                         "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
                         "UPDATE hangman SET correct = correct + @amount WHERE user LIKE @user;";
-                    cmd.Parameters.Add("@user", user.ToLowerInvariant());
-                    cmd.Parameters.Add("@amount", amount);
+
+                    DbParameter param = SQLiteInterface.Instance.Parameter;
+
+                    param.ParameterName = "@user";
+                    param.DbType = DbType.String;
+                    param.Direction = ParameterDirection.Input;
+                    param.Value = user.ToLowerInvariant();
+                    cmd.Parameters.Add(param);
+
+                    param.ParameterName = "@amount";
+                    param.DbType = DbType.Int32;
+                    param.Direction = ParameterDirection.Input;
+                    param.Value = amount;
+                    cmd.Parameters.Add(param);
+
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -298,13 +317,26 @@ namespace Fun
         {
             try
             {
-                using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+                using (DbCommand cmd = SQLiteInterface.Instance.Command)
                 {
                     cmd.CommandText =
                         "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
                         "UPDATE hangman SET incorrect = incorrect + @amount WHERE user LIKE @user;";
-                    cmd.Parameters.Add("@user", user.ToLowerInvariant());
-                    cmd.Parameters.Add("@amount", amount);
+
+                    DbParameter param = SQLiteInterface.Instance.Parameter;
+
+                    param.ParameterName = "@user";
+                    param.DbType = DbType.String;
+                    param.Direction = ParameterDirection.Input;
+                    param.Value = user.ToLowerInvariant();
+                    cmd.Parameters.Add(param);
+
+                    param.ParameterName = "@amount";
+                    param.DbType = DbType.Int32;
+                    param.Direction = ParameterDirection.Input;
+                    param.Value = amount;
+                    cmd.Parameters.Add(param);
+
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -318,13 +350,26 @@ namespace Fun
         {
             try
             {
-                using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+                using (DbCommand cmd = SQLiteInterface.Instance.Command)
                 {
                     cmd.CommandText =
                         "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
                         "UPDATE hangman SET word = word + @amount WHERE user LIKE @user;";
-                    cmd.Parameters.Add("@user", user.ToLowerInvariant());
-                    cmd.Parameters.Add("@amount", amount);
+
+                    DbParameter param = SQLiteInterface.Instance.Parameter;
+
+                    param.ParameterName = "@user";
+                    param.DbType = DbType.String;
+                    param.Direction = ParameterDirection.Input;
+                    param.Value = user.ToLowerInvariant();
+                    cmd.Parameters.Add(param);
+
+                    param.ParameterName = "@amount";
+                    param.DbType = DbType.Int32;
+                    param.Direction = ParameterDirection.Input;
+                    param.Value = amount;
+                    cmd.Parameters.Add(param);
+
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -338,13 +383,26 @@ namespace Fun
         {
             try
             {
-                using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+                using (DbCommand cmd = SQLiteInterface.Instance.Command)
                 {
                     cmd.CommandText =
                         "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
                         "UPDATE hangman SET finalLetter = finalLetter + @amount WHERE user LIKE @user;";
-                    cmd.Parameters.Add("@user", user.ToLowerInvariant());
-                    cmd.Parameters.Add("@amount", amount);
+
+                    DbParameter param = SQLiteInterface.Instance.Parameter;
+
+                    param.ParameterName = "@user";
+                    param.DbType = DbType.String;
+                    param.Direction = ParameterDirection.Input;
+                    param.Value = user.ToLowerInvariant();
+                    cmd.Parameters.Add(param);
+
+                    param.ParameterName = "@amount";
+                    param.DbType = DbType.Int32;
+                    param.Direction = ParameterDirection.Input;
+                    param.Value = amount;
+                    cmd.Parameters.Add(param);
+
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -358,12 +416,20 @@ namespace Fun
         {
             try
             {
-                using (SqliteCommand cmd = (SqliteCommand)SQLiteInterface.Instance.Connection.CreateCommand())
+                using (DbCommand cmd = SQLiteInterface.Instance.Command)
                 {
                     cmd.CommandText =
                         "SELECT correct, incorrect, word, finalLetter FROM hangman WHERE user LIKE @user";
-                    cmd.Parameters.Add("@user", user.ToLowerInvariant());
-                    SqliteDataReader reader = cmd.ExecuteReader();
+
+                    DbParameter param = SQLiteInterface.Instance.Parameter;
+
+                    param.ParameterName = "@user";
+                    param.DbType = DbType.String;
+                    param.Direction = ParameterDirection.Input;
+                    param.Value = user.ToLowerInvariant();
+                    cmd.Parameters.Add(param);
+
+                    DbDataReader reader = cmd.ExecuteReader();
 
                     if (!reader.HasRows)
                         return "No scores held for " + user;
@@ -377,7 +443,7 @@ namespace Fun
 
                     string ratio = (incorrect > 0 ? ((float)correct / (float)incorrect).ToString() : "Infinity!");
 
-                    return "Scores for " + user + " - Correct: " + correct + " Incorrect: " + incorrect + " Ratio: " + ratio + " Final Letter: " + finalLetter + " Whole Word: " + guessedWord;
+                    return "Scores for " + user + " - Correct/Incorrect: " + correct + "/" + incorrect + " Ratio: " + ratio + " Final Letter: " + finalLetter + " Whole Word: " + guessedWord;
                 }
             }
             catch (System.Exception ex)
@@ -395,6 +461,8 @@ namespace Fun
                 words.AddRange(File.ReadAllLines(path));
             else
                 words.Add("add some words or phrases you fool");
+
+            words.Shuffle();
         }
 
         void SaveWords()
