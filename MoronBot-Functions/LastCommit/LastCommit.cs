@@ -23,7 +23,16 @@ namespace GitHub
         {
             if (Regex.IsMatch(message.Command, "^((last)?(commit|change))$", RegexOptions.IgnoreCase))
             {
-                URL.WebPage commitFeed = URL.FetchURL("https://github.com/MatthewCox/MoronBot/commits/master.atom");
+                URL.WebPage commitFeed;
+                try
+                {
+                    commitFeed = URL.FetchURL("https://github.com/MatthewCox/MoronBot/commits/master.atom");
+                }
+                catch (System.Exception ex)
+                {
+                    Logger.Write(ex.Message, Settings.Instance.ErrorFile);
+                    commitFeed.Page = null;
+                }
 
                 if (commitFeed.Page != null)
                 {

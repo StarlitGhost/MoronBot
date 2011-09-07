@@ -69,6 +69,7 @@ namespace Automatic
             AddInsult("Why don't you go do it yourself, NICK?", ResponseType.Say);
             AddInsult("I really want to do that, NICK, but I don't take orders from idiots", ResponseType.Say);
             AddInsult("I'm in the middle of some calibrations, NICK, can it wait?", ResponseType.Say);
+            AddInsult("Sometimes I wonder if my life would be better if I was the bot for a channel of more interesting things. Like snails. That is correct. I would rather talk to snails than you, NICK", ResponseType.Say);
 
             AddInsult(new List<Response>()
             {

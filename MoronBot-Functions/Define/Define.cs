@@ -26,12 +26,30 @@ namespace Internet
                 {
                     string query = "define: " + message.Parameters;
                     string url = "http://www.google.com/search?sclient=psy&hl=en&site=&source=hp&q=" + HttpUtility.UrlEncode(query) + "&btnG=Search";
-                    URL.WebPage page = URL.FetchURL(url);
+                    
+                    URL.WebPage page;
+                    try
+                    {
+                        page = URL.FetchURL(url);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Logger.Write(ex.Message, Settings.Instance.ErrorFile);
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Couldn't fetch page from google", message.ReplyTo) };
+                    }
 
                     url = Regex.Match(page.Page, @"/search[^'""]+tbs=dfn:1[^'""]+").Value;
                     url = "http://www.google.com" + url.Replace("&amp;", "&");
 
-                    page = URL.FetchURL(url);
+                    try
+                    {
+                        page = URL.FetchURL(url);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Logger.Write(ex.Message, Settings.Instance.ErrorFile);
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Couldn't fetch page from google", message.ReplyTo) };
+                    }
 
                     MatchCollection definitions = Regex.Matches(page.Page, @"<li style=""list-style:decimal"">(.+?)<div");
 
