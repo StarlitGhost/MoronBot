@@ -290,26 +290,26 @@ namespace Fun
                         "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
                         "UPDATE hangman SET correct = correct + @amount WHERE user LIKE @user;";
 
-                    DbParameter param = SQLiteInterface.Instance.Parameter;
+                    DbParameter paramUser = cmd.CreateParameter();
+                    paramUser.ParameterName = "@user";
+                    paramUser.DbType = DbType.String;
+                    paramUser.Direction = ParameterDirection.Input;
+                    paramUser.Value = user.ToLowerInvariant();
+                    cmd.Parameters.Add(paramUser);
 
-                    param.ParameterName = "@user";
-                    param.DbType = DbType.String;
-                    param.Direction = ParameterDirection.Input;
-                    param.Value = user.ToLowerInvariant();
-                    cmd.Parameters.Add(param);
-
-                    param.ParameterName = "@amount";
-                    param.DbType = DbType.Int32;
-                    param.Direction = ParameterDirection.Input;
-                    param.Value = amount;
-                    cmd.Parameters.Add(param);
+                    DbParameter paramAmount = cmd.CreateParameter();
+                    paramAmount.ParameterName = "@amount";
+                    paramAmount.DbType = DbType.Int32;
+                    paramAmount.Direction = ParameterDirection.Input;
+                    paramAmount.Value = amount;
+                    cmd.Parameters.Add(paramAmount);
 
                     cmd.ExecuteNonQuery();
                 }
             }
             catch (System.Exception ex)
             {
-                Logger.Write(ex.Message, Settings.Instance.ErrorFile);
+                Logger.Write("Correct: " + ex.Message, Settings.Instance.ErrorFile);
             }
         }
 
@@ -323,26 +323,26 @@ namespace Fun
                         "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
                         "UPDATE hangman SET incorrect = incorrect + @amount WHERE user LIKE @user;";
 
-                    DbParameter param = SQLiteInterface.Instance.Parameter;
+                    DbParameter paramUser = cmd.CreateParameter();
+                    paramUser.ParameterName = "@user";
+                    paramUser.DbType = DbType.String;
+                    paramUser.Direction = ParameterDirection.Input;
+                    paramUser.Value = user.ToLowerInvariant();
+                    cmd.Parameters.Add(paramUser);
 
-                    param.ParameterName = "@user";
-                    param.DbType = DbType.String;
-                    param.Direction = ParameterDirection.Input;
-                    param.Value = user.ToLowerInvariant();
-                    cmd.Parameters.Add(param);
-
-                    param.ParameterName = "@amount";
-                    param.DbType = DbType.Int32;
-                    param.Direction = ParameterDirection.Input;
-                    param.Value = amount;
-                    cmd.Parameters.Add(param);
+                    DbParameter paramAmount = cmd.CreateParameter();
+                    paramAmount.ParameterName = "@amount";
+                    paramAmount.DbType = DbType.Int32;
+                    paramAmount.Direction = ParameterDirection.Input;
+                    paramAmount.Value = amount;
+                    cmd.Parameters.Add(paramAmount);
 
                     cmd.ExecuteNonQuery();
                 }
             }
             catch (System.Exception ex)
             {
-                Logger.Write(ex.Message, Settings.Instance.ErrorFile);
+                Logger.Write("Incorrect: " + ex.Message, Settings.Instance.ErrorFile);
             }
         }
 
@@ -356,26 +356,26 @@ namespace Fun
                         "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
                         "UPDATE hangman SET word = word + @amount WHERE user LIKE @user;";
 
-                    DbParameter param = SQLiteInterface.Instance.Parameter;
+                    DbParameter paramUser = cmd.CreateParameter();
+                    paramUser.ParameterName = "@user";
+                    paramUser.DbType = DbType.String;
+                    paramUser.Direction = ParameterDirection.Input;
+                    paramUser.Value = user.ToLowerInvariant();
+                    cmd.Parameters.Add(paramUser);
 
-                    param.ParameterName = "@user";
-                    param.DbType = DbType.String;
-                    param.Direction = ParameterDirection.Input;
-                    param.Value = user.ToLowerInvariant();
-                    cmd.Parameters.Add(param);
-
-                    param.ParameterName = "@amount";
-                    param.DbType = DbType.Int32;
-                    param.Direction = ParameterDirection.Input;
-                    param.Value = amount;
-                    cmd.Parameters.Add(param);
+                    DbParameter paramAmount = cmd.CreateParameter();
+                    paramAmount.ParameterName = "@amount";
+                    paramAmount.DbType = DbType.Int32;
+                    paramAmount.Direction = ParameterDirection.Input;
+                    paramAmount.Value = amount;
+                    cmd.Parameters.Add(paramAmount);
 
                     cmd.ExecuteNonQuery();
                 }
             }
             catch (System.Exception ex)
             {
-                Logger.Write(ex.Message, Settings.Instance.ErrorFile);
+                Logger.Write("Word: " + ex.Message, Settings.Instance.ErrorFile);
             }
         }
 
@@ -389,26 +389,26 @@ namespace Fun
                         "INSERT OR IGNORE INTO hangman VALUES (@user, 0, 0, 0, 0);" +
                         "UPDATE hangman SET finalLetter = finalLetter + @amount WHERE user LIKE @user;";
 
-                    DbParameter param = SQLiteInterface.Instance.Parameter;
+                    DbParameter paramUser = cmd.CreateParameter();
+                    paramUser.ParameterName = "@user";
+                    paramUser.DbType = DbType.String;
+                    paramUser.Direction = ParameterDirection.Input;
+                    paramUser.Value = user.ToLowerInvariant();
+                    cmd.Parameters.Add(paramUser);
 
-                    param.ParameterName = "@user";
-                    param.DbType = DbType.String;
-                    param.Direction = ParameterDirection.Input;
-                    param.Value = user.ToLowerInvariant();
-                    cmd.Parameters.Add(param);
-
-                    param.ParameterName = "@amount";
-                    param.DbType = DbType.Int32;
-                    param.Direction = ParameterDirection.Input;
-                    param.Value = amount;
-                    cmd.Parameters.Add(param);
+                    DbParameter paramAmount = cmd.CreateParameter();
+                    paramAmount.ParameterName = "@amount";
+                    paramAmount.DbType = DbType.Int32;
+                    paramAmount.Direction = ParameterDirection.Input;
+                    paramAmount.Value = amount;
+                    cmd.Parameters.Add(paramAmount);
 
                     cmd.ExecuteNonQuery();
                 }
             }
             catch (System.Exception ex)
             {
-                Logger.Write(ex.Message, Settings.Instance.ErrorFile);
+                Logger.Write("Final Letter: " + ex.Message, Settings.Instance.ErrorFile);
             }
         }
 
