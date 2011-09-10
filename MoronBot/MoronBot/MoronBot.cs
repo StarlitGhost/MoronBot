@@ -26,6 +26,9 @@ namespace MoronBot
     {
         #region Variables
 
+        /// <summary>
+        /// The CwIRC Interface that is used to send and receive messages to and from an IRC server
+        /// </summary>
         CwIRC.Interface cwIRC;
 
         /// <summary>
@@ -40,28 +43,59 @@ namespace MoronBot
                 Settings.Instance.CurrentNick = value;
             }
         }
+        /// <summary>
+        /// Used to set the bot's nickname if the one in the settings file is already in use
+        /// </summary>
         int nickUsedCount = 0;
 
+        /// <summary>
+        /// A List containing all of the Functions that are activated based on usernames
+        /// </summary>
         internal List<IFunction> UserListFunctions = new List<IFunction>();
+        /// <summary>
+        /// A List containing all of the Functions that are activated based upon regex parsing of the message text
+        /// </summary>
         internal List<IFunction> RegexFunctions = new List<IFunction>();
+        /// <summary>
+        /// A List containing all of the Functions that are activated based on the 'standard' command syntaxes '|(function)', 'botname function'
+        /// </summary>
         internal List<IFunction> CommandFunctions = new List<IFunction>();
 
+        /// <summary>
+        /// A List of the names of Functions loaded
+        /// </summary>
         List<string> commandList = new List<string>();
         public List<string> CommandList
         {
             get { return commandList; }
         }
 
+        /// <summary>
+        /// A List containing functions that have been unloaded
+        /// </summary>
         List<IFunction> unloadedList = new List<IFunction>();
 
+        /// <summary>
+        /// A map of function names -> their associated help text
+        /// </summary>
         Dictionary<string, string> helpLibrary = new Dictionary<string, string>();
         public Dictionary<string, string> HelpLibrary
         {
             get { return helpLibrary; }
         }
 
+        /// <summary>
+        /// A queue of messages to send to the IRC server
+        /// </summary>
         List<IRCResponse> MessageQueue = new List<IRCResponse>();
+        /// <summary>
+        /// A lock to synchronize message queue operations
+        /// </summary>
         readonly object queueSync = new object();
+        /// <summary>
+        /// A lock to synchronize message processing
+        /// </summary>
+        readonly object messageSync = new object();
 
         #endregion Variables
 
@@ -492,8 +526,12 @@ namespace MoronBot
         void CwIRC_MessageReceived(object sender, string message)
         {
             BotMessage botMessage = new BotMessage(message, Nick);
-            OnNewRawIRC(botMessage.ToString());
-            ProcessMessage(botMessage);
+
+            lock (messageSync)
+            {
+                OnNewRawIRC(botMessage.ToString());
+                ProcessMessage(botMessage);
+            }
         }
         #endregion IRC Message Receiver
 
