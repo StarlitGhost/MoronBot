@@ -39,7 +39,7 @@ namespace Automatic
             }
 
             // Someone has greeted MoronBot
-            Match match = Regex.Match(message.MessageString, @"^('?sup|hi|hey|hello|greetings|bonjour|salut|howdy|'?yo|o?hai|mojn),?[ ]" + Regex.Escape(Settings.Instance.CurrentNick) + @"([^a-zA-Z0-9_\|`\[\]\^-]|$)", RegexOptions.IgnoreCase);
+            Match match = Regex.Match(message.MessageString, @"^('?sup|hi|hey|hello|greetings|bonjour|salut|howdy|'?yo|o?hai|mojn|dongs),?[ ]" + Regex.Escape(Settings.Instance.CurrentNick) + @"([^a-zA-Z0-9_\|`\[\]\^-]|$)", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 return new List<IRCResponse>() { 
