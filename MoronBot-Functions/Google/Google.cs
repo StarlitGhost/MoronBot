@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Web;
 
 using CwIRC;
 using MBFunctionInterface;
+using MBUtilities;
 
 using Gapi;
 
@@ -29,8 +31,7 @@ namespace Internet
                     try
                     {
                         searchResults = Gapi.Search.Searcher.Search(Gapi.Search.SearchType.Web, searchTerm);
-                        //Gapi.Search.SearchSafety.Active;
-                        //Gapi.Search.S
+
                         if (searchResults.Items.Length == 0)
                         {
                             return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No results found for \"" + message.Parameters + "\"!", message.ReplyTo) };
@@ -42,7 +43,7 @@ namespace Internet
                     {
                         return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, ex.GetType().ToString() + " | " + ex.Message, message.ReplyTo) };
                     }
-                    string searchContent = Regex.Replace(searchResult.Content, @"<.+?>", "");
+                    string searchContent = HttpUtility.HtmlDecode(URL.StripHTML(searchResult.Content));
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, searchContent + " (" + searchResult.Url + ")", message.ReplyTo) };
                 }
                 else

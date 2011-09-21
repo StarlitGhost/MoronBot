@@ -269,5 +269,10 @@ namespace MBUtilities
             }
             return result;
         }
+
+        public static string StripHTML(string text)
+        {
+            return Regex.Replace(text, @"<.*?>", String.Empty);
+        }
     }
 }
