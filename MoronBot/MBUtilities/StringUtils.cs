@@ -1,10 +1,12 @@
-﻿namespace MBUtilities
+﻿using System.Text.RegularExpressions;
+
+namespace MBUtilities
 {
     public static class StringUtils
     {
         public static string ReplaceNewlines(string text, string replacement)
         {
-            return text.Replace("\r\n", replacement).Replace("\n", replacement).Replace("\r", replacement);
+            return Regex.Replace(text, @"[\r\n]+", replacement);
         }
     }
 }

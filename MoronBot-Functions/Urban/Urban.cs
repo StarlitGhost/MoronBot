@@ -25,8 +25,8 @@ namespace Internet
             {
                 if (message.ParameterList.Count > 0)
                 {
-                    string query = message.Parameters;
-                    string url = "http://www.urbandictionary.com/define.php?term=" + HttpUtility.UrlEncode(query);
+                    string query = HttpUtility.UrlEncode(message.Parameters);
+                    string url = "http://www.urbandictionary.com/define.php?term=" + query;
                     
                     URL.WebPage page;
                     try
@@ -39,23 +39,39 @@ namespace Internet
                         return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Couldn't fetch page from UrbanDictionary", message.ReplyTo) };
                     }
 
-                    Match definition = Regex.Match(page.Page, @"<div class=""definition"">(.+?)</div><div class=""example"">(.+?)</div>");
+                    Match nameMatch = Regex.Match(page.Page, @"<td class='word'>[\r\n]+(.+?)[\r\n]+</td>");
+                    Match definitionMatch = Regex.Match(page.Page, @"<div class=""definition"">(.+?)</div><div class=""example"">(.+?)</div>");
 
-                    if (definition.Success)
+                    if (definitionMatch.Success)
                     {
+                        string word = URL.StripHTML(HttpUtility.HtmlDecode(nameMatch.Groups[1].Value));
+                        string definition = StringUtils.ReplaceNewlines(URL.StripHTML(HttpUtility.HtmlDecode(definitionMatch.Groups[1].Value)), " | ");
+                        string example = StringUtils.ReplaceNewlines(URL.StripHTML(HttpUtility.HtmlDecode(definitionMatch.Groups[2].Value)), " | ");
+
                         List<IRCResponse> responses = new List<IRCResponse>();
 
+                        if (message.Parameters.ToLowerInvariant() == word.ToLowerInvariant())
+                        {
+                            responses.Add(new IRCResponse(
+                                ResponseType.Say,
+                                "Top definition for " + message.Parameters + " (" + url + "):",
+                                message.ReplyTo));
+                        }
+                        else
+                        {
+                            responses.Add(new IRCResponse(
+                                ResponseType.Say,
+                                "Top definition containing " + message.Parameters + " (" + word + ") (" + url + "):",
+                                message.ReplyTo));
+                        }
+
                         responses.Add(new IRCResponse(
                             ResponseType.Say,
-                            "Top definition for " + message.Parameters + " (" + url + "):",
+                            definition,
                             message.ReplyTo));
                         responses.Add(new IRCResponse(
                             ResponseType.Say,
-                            Regex.Replace(Regex.Replace(HttpUtility.HtmlDecode(definition.Groups[1].Value), @"<.*?>", String.Empty), @"[\r\n]+", " | "),
-                            message.ReplyTo));
-                        responses.Add(new IRCResponse(
-                            ResponseType.Say,
-                            "Example: " + Regex.Replace(Regex.Replace(HttpUtility.HtmlDecode(definition.Groups[2].Value), @"<.*?>", String.Empty), @"[\r\n]+", " | "),
+                            "Example: " + example,
                             message.ReplyTo));
 
                         return responses;
