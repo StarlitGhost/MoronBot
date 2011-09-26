@@ -24,6 +24,9 @@ namespace Internet
             {
                 if (message.ParameterList.Count > 0)
                 {
+                    if (Regex.IsMatch(message.Parameters, @"xela(re[ck]o)?'s existence", RegexOptions.IgnoreCase))
+                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Of course Xela exists! Without him I wouldn't have the capacity for apathy! ;D", message.ReplyTo) };
+
                     string query = "define: " + message.Parameters;
                     string url = "http://www.google.com/search?sclient=psy&hl=en&site=&source=hp&q=" + HttpUtility.UrlEncode(query) + "&btnG=Search";
                     

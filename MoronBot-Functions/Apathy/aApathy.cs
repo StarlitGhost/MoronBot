@@ -40,6 +40,7 @@ namespace Automatic
             AccessList.Add("kiraisl");
             AccessList.Add("pikachaos");
             AccessList.Add("tyranic-moron");
+            AccessList.Add("maerarde");
 
             InitInsults();
         }
