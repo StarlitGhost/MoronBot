@@ -38,7 +38,7 @@ namespace Utility
                     else
                     {
                         List<IRCResponse> response = new List<IRCResponse>();
-                        response.Add(new IRCResponse(ResponseType.Say, "Event \"" + TimeTill.EventList[index].EventName + "\", with date \"" + TimeTill.EventList[index].EventDate.ToString() + "\" removed from the event list!", message.ReplyTo));
+                        response.Add(new IRCResponse(ResponseType.Say, "Event \"" + TimeTill.EventList[index].EventName + "\", with date \"" + TimeTill.EventList[index].EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)") + "\" removed from the event list!", message.ReplyTo));
                         TimeTill.EventList.RemoveAt(index);
                         TimeTill.SaveEvents();
                         return response;
