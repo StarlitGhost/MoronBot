@@ -13,7 +13,7 @@ namespace Utility
     {
         public AddEvent()
         {
-            Help = "(add/set)event <date> <event>  - Adds an 'event' to the list of events used in Countdown. <date> is in dd-MM-yyyy format. You can put the date in brackets if you want to specify time and so forth.";
+            Help = "(add/set)event (<date>) <event>  - Adds an 'event' to the list of events used in Countdown. <date> is in dd-MM-yyyy format. You can put the date in brackets if you want to specify time and so forth.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
@@ -32,15 +32,27 @@ namespace Utility
                         Match dateMessage = Regex.Match(message.Parameters, @"^\((.+)\) (.+)");
                         if (dateMessage.Success)
                         {
-                            parseSuccess = DateTime.TryParse(dateMessage.Groups[1].Value, out eventStruct.EventDate);
-                            eventStruct.EventDate = DateTime.SpecifyKind(eventStruct.EventDate, DateTimeKind.Utc);
+                            parseSuccess = DateTime.TryParse(dateMessage.Groups[1].Value, new CultureInfo("en-GB"), DateTimeStyles.None, out eventStruct.EventDate);
+                            
+                            DaylightTime daylight = TimeZone.CurrentTimeZone.GetDaylightChanges(eventStruct.EventDate.Year);
+                            if (TimeZone.IsDaylightSavingTime(eventStruct.EventDate, daylight))
+                                eventStruct.EventDate = DateTime.SpecifyKind(eventStruct.EventDate.AddHours(-1.0), DateTimeKind.Utc);
+                            else
+                                eventStruct.EventDate = DateTime.SpecifyKind(eventStruct.EventDate, DateTimeKind.Utc);
+
                             eventStruct.EventName = dateMessage.Groups[2].Value;
                         }
                     }
                     else
                     {
-                        parseSuccess = DateTime.TryParse(message.ParameterList[0], out eventStruct.EventDate);
-                        eventStruct.EventDate = DateTime.SpecifyKind(eventStruct.EventDate, DateTimeKind.Utc);
+                        parseSuccess = DateTime.TryParse(message.ParameterList[0], new CultureInfo("en-GB"), DateTimeStyles.None, out eventStruct.EventDate);
+
+                        DaylightTime daylight = TimeZone.CurrentTimeZone.GetDaylightChanges(eventStruct.EventDate.Year);
+                        if (TimeZone.IsDaylightSavingTime(eventStruct.EventDate, daylight))
+                            eventStruct.EventDate = DateTime.SpecifyKind(eventStruct.EventDate.AddHours(-1.0), DateTimeKind.Utc);
+                        else
+                            eventStruct.EventDate = DateTime.SpecifyKind(eventStruct.EventDate, DateTimeKind.Utc);
+
                         eventStruct.EventName = message.Parameters.Remove(0, message.ParameterList[0].Length + 1);
                     }
 
@@ -51,11 +63,11 @@ namespace Utility
                             TimeTill.EventList.Add(eventStruct);
                             TimeTill.EventList.Sort(TimeTill.EventStruct.CompareEventStructsByDate);
                             TimeTill.SaveEvents();
-                            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm"), message.ReplyTo) };
+                            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)"), message.ReplyTo) };
                         }
                         else
                         {
-                            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm"), message.ReplyTo) };
+                            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)"), message.ReplyTo) };
                         }
 
                     }
