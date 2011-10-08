@@ -10,6 +10,10 @@ using MBUtilities;
 
 namespace Internet
 {
+    /// <summary>
+    /// A Function which returns the title, length, description, and link of the top YouTube search result for the given search term.
+    /// </summary>
+    /// <suggester>SirGir</suggester>
     public class YouTube : Function
     {
         public YouTube()

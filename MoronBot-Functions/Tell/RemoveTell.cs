@@ -9,6 +9,9 @@ namespace Utility
 {
     public class RemoveTell : Function
     {
+        /// <summary>
+        /// A Function which allows the sender of a message to remove that message before it is received.
+        /// </summary>
         public RemoveTell()
         {
             Help = "r(emove)tell <message text> - Removes a message from the message database, if it matches <message text> and was sent by you.";

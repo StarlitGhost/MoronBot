@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -13,6 +13,10 @@ using MBUtilities.Channel;
 
 namespace Internet
 {
+    /// <summary>
+    /// A Function which returns the currently playing song from Moddington's internet radio station.
+    /// </summary>
+    /// <suggester>Moddington</suggester>
     public class ModdTunes : Function
     {
         public ModdTunes()

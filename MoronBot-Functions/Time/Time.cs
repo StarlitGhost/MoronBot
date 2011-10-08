@@ -7,6 +7,9 @@ using MBFunctionInterface;
 
 namespace Utility
 {
+    /// <summary>
+    /// A Function which returns the current time, to the nearest 5 minutes.
+    /// </summary>
     public class Time : Function
     {
         public Time()

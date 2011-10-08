@@ -10,11 +10,14 @@ using MBUtilities;
 
 namespace Utility
 {
+    /// <summary>
+    /// A Function which posts the daily log for the current channel to pastebin.com, and returns a link to it.
+    /// </summary>
     public class Log : Function
     {
         public Log()
         {
-            Help = "log - Posts the daily log to pastebin.com, and returns a link to it.";
+            Help = "log (<-#>) - Posts the daily log to pastebin.com, and returns a link to it. You can also fetch previous logs, by specifying an offset in days ('|log -1' would fetch yesterday's logs, for instance).";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }

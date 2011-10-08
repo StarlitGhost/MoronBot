@@ -9,6 +9,10 @@ using MBUtilities;
 
 namespace Internet
 {
+    /// <summary>
+    /// A Function which returns the dictionary definition of the given search term from Google
+    /// </summary>
+    /// <suggester>Aeltrius</suggester>
     public class Define : Function
     {
         public Define()

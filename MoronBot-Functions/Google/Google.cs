@@ -10,6 +10,9 @@ using Gapi;
 
 namespace Internet
 {
+    /// <summary>
+    /// A Function which returns the top Google search result for a given search term.
+    /// </summary>
     public class Google : Function
     {
         public Google()

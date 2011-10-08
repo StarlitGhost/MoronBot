@@ -8,6 +8,9 @@ using MBUtilities;
 
 namespace Utility
 {
+    /// <summary>
+    /// A Function which returns messages sent to a user, when that user says something in the bot's presence.
+    /// </summary>
     public class TellAuto : Function
     {
         public TellAuto()
