@@ -8,6 +8,10 @@ using MBUtilities;
 
 namespace Internet
 {
+    /// <summary>
+    /// A Function which returns the english translation of a given sentence from Google Translate.
+    /// No longer works because Google restricted access to the translation API.
+    /// </summary>
     public class Translate : Function
     {
         public Translate()

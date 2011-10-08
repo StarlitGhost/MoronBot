@@ -58,6 +58,8 @@ namespace Utility
 
                     if (parseSuccess)
                     {
+                        eventStruct.EventName = StringUtils.StripIRCFormatChars(eventStruct.EventName);
+
                         if (TimeTill.EventList.FindIndex(s => s.EventName == eventStruct.EventName) < 0)
                         {
                             TimeTill.EventList.Add(eventStruct);

@@ -7,6 +7,10 @@ using MBUtilities;
 
 namespace Utility
 {
+    /// <summary>
+    /// A Function which returns all of the messages that the user has sent, that have yet to be received.
+    /// </summary>
+    /// <suggester>Aeltrius</suggester>
     public class SentTells : Function
     {
         public SentTells()

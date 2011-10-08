@@ -11,6 +11,9 @@ using MBUtilities.Channel;
 
 namespace Internet
 {
+    /// <summary>
+    /// A Function which returns the last song a user played, from Last.fm
+    /// </summary>
     public class NowPlaying : Function
     {
         public static Dictionary<string, string> AccountMap = new Dictionary<string, string>();
@@ -158,16 +161,17 @@ namespace Internet
             {
                 if (message.ParameterList.Count > 0)
                 {
+                    string lastFMName = StringUtils.ReplaceNewlines(StringUtils.StripIRCFormatChars(message.ParameterList[0]), "");
                     if (NowPlaying.AccountMap.ContainsKey(message.User.Name.ToUpper()))
                     {
-                        NowPlaying.AccountMap[message.User.Name.ToUpper()] = message.ParameterList[0];
+                        NowPlaying.AccountMap[message.User.Name.ToUpper()] = lastFMName;
                     }
                     else
                     {
-                        NowPlaying.AccountMap.Add(message.User.Name.ToUpper(), message.ParameterList[0]);
+                        NowPlaying.AccountMap.Add(message.User.Name.ToUpper(), lastFMName);
                     }
                     NowPlaying.SaveLinks();
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "LastFM account \"" + message.ParameterList[0] + "\" is now linked to IRC name \"" + message.User.Name + "\"", message.ReplyTo) };
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "LastFM account \"" + lastFMName + "\" is now linked to IRC name \"" + message.User.Name + "\"", message.ReplyTo) };
                 }
                 else
                 {

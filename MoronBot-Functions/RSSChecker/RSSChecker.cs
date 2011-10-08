@@ -12,6 +12,9 @@ using MBUtilities.Channel;
 
 namespace Internet
 {
+    /// <summary>
+    /// A Function which checks if RSS feeds have updated, and returns a link to the oldest new item if they have.
+    /// </summary>
     public class RSSChecker : Function
     {
         public struct Feed

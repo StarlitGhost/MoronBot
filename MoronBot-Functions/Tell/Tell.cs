@@ -10,6 +10,9 @@ using MBUtilities;
 
 namespace Utility
 {
+    /// <summary>
+    /// A Function which allows users to send messages to each other, even when the intended recipient is offline.
+    /// </summary>
     public class Tell : Function
     {
         public struct TellMessage
@@ -90,7 +93,7 @@ namespace Utility
                         TellMessage tellMessage = new TellMessage();
                         tellMessage.From = message.User.Name;
                         tellMessage.SentDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss (UTC zz)");
-                        tellMessage.Message = msg;
+                        tellMessage.Message = StringUtils.ReplaceNewlines(StringUtils.StripIRCFormatChars(msg), " | ");
                         MessageMap[to].Add(tellMessage);
                         WriteMessages();
                         return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Ok, I'll tell " + message.ParameterList[0] + " that when they next speak.", message.ReplyTo) };

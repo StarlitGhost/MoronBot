@@ -10,6 +10,10 @@ using System;
 
 namespace Internet
 {
+    /// <summary>
+    /// A Function which returns the top definition of a given search term from UrbanDictionary.com
+    /// </summary>
+    /// <suggester>Maerarde</suggester>
     public class Urban : Function
     {
         public Urban()

@@ -8,6 +8,9 @@ using MBUtilities;
 
 namespace Internet
 {
+    /// <summary>
+    /// A Function which returns a shortened version of the given url, via Goo.gl.
+    /// </summary>
     public class Googl : Function
     {
         public Googl()
