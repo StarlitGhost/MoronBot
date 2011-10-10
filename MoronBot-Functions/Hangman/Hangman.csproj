@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Hangman</RootNamespace>
     <AssemblyName>Hangman</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -32,14 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Community.CsharpSqlite">
-      <HintPath>..\..\MoronBot\bin\Community.CsharpSqlite.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Community.CsharpSqlite.SQLiteClient">
-      <HintPath>..\..\MoronBot\bin\Community.CsharpSqlite.SQLiteClient.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="CwIRC">
       <HintPath>..\..\MoronBot\bin\CwIRC.dll</HintPath>
       <Private>False</Private>
