@@ -1,6 +1,5 @@
-"""-------------------------------------------------------------------
- Here is an example function that replies to people when the say hello to the bot:
- -------------------------------------------------------------------"""
+Here is an example function that replies to people when the say hello to the bot:
+
 '''python
 from MBFunctionInterface import BotMessage		# The messages you will be recieving
 from CwIRC import IRCResponse, ResponseType		# What you will be sending back to the server
@@ -20,9 +19,9 @@ class Instantiate(Function):
 		else:
 			return
 '''
-"""-------------------------------------------------------------------
- Here is an example of a command function, that makes the bot say what you ask it to:
- -------------------------------------------------------------------"""
+
+Here is an example of a command function, that makes the bot say what you ask it to:
+
 '''python
 from MBFunctionInterface import BotMessage
 from CwIRC import IRCResponse, ResponseType
@@ -38,7 +37,7 @@ class Instantiate(Function):
 		else:
 			return
 '''
-"""-------------------------------------------------------------------
+
 You may wish to use Python's regular expressions module 're' to do more advanced matching on messages and commands.
 Feel free to ask me about this if you have any problems! :D
 
@@ -134,5 +133,3 @@ from MBUtilities
 			.Write(text, filepath)
 				- appends 'text' to the file at 'filepath'
 				  used with ErrorFile from Settings.Instance usually; Logger.Write("my debug message", Settings.Instance.ErrorFile)
-
- -------------------------------------------------------------------"""
