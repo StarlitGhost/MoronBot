@@ -75,7 +75,9 @@ namespace Utility
 
             ICollection<string> paths = engine.GetSearchPaths();
             paths.Add(Settings.Instance.FunctionPath);
-            paths.Add(Path.Combine(Settings.Instance.FunctionPath, "Python"));
+            string pathFunctionPython = Path.Combine(Settings.Instance.FunctionPath, "Python");
+            paths.Add(pathFunctionPython);
+            paths.Add(Path.Combine(pathFunctionPython, "libs"));
             engine.SetSearchPaths(paths);
 
             scope = engine.CreateScope();

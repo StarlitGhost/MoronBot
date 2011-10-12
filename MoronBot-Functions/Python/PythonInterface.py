@@ -2,6 +2,7 @@ import sys
 
 from MBFunctionInterface import BotMessage
 from CwIRC import IRCResponse, ResponseType
+from MBUtilities import Settings
 
 import Function
 
@@ -16,8 +17,7 @@ def ProcessMessage(message):
 			loadType = LoadFunction(path)
 			responses.append( IRCResponse(ResponseType.Say, "Python Function '" + path + "' " + loadType + "oaded!", message.ReplyTo) )
 		except Exception, x:
-			responses.append( IRCResponse(ResponseType.Say, str(sys.exc_info()), "Tyranic-Moron" ) )
-			#responses.append( IRCResponse(ResponseType.Say, "Error loading Python Function '" + path + "': " + x.message, message.ReplyTo) )
+			responses.append( IRCResponse(ResponseType.Say, "Python Load Error: " + str(sys.exc_info()), Settings.Instance.Owner ) )
 	elif message.Command == "pyunload":
 		path = message.ParameterList[0]
 		try:
@@ -27,13 +27,13 @@ def ProcessMessage(message):
 			else:
 				responses.append( IRCResponse(ResponseType.Say, "Python Function '" + path + "' not found", message.ReplyTo) )
 		except Exception, x:
-			responses.append( IRCResponse(ResponseType.Say, "Error unloading Python Function '" + path + "': " + x.message, message.ReplyTo) )
+			responses.append( IRCResponse(ResponseType.Say, "Python Unload Error: " + str(sys.exc_info()), Settings.Instance.Owner) )
 	else:
 		for name, func in functions.iteritems():
 			try:
 				responses.append( func.GetResponse(message) )
 			except Exception, x:
-				responses.append( IRCResponse(ResponseType.Say, "Error executing Python Function '" + name + "':" + x.message, message.User.Name) )
+				responses.append( IRCResponse(ResponseType.Say, "Python Execution Error: " + str(sys.exc_info()), Settings.Instance.Owner) )
 	
 	return responses
 

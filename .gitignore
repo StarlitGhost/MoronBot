@@ -10,3 +10,5 @@ MoronBot-Executable/*
 *.pidb
 *.userprefs
 *.resources
+MoronBot-PythonInterfaceOnly/*
+*.zip

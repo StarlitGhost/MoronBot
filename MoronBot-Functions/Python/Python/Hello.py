@@ -6,10 +6,10 @@ from Function import Function
 import re
 
 class Instantiate(Function):
-	Help = "I unno lol"
+	Help = "Responds to people who greet the bot"
 
 	def GetResponse(self, message):
-		match = re.search("^(ahoy there|oh hai)[ ]" + Settings.Instance.CurrentNick, message.MessageString, re.IGNORECASE)
+		match = re.search("^(hello|ahoy there|oh hai)[ ]" + Settings.Instance.CurrentNick, message.MessageString, re.IGNORECASE)
 		if match:
 			return IRCResponse(ResponseType.Say, match.group(1) + " " + message.User.Name + "!", message.ReplyTo)
 		return
