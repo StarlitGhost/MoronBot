@@ -51,13 +51,7 @@ namespace Utility
                 }
                 catch (System.Exception ex)
                 {
-                    Logger.Write("Python Error: " + ex.Message, Settings.Instance.ErrorFile);
-                    DynamicStackFrame[] frames = PythonOps.GetDynamicStackFrames(ex);
-                    foreach (DynamicStackFrame frame in frames)
-                        Logger.Write("\t" +
-                            frame.GetFileName() + " " +
-                            frame.GetFileLineNumber() + " " +
-                            frame.GetMethodName(), Settings.Instance.ErrorFile);
+                    Log(ex);
                 }
             }
 
@@ -89,14 +83,19 @@ namespace Utility
             }
             catch (System.Exception ex)
             {
-                Logger.Write("Python Error: " + ex.Message, Settings.Instance.ErrorFile);
-                DynamicStackFrame[] frames = PythonOps.GetDynamicStackFrames(ex);
-                foreach (DynamicStackFrame frame in frames)
-                    Logger.Write("\t" +
-                        frame.GetFileName() + " " +
-                        frame.GetFileLineNumber() + " " +
-                        frame.GetMethodName(), Settings.Instance.ErrorFile);
+                Log(ex);
             }
+        }
+
+        void Log(System.Exception ex)
+        {
+            Logger.Write("Python Error: " + ex.Message, Settings.Instance.ErrorFile);
+            DynamicStackFrame[] frames = PythonOps.GetDynamicStackFrames(ex);
+            foreach (DynamicStackFrame frame in frames)
+                Logger.Write("\t" +
+                    frame.GetFileName() + " " +
+                    frame.GetFileLineNumber() + " " +
+                    frame.GetMethodName(), Settings.Instance.ErrorFile);
         }
     }
 }

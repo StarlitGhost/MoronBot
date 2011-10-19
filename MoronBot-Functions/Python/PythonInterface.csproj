@@ -554,6 +554,7 @@
     <Content Include="Python\libs\_weakrefset.py" />
     <Content Include="Python\libs\__future__.py" />
     <Content Include="Python\libs\__phello__.foo.py" />
+    <Content Include="Python\Wikipedia.py" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
