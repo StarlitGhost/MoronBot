@@ -39,7 +39,7 @@ namespace MoronBot
             get { return Settings.Instance.CurrentNick; }
             set
             {
-                OnNickChanged(value);
+                MBEvents.OnNickChanged(this, value);
                 Settings.Instance.CurrentNick = value;
             }
         }
@@ -98,31 +98,6 @@ namespace MoronBot
         readonly object messageSync = new object();
 
         #endregion Variables
-
-        #region Events
-
-        public event StringEventHandler NickChanged;
-        protected virtual void OnNickChanged(string nick)
-        {
-            if (NickChanged != null)
-                NickChanged(this, nick);
-        }
-
-        public event StringEventHandler NewRawIRC;
-        protected virtual void OnNewRawIRC(string text)
-        {
-            if (NewRawIRC != null)
-                NewRawIRC(this, text);
-        }
-
-        public event StringEventHandler NewFormattedIRC;
-        protected virtual void OnNewFormattedIRC(string text)
-        {
-            if (NewFormattedIRC != null)
-                NewFormattedIRC(this, text);
-        }
-
-        #endregion Events
 
         #region Constructor & Destructor
         /// <summary>
@@ -256,7 +231,7 @@ namespace MoronBot
             DateTime date = DateTime.Now.IsDaylightSavingTime() ? DateTime.UtcNow.AddHours(1.0) : DateTime.UtcNow;
 
             string timeData = date.ToString(@"[HH:mm] ") + data;
-            OnNewFormattedIRC(fileName + " " + timeData);
+            MBEvents.OnNewFormattedIRC(this, fileName + " " + timeData);
 
             string fileDate = date.ToString(@" yyyy-MM-dd");
             string filePath = Path.Combine(Settings.Instance.LogPath,
@@ -529,7 +504,7 @@ namespace MoronBot
 
             lock (messageSync)
             {
-                OnNewRawIRC(botMessage.ToString());
+                MBEvents.OnNewRawIRC(this, botMessage.ToString());
                 ProcessMessage(botMessage);
             }
         }
@@ -601,7 +576,7 @@ namespace MoronBot
 
         void FuncDirChanged(object sender, FileSystemEventArgs e)
         {
-            LoadFunctions();
+            //LoadFunctions();
         }
 
         void LoadFunction(IFunction func)

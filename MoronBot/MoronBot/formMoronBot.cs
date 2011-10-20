@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
+using MBUtilities;
 using MBUtilities.Channel;
 
 namespace MoronBot
@@ -34,12 +35,12 @@ namespace MoronBot
             listUsers.DisplayMember = "Nick";
             listUsers.DataSource = _bindingSourceUsers;
 
-            moronBot.NickChanged += moronBot_NickChanged;
-            moronBot.NewRawIRC += moronBot_NewRawIRC;
-            moronBot.NewFormattedIRC += moronBot_NewFormattedIRC;
+            MBEvents.NickChanged += moronBot_NickChanged;
+            MBEvents.NewRawIRC += moronBot_NewRawIRC;
+            MBEvents.NewFormattedIRC += moronBot_NewFormattedIRC;
 
-            ChannelList.ChannelListModified += channelList_Modified;
-            ChannelList.UserListModified += userList_Modified;
+            MBEvents.ChannelListModified += channelList_Modified;
+            MBEvents.UserListModified += userList_Modified;
         }
 
         void btnClear_Click(object sender, EventArgs e)

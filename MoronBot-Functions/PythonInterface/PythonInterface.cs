@@ -11,7 +11,6 @@ using CwIRC;
 
 using Newtonsoft.Json;
 using MBUtilities;
-using MoronBot;
 
 namespace PythonInterface
 {
@@ -22,6 +21,8 @@ namespace PythonInterface
             Help = "A C# function which passes messages to other functions written in python.";
             Type = Types.Regex;
             AccessLevel = AccessLevels.Anyone;
+			
+			MBEvents.NickChanged += OnNickChanged;
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
@@ -32,21 +33,8 @@ namespace PythonInterface
 			
 			try
 			{
-				HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-				request.Method = "POST";
-				request.ContentType = "application/json; charset=utf-8";
-				StreamWriter writer = new StreamWriter(request.GetRequestStream());
-				writer.Write(json);
-				writer.Close();
-				
-				HttpWebResponse webResponse = (HttpWebResponse)request.GetResponse();
-				Stream responseStream = webResponse.GetResponseStream();
-				Encoding encode = Encoding.UTF8;
-				StreamReader stream = new StreamReader(responseStream, encode);
-				
-				StringBuilder sb = new StringBuilder();
-				sb.Append(stream.ReadToEnd());
-				string jsonResponse = sb.ToString();
+				Stream responseStream = SendToServer(url, json);
+				string jsonResponse = ReceiveFromServer(responseStream);
 				
 				List<IRCResponse> ircResponses = JsonConvert.DeserializeObject<List<IRCResponse>>(jsonResponse);
 	            
@@ -58,5 +46,41 @@ namespace PythonInterface
 				return null;
 			}
         }
+		
+		void OnNickChanged(object o, string newNick)
+		{
+			string url = "http://localhost:8080/nickchange";
+			try
+			{
+				SendToServer(url, newNick);
+			}
+			catch (System.Exception /*ex*/)
+			{
+				return;
+			}
+		}
+		
+		Stream SendToServer(string url, string text)
+		{
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+			request.Method = "POST";
+			request.ContentType = "application/json; charset=utf-8";
+			StreamWriter writer = new StreamWriter(request.GetRequestStream());
+			writer.Write(text);
+			writer.Close();
+			
+			HttpWebResponse webResponse = (HttpWebResponse)request.GetResponse();
+			return webResponse.GetResponseStream();
+		}
+		
+		string ReceiveFromServer(Stream responseStream)
+		{
+			Encoding encode = Encoding.UTF8;
+			StreamReader stream = new StreamReader(responseStream, encode);
+			
+			StringBuilder sb = new StringBuilder();
+			sb.Append(stream.ReadToEnd());
+			return sb.ToString();
+		}
     }
 }

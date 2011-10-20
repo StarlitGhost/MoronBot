@@ -15,22 +15,6 @@ namespace MBUtilities.Channel
 
         public static BindingList<Channel> Channels { get; set; }
 
-        #region Events
-        public static event VoidEventHandler ChannelListModified;
-        public static void OnChannelListModified()
-        {
-            if (ChannelListModified != null)
-                ChannelListModified(new object());
-        }
-
-        public static event VoidEventHandler UserListModified;
-        public static void OnUserListModified()
-        {
-            if (UserListModified != null)
-                UserListModified(new object());
-        }
-        #endregion Events
-
         static ChannelList()
         {
             Channels = new BindingList<Channel>();
@@ -53,7 +37,7 @@ namespace MBUtilities.Channel
                     Channels.Add(channel);
                     channelID = Channels.IndexOf(channel);
 
-                    OnChannelListModified();
+                    MBEvents.OnChannelListModified();
                 }
             }
 
@@ -77,7 +61,7 @@ namespace MBUtilities.Channel
                     Channels[channelID].Users.Add(user);
                     userID = Channels[channelID].Users.IndexOf(user);
 
-                    OnUserListModified();
+                    MBEvents.OnUserListModified();
                 }
             }
 
@@ -185,7 +169,7 @@ namespace MBUtilities.Channel
                     }
                 }
             }
-            OnUserListModified();
+            MBEvents.OnUserListModified();
 
             return channels;
         }
@@ -197,7 +181,7 @@ namespace MBUtilities.Channel
             lock (channelSync)
                 Channels[channelID].Users[userID].Hostmask = message.User.Hostmask;
 
-            OnUserListModified();
+            MBEvents.OnUserListModified();
         }
 
         public static void ParsePART(BotMessage message, bool parterIsMe)
@@ -207,13 +191,13 @@ namespace MBUtilities.Channel
             lock (channelSync)
                 Channels[channelID].Users.RemoveAt(userID);
 
-            OnUserListModified();
+            MBEvents.OnUserListModified();
             if (parterIsMe)
             {
                 lock (channelSync)
                     Channels.RemoveAt(channelID);
 
-                OnChannelListModified();
+                MBEvents.OnChannelListModified();
             }
         }
 
@@ -233,7 +217,7 @@ namespace MBUtilities.Channel
                     }
                 }
             }
-            OnUserListModified();
+            MBEvents.OnUserListModified();
 
             return quittedChannels;
         }
@@ -286,7 +270,7 @@ namespace MBUtilities.Channel
                         }
                     }
                 }
-                OnUserListModified();
+                MBEvents.OnUserListModified();
             }
             else // Channel mode change
             {
@@ -297,7 +281,7 @@ namespace MBUtilities.Channel
 
                 ParseChannelModeString(modeString, channelID);
 
-                OnChannelListModified();
+                MBEvents.OnChannelListModified();
             }
         }
 
@@ -346,7 +330,7 @@ namespace MBUtilities.Channel
 
             ParseChannelModeString(message.MessageList[4], channelID);
 
-            OnChannelListModified();
+            MBEvents.OnChannelListModified();
         }
 
         public static void ParseTOPIC(BotMessage message)
@@ -356,7 +340,7 @@ namespace MBUtilities.Channel
             lock (channelSync)
                 Channels[channelID].Topic = message.MessageString;
 
-            OnChannelListModified();
+            MBEvents.OnChannelListModified();
         }
 
         /// <summary>
@@ -370,7 +354,7 @@ namespace MBUtilities.Channel
             lock (channelSync)
                 Channels[channelID].Topic = message.RawMessage.Substring(message.RawMessage.IndexOf(':', 1) + 1);
 
-            OnChannelListModified();
+            MBEvents.OnChannelListModified();
         }
 
         /// <summary>
@@ -387,7 +371,7 @@ namespace MBUtilities.Channel
                 Channels[channelID].Users[userID].Hostmask = message.MessageList[5];
             //Channels[channelID].Users[userID].Symbols = Regex.Replace(message.MessageList[8], @"[a-zA-Z]+", "");
             
-            OnUserListModified();
+            MBEvents.OnUserListModified();
         }
 
         /// <summary>
@@ -430,7 +414,7 @@ namespace MBUtilities.Channel
                     }
                 }
             }
-            OnUserListModified();
+            MBEvents.OnUserListModified();
         }
     }
 }
