@@ -1,4 +1,6 @@
-﻿using System;
+using System;
+
+using MBUtilities;
 
 namespace MoronBot
 {
@@ -10,8 +12,8 @@ namespace MoronBot
         {
             moronBot = Program.moronBot;
 
-            moronBot.NickChanged += moronBot_NickChanged;
-            moronBot.NewFormattedIRC += moronBot_NewFormattedIRC;
+            MBEvents.NickChanged += moronBot_NickChanged;
+            MBEvents.NewFormattedIRC += moronBot_NewFormattedIRC;
         }
 
         public static void Start()

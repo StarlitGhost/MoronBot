@@ -1,10 +1,11 @@
 import sys
 import web
+import GlobalVars
 
 try:
-	import json
+    import json
 except ImportError:
-	import simplejson as json
+    import simplejson as json
 
 import os
 abspath = os.path.abspath(__file__)
@@ -22,7 +23,7 @@ class MessageHandler:
         data = web.data()
         jsonData = json.loads(data)
         message = IRCMessage(jsonData)
-        print "Message Received: " + message.MessageString
+        print message.ReplyTo + " <" + message.User.Name + "> " + message.MessageString
         
         responses = []
         
@@ -39,7 +40,18 @@ class MessageHandler:
         
         return json.dumps(responses)
 
-urls = ('/message', 'MessageHandler')
+class BotDetailHandler:
+    def POST(self, path=None):
+        if path == 'nickchange':
+            newNick = web.data()
+            print "nickchange received: " + newNick
+            GlobalVars.CurrentNick = newNick
+        return
+
+urls = (
+	'/message', 'MessageHandler',
+	'/(nickchange)', 'BotDetailHandler'
+)
 
 if __name__ == "__main__":
     AutoLoadFunctions()

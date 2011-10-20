@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,7 +12,6 @@
     <AssemblyName>MBUtilities</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,15 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bitly">
-      <HintPath>..\MoronBot\Bitly.dll</HintPath>
-    </Reference>
     <Reference Include="Community.CsharpSqlite, Version=3.7.7.1, Culture=neutral, processorArchitecture=x86" />
     <Reference Include="Community.CsharpSqlite.SQLiteClient, Version=3.7.7.1, Culture=neutral, processorArchitecture=x86" />
-    <Reference Include="GAPI">
-      <HintPath>..\MoronBot\GAPI.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Data.Sqlite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL" />
     <Reference Include="Mono.Data.SqliteClient, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -50,6 +42,13 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Bitly, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\MoronBot\Bitly.dll</HintPath>
+    </Reference>
+    <Reference Include="GAPI, Version=0.4.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\MoronBot\GAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Data.Sqlite" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Channel\Channel.cs" />
@@ -64,6 +63,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="SQLiteInterface.cs" />
     <Compile Include="URL.cs" />
+    <Compile Include="MBEvents.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CwIRC\CwIRC.csproj">
