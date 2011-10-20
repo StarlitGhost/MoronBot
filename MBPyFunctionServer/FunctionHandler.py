@@ -4,7 +4,7 @@ import GlobalVars
 def LoadFunction(path, loadAs=""):
     loadType = "l"
     name = path
-    src = __import__("PythonFunctions." + name, fromlist=[])
+    src = __import__("PythonFunctions." + name, globals(), locals(), [])
     if loadAs != "":
         name = loadAs
     if name in GlobalVars.functions:
@@ -40,4 +40,4 @@ def AutoLoadFunctions():
                 try:
                     LoadFunction(item[:-3])
                 except Exception, x:
-                    print x.message
+                    print x.args

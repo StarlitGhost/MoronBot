@@ -636,7 +636,7 @@ class Reloader:
     if so, reloads them.
     """
 
-    SUFFIX = '$py.class' if sys.platform.startswith('java') else '.pyc'
+    SUFFIX = sys.platform.startswith('java') and '$py.class' or '.pyc'
     """File suffix of compiled modules."""
 
     def __init__(self):
