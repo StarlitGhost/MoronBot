@@ -79,6 +79,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Urban", "Urban\Urban.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTube", "YouTube\YouTube.csproj", "{F3477E63-816B-4D14-8117-356C380B4DC3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PythonInterface", "PythonInterface\PythonInterface.csproj", "{B13D5876-E589-43F7-AF62-67052AA91C45}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -419,6 +421,16 @@ Global
 		{F3477E63-816B-4D14-8117-356C380B4DC3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{F3477E63-816B-4D14-8117-356C380B4DC3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{F3477E63-816B-4D14-8117-356C380B4DC3}.Release|Win32.ActiveCfg = Release|Any CPU
+		{B13D5876-E589-43F7-AF62-67052AA91C45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B13D5876-E589-43F7-AF62-67052AA91C45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B13D5876-E589-43F7-AF62-67052AA91C45}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B13D5876-E589-43F7-AF62-67052AA91C45}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B13D5876-E589-43F7-AF62-67052AA91C45}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{B13D5876-E589-43F7-AF62-67052AA91C45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B13D5876-E589-43F7-AF62-67052AA91C45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B13D5876-E589-43F7-AF62-67052AA91C45}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B13D5876-E589-43F7-AF62-67052AA91C45}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B13D5876-E589-43F7-AF62-67052AA91C45}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -457,6 +469,7 @@ Global
 		{0E0A2E16-33D6-42F8-98B9-DC1F985F274A} = {511223A6-2E3E-42DE-9ADE-186E798483F7}
 		{63DEF1C3-ED54-4FC4-81CD-3E181C2E7B3C} = {511223A6-2E3E-42DE-9ADE-186E798483F7}
 		{258CE3AB-C4EB-4062-9107-6716519D77F5} = {511223A6-2E3E-42DE-9ADE-186E798483F7}
+		{B13D5876-E589-43F7-AF62-67052AA91C45} = {511223A6-2E3E-42DE-9ADE-186E798483F7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		BuildVersion_UseGlobalSettings = False
