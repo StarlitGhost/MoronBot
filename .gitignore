@@ -14,3 +14,4 @@ MoronBot-Executable/*
 MoronBot-PythonInterfaceOnly/*
 *.zip
 *.pyc
+MoronBot-PythonDev/*
