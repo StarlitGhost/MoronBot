@@ -1,5 +1,5 @@
 class Function(object):
-    Help = ""
+    Help = ''
     
     def GetResponse(self, message):
         pass
