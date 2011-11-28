@@ -23,37 +23,40 @@ class MessageHandler:
         data = web.data()
         jsonData = json.loads(data)
         message = IRCMessage(jsonData)
-        print message.ReplyTo + " <" + message.User.Name + "> " + message.MessageString
+        print ( '%s <%s> %s' %
+                (message.ReplyTo, message.User.Name, message.MessageString) )
         
         responses = []
         
-        for name, func in functions.items():
+        for (name, func) in functions.items():
             try:
                 response = func.GetResponse(message)
-                if response != None:
+                if response is not None:
                     responses.append( response.__dict__ )
             except Exception:
-                responses.append( IRCResponse(\
-                ResponseType.Say, \
-                "Python Execution Error in '" + name +  "': " + str(sys.exc_info()), \
-                message.ReplyTo).__dict__ )
+                msg = IRCResponse(ResponseType.Say,
+                                  ("Python Execution Error in '%s': %s" %
+                                   (name, str( sys.exc_info() ))),
+                                  message.ReplyTo)
+                responses.append( msg.__dict__ )
         
         return json.dumps(responses)
 
 class BotDetailHandler:
     def POST(self, path=None):
-        if path == 'nickchange':
-            newNick = web.data()
-            print "nickchange received: " + newNick
-            GlobalVars.CurrentNick = newNick
-        return
+        if not path == 'nickchange':
+            return
+        
+        newNick = web.data()
+        print 'nickchange received: ' + newNick
+        GlobalVars.CurrentNick = newNick
 
 urls = (
 	'/message', 'MessageHandler',
 	'/(nickchange)', 'BotDetailHandler'
 )
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     AutoLoadFunctions()
     app = web.application(urls, globals(), True)
     app.run()

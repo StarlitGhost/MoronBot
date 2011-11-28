@@ -3,26 +3,26 @@ from enumType import enum
 TargetTypes = enum('CHANNEL', 'USER')
 
 class UserStruct:
-    Hostmask = ""
-    Name = ""
-    User = ""
+    Hostmask = ''
+    Name = ''
+    User = ''
 
     def __init__(self, dct):
         self.__dict__ = dct
 
 class IRCMessage:
-    User = UserStruct({"User":"","Name":"","Hostmask":""})
+    User = UserStruct({'User':'','Name':'','Hostmask':''})
     TargetType = TargetTypes.CHANNEL
-    Type = ""
-    ReplyTo = ""
+    Type = ''
+    ReplyTo = ''
     MessageList = []
-    MessageString = ""
-    RawMessage = ""
+    MessageString = ''
+    RawMessage = ''
     CTCP = False
-    CTCPString = ""
-    Parameters = ""
+    CTCPString = ''
+    Parameters = ''
     ParameterList = []
-    Command = ""
+    Command = ''
 
     def __init__(self, json):
         self.__dict__ = json

@@ -6,14 +6,13 @@ from GlobalVars import *
 import re
 
 class Instantiate(Function):
-    Help = 'Responds to people who greet the bot'
+    Help = 'Responds to bees'
 
     def GetResponse(self, message):
-        match = re.search('^(ahoy there)[ ]' + CurrentNick,
+        match = re.search('([^a-zA-Z]|^)bees([^a-zA-Z]|$)',
                           message.MessageString,
                           re.IGNORECASE)
         if match:
             return IRCResponse(ResponseType.Say,
-                               '%s %s!' % (match.group(1),
-                                           message.User.Name),
+                               'BEES?! AAAARRGGHGHFLFGFGFLHL',
                                message.ReplyTo)

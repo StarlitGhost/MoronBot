@@ -127,6 +127,7 @@ namespace MoronBot
             cwIRC.NICK(Nick);
             cwIRC.USER(Nick, "Nope", "Whatever", "MoronBot 0.1.6");
             cwIRC.SendData("PASS mOrOnBoTuS");
+            Say("identify mOrOnBoTuS", "NickServ");
 
             cwIRC.JOIN(Settings.Instance.Channel);
         }
@@ -332,8 +333,8 @@ namespace MoronBot
                         cwIRC.SendData("MODE " + message.MessageList[2].TrimStart(':'));
                     }
 
-                    cwIRC.SendData("WHO " + message.MessageList[2].TrimStart(':'));
-                    cwIRC.SendData("NAMES " + message.MessageList[2].TrimStart(':'));
+                    //cwIRC.SendData("WHO " + message.MessageList[2].TrimStart(':'));
+                    //cwIRC.SendData("NAMES " + message.MessageList[2].TrimStart(':'));
 
                     Log(" >> " + message.User.Name + " joined " + parameter, parameter.ToLowerInvariant());
                     break;

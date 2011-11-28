@@ -1,14 +1,14 @@
 import os
 import GlobalVars
 
-def LoadFunction(path, loadAs=""):
-    loadType = "l"
+def LoadFunction(path, loadAs=''):
+    loadType = 'l'
     name = path
-    src = __import__("PythonFunctions." + name, globals(), locals(), [])
-    if loadAs != "":
+    src = __import__('PythonFunctions.' + name, globals(), locals(), [])
+    if loadAs != '':
         name = loadAs
     if name in GlobalVars.functions:
-        loadType = "rel"
+        loadType = 'rel'
     reload(src)
 
     components = name.split('.')
@@ -33,11 +33,14 @@ def UnloadFunction(name):
     return success
 
 def AutoLoadFunctions():
-    root = os.path.join(".", "PythonFunctions")
+    root = os.path.join('.', 'PythonFunctions')
     for item in os.listdir(root):
-        if os.path.isfile(os.path.join(root, item)):
-            if item.endswith(".py"):
-                try:
-                    LoadFunction(item[:-3])
-                except Exception, x:
-                    print x.args
+        if not os.path.isfile(os.path.join(root, item)):
+            continue
+        if not item.endswith('.py'):
+            continue
+        
+        try:
+            LoadFunction(item[:-3])
+        except Exception, x:
+            print x.args

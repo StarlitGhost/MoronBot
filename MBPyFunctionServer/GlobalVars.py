@@ -1,2 +1,2 @@
 functions = {}
-CurrentNick = "MoronBot"
+CurrentNick = 'MoronBot'

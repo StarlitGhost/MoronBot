@@ -14,7 +14,7 @@ class Instantiate(Function):
             path = message.ParameterList[0]
             try:
                 loadType = LoadFunction(path)
-                return IRCResponse(ResponseType.Say, "Python Function '" + path + "' " + loadType + "oaded!", message.ReplyTo)
+                return IRCResponse(ResponseType.Say, "Python Function '%s' %soaded!" % (path, loadType), message.ReplyTo)
             except Exception:
                 return IRCResponse(ResponseType.Say, "Python Load Error: " + str(sys.exc_info()), message.ReplyTo)
         elif message.Command == "pyunload":
@@ -22,8 +22,8 @@ class Instantiate(Function):
             try:
                 success = UnloadFunction(path)
                 if success:
-                    return IRCResponse(ResponseType.Say, "Python Function '" + path + "' unloaded!", message.ReplyTo)
+                    return IRCResponse(ResponseType.Say, "Python Function '%s' unloaded!" % path, message.ReplyTo)
                 else:
-                    return IRCResponse(ResponseType.Say, "Python Function '" + path + "' not found", message.ReplyTo)
-            except Exception, x:
+                    return IRCResponse(ResponseType.Say, "Python Function '%s' not found" % path, message.ReplyTo)
+            except Exception:
                 return IRCResponse(ResponseType.Say, "Python Unload Error: " + str(sys.exc_info()), message.ReplyTo)

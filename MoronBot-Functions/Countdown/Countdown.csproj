@@ -52,7 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddEvent.cs" />
+    <Compile Include="Event.cs" />
     <Compile Include="TimeSince.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="RemoveEvent.cs" />
