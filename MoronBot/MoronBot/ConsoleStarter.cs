@@ -14,6 +14,7 @@ namespace MoronBot
 
             MBEvents.NickChanged += moronBot_NickChanged;
             MBEvents.NewFormattedIRC += moronBot_NewFormattedIRC;
+            MBEvents.NewRawIRC += moronBot_NewRawIRC;
         }
 
         public static void Start()
@@ -37,6 +38,11 @@ namespace MoronBot
         }
 
         static void moronBot_NewFormattedIRC(object sender, string text)
+        {
+            Console.WriteLine(text);
+        }
+
+        static void moronBot_NewRawIRC(object sender, string text)
         {
             Console.WriteLine(text);
         }

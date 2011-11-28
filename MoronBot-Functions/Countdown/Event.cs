@@ -9,9 +9,9 @@ using MBUtilities;
 
 namespace Utility
 {
-    public class AddEvent : Function
+    public class Event : Function
     {
-        public AddEvent()
+        public Event()
         {
             Help = "(add/set)event (<date>) <event>  - Adds an 'event' to the list of events used in Countdown. <date> is in dd-MM-yyyy format. You can put the date in brackets if you want to specify time and so forth.";
             Type = Types.Command;
