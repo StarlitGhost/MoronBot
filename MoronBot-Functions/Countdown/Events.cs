@@ -30,10 +30,11 @@ namespace Utility
                     {
                         daysAhead = 7;
                     }
-                    if (daysAhead > 36500)
+                    if (Math.Abs(daysAhead) > 36500)
                     {
                         daysAhead = 36500;
                     }
+                    daysAhead = Math.Abs(daysAhead);
                 }
                 List<string> weekEvents = new List<string>();
                 foreach (TimeTill.EventStruct weekEvent in TimeTill.EventList)

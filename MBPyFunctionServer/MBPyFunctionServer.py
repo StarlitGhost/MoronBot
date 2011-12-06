@@ -23,15 +23,21 @@ class MessageHandler:
         data = web.data()
         jsonData = json.loads(data)
         message = IRCMessage(jsonData)
-        print ( '%s <%s> %s' %
-                (message.ReplyTo, message.User.Name, message.MessageString) )
+        print ( '%s <%s> %s' % (message.ReplyTo,
+                                message.User.Name,
+                                message.MessageString) )
         
         responses = []
         
         for (name, func) in functions.items():
             try:
                 response = func.GetResponse(message)
-                if response is not None:
+                if response is None:
+                    continue
+                if hasattr(response, '__iter__'):
+                    for r in response:
+                        responses.append( r.__dict__ )
+                else:
                     responses.append( response.__dict__ )
             except Exception:
                 msg = IRCResponse(ResponseType.Say,
@@ -44,7 +50,7 @@ class MessageHandler:
 
 class BotDetailHandler:
     def POST(self, path=None):
-        if not path == 'nickchange':
+        if path is not 'nickchange':
             return
         
         newNick = web.data()
