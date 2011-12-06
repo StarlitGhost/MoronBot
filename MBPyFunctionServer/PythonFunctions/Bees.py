@@ -9,7 +9,7 @@ class Instantiate(Function):
     Help = 'Responds to bees'
 
     def GetResponse(self, message):
-        match = re.search('([^a-zA-Z]|^)bees([^a-zA-Z]|$)',
+        match = re.search('([^a-zA-Z]|^)bee+s?([^a-zA-Z]|$)',
                           message.MessageString,
                           re.IGNORECASE)
         if match:
