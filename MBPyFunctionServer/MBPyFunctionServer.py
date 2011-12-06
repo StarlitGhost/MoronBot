@@ -24,8 +24,8 @@ class MessageHandler:
         jsonData = json.loads(data)
         message = IRCMessage(jsonData)
         print ( '%s <%s> %s' % (message.ReplyTo,
-		                         message.User.Name,
-								 message.MessageString) )
+                                message.User.Name,
+                                message.MessageString) )
         
         responses = []
         
