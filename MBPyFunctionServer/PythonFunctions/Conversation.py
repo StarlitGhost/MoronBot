@@ -9,7 +9,7 @@ class Instantiate(Function):
     Help = 'Responds to greetings and such'
 
     def GetResponse(self, message):
-        match = re.search("^(?P<greeting>'?sup|hi(ya)?|hey|hello|'?lo|mornin[g']?|greetings|bonjour|salut|howdy|'?yo|o?hai|mojn|hej|dongs|ahoy( hoy)?|salutations|g'?day|bye|night)(there)?,?[ ]%s([^a-zA-Z0-9_\|`\[\]\^-]|$)" % CurrentNick,
+        match = re.search("^(?P<greeting>(wa+s+|')?so?u+p|hi(ya)?|hey|hello|'?lo|mornin[g']?|greetings|bonjour|salut|howdy|'?yo|o?hai|mojn|hej|dongs|ahoy( hoy)?|salutations|g'?day|hola|bye|night)(there)?,?[ ]%s([^a-zA-Z0-9_\|`\[\]\^-]|$)" % CurrentNick,
                           message.MessageString,
                           re.IGNORECASE)
         if match:
