@@ -20,6 +20,7 @@ namespace Utility
             public string From;
             public string SentDate;
             public string Message;
+            public string Target;
         }
 
         struct UserDateNumber
@@ -94,6 +95,7 @@ namespace Utility
                         tellMessage.From = message.User.Name;
                         tellMessage.SentDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss (UTC zz)");
                         tellMessage.Message = StringUtils.ReplaceNewlines(StringUtils.StripIRCFormatChars(msg), " | ");
+                        tellMessage.Target = message.TargetType == 0 ? message.ReplyTo : "PM";
                         MessageMap[to].Add(tellMessage);
                         WriteMessages();
                         return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Ok, I'll tell " + message.ParameterList[0] + " that when they next speak.", message.ReplyTo) };
@@ -137,6 +139,7 @@ namespace Utility
                         writer.WriteElementString("Text", tellMessage.Message);
                         writer.WriteElementString("From", tellMessage.From);
                         writer.WriteElementString("Date", tellMessage.SentDate);
+                        writer.WriteElementString("Target", tellMessage.Target);
 
                         writer.WriteEndElement();
                     }
@@ -172,6 +175,7 @@ namespace Utility
                     tellMessage.Message = messageNode.SelectSingleNode("Text").FirstChild.Value;
                     tellMessage.From = messageNode.SelectSingleNode("From").FirstChild.Value;
                     tellMessage.SentDate = messageNode.SelectSingleNode("Date").FirstChild.Value;
+                    tellMessage.Target = messageNode.SelectSingleNode("Target").FirstChild.Value;
 
                     tellMessages.Add(tellMessage);
                 }

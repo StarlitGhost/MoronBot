@@ -23,6 +23,7 @@ class MessageHandler:
         data = web.data()
         jsonData = json.loads(data)
         message = IRCMessage(jsonData)
+        message.MessageString = message.MessageString.encode('ascii', 'xmlcharrefreplace')
         print ( '%s <%s> %s' % (message.ReplyTo,
                                 message.User.Name,
                                 message.MessageString) )
