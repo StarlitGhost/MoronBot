@@ -12,7 +12,6 @@ import re
 import urllib, urllib2
 
 import htmlentitydefs
-##
 # Removes HTML or XML character references and entities from a text string.
 #
 # @param text The HTML (or XML) source text.
@@ -42,7 +41,10 @@ class Instantiate(Function):
     Help = 'wiki(pedia) <search term> - returns the top result for a given search term from wikipedia.'
     
     def GetResponse(self, message):
-        match = re.search('^wiki(pedia)?', message.Command, re.IGNORECASE)
+        if not message.MessageString[:1] == '|':
+            return
+        
+        match = re.search('^wiki(pedia)?$', message.Command, re.IGNORECASE)
         if not match:
             return
         
@@ -68,4 +70,5 @@ class Instantiate(Function):
             
             return IRCResponse(ResponseType.Say, replyText, message.ReplyTo)
         except Exception, x:
+            print str(x)
             return IRCResponse(ResponseType.Say, x.args, message.ReplyTo)

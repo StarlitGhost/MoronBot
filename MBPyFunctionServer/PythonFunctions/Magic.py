@@ -15,7 +15,10 @@ class Instantiate(Function):
     Help = '|mtg <card name>'
     
     def GetResponse(self, message):
-        match = re.search('^mtg', message.Command, re.IGNORECASE)
+        if not message.MessageString[:1] == '|':
+            return
+        
+        match = re.search('^mtgf?$', message.Command, re.IGNORECASE)
         if not match:
             return
         
