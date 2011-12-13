@@ -32,7 +32,7 @@ namespace Utility
                 {
                     foreach (Tell.TellMessage msg in kvp.Value)
                     {
-                        responses.Add(new IRCResponse(ResponseType.Say, msg.Message, msg.Target == "PM" ? message.User.Name : msg.Target));
+                        responses.Add(new IRCResponse(ResponseType.Say, message.User.Name + ": " + msg.Message, msg.Target == "PM" ? message.User.Name : msg.Target));
                         responses.Add(new IRCResponse(ResponseType.Say, "^ from " + msg.From + " on " + msg.SentDate, msg.Target == "PM" ? message.User.Name : msg.Target));
                     }
 
