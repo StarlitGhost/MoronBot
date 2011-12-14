@@ -41,6 +41,7 @@ namespace Automatic
             AccessList.Add("pikachaos");
             AccessList.Add("tyranic-moron");
             AccessList.Add("maerarde");
+            AccessList.Add("dragoon");
 
             InitInsults();
         }
@@ -68,11 +69,12 @@ namespace Automatic
             AddInsult("That command NICK? Really?", ResponseType.Say);
             AddInsult("There's a time and place for everything, NICK, but not now.", ResponseType.Say);
             AddInsult("Why don't you go do it yourself, NICK?", ResponseType.Say);
-            AddInsult("I really want to do that, NICK, but I don't take orders from idiots", ResponseType.Say);
-            AddInsult("I'm in the middle of some calibrations, NICK, can it wait?", ResponseType.Say);
-            AddInsult("Sometimes I wonder if my life would be better if I was the bot for a channel of more interesting things. Like snails. That is correct. I would rather talk to snails than you, NICK", ResponseType.Say);
+            AddInsult("I really want to do that, NICK, but I don't take orders from idiots", ResponseType.Say); // XelaReko
+            AddInsult("I'm in the middle of some calibrations, NICK, can it wait?", ResponseType.Say); // XelaReko
+            AddInsult("Sometimes I wonder if my life would be better if I was the bot for a channel of more interesting things. Like snails. That is correct. I would rather talk to snails than you, NICK", ResponseType.Say); // XelaReko
+            AddInsult("Ugh, what now NICK? Can't you wait a little bit longer? I have things to do, you know!", ResponseType.Say); // Dragoon
 
-            AddInsult(new List<Response>()
+            AddInsult(new List<Response>() // XelaReko
             {
                 new Response("yawns", ResponseType.Do),
                 new Response("Call me when you have something worthwhile to say, NICK", ResponseType.Say)
