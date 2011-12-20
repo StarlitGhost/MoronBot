@@ -25,6 +25,8 @@ namespace Utility
             {
                 if (message.ParameterList.Count > 0)
                 {
+                    List<string> keysToRemove = new List<string>();
+
                     foreach (string user in Tell.MessageMap.Keys)
                     {
                         int index = Tell.MessageMap[user].FindIndex(s =>
@@ -41,7 +43,12 @@ namespace Utility
                                 "\" to \"" +
                                 user +
                                 "\" removed from the message database!", message.ReplyTo));
+
                             Tell.MessageMap[user].RemoveAt(index);
+
+                            if (Tell.MessageMap[user].Count == 0)
+                                Tell.MessageMap.Remove(user);
+
                             Tell.WriteMessages();
                             return response;
                         }
