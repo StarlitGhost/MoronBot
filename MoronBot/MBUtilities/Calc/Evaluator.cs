@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Utility.Calc
+namespace MBUtilities.Calc
 {
     public static class Evaluator
     {
@@ -60,44 +60,7 @@ namespace Utility.Calc
                 Operator op = AllOperators.Find(operatorToken.LinearToken);
                 double returnValue = double.NaN;
 
-                switch (op.Symbol)
-                {
-                    case OperatorSymbol.Add:
-                        {
-                            returnValue = number1 + number2;
-                            break;
-                        }
-                    case OperatorSymbol.Subtract:
-                        {
-                            returnValue = number1 - number2;
-                            break;
-                        }
-                    case OperatorSymbol.Multiply:
-                        {
-                            returnValue = number1 * number2;
-                            break;
-                        }
-                    case OperatorSymbol.Divide:
-                        {
-                            returnValue = number1 / number2;
-                            break;
-                        }
-                    case OperatorSymbol.Modulus:
-                        {
-                            returnValue = number1 % number2;
-                            break;
-                        }
-                    case OperatorSymbol.Exponent:
-                        {
-                            returnValue = Math.Pow(number1, number2);
-                            break;
-                        }
-                    case OperatorSymbol.UnaryMinus:
-                        {
-                            returnValue = -number1;
-                            break;
-                        }
-                }
+                returnValue = op.Execute(number1, number2);
 
                 returnValue = Math.Round(returnValue, 4);
                 Constant returnValueConstant = new Constant() { Value = returnValue.ToString() };

@@ -5,18 +5,22 @@ using System.Text.RegularExpressions;
 using CwIRC;
 using MBFunctionInterface;
 
-using Utility.Calc;
+using MBUtilities.Calc;
 
 namespace Utility
 {
     public class Calculate : Function
     {
+        List<Operator> Operators { get; set; }
+
         public Calculate()
         {
             Help = "calc <expr> - Calculates the result of the given expression. " +
                 "Supported operations, in decreasing order of precedence, are: ( ), ^, % / *, - +";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            Operators = PopulateOperators();
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
@@ -25,6 +29,8 @@ namespace Utility
             {
                 if (message.ParameterList.Count > 0) // Expression given
                 {
+                    AllOperators.Operators = Operators;
+
                     string stringExpr = Regex.Replace(message.Parameters, @"\w+", MathsConstants);
 
                     Expression expr = Tokenizer.Split(stringExpr);
@@ -35,7 +41,6 @@ namespace Utility
                     string errorMessage = string.Empty;
 
                     Evaluator.Validate(expr, ref postfixTokens, out isError, out errorTokenIndex, out errorMessage);
-
 
                     string output = "";
 
@@ -86,6 +91,100 @@ namespace Utility
             }
 
             return match.Value;
+        }
+
+        static List<Operator> PopulateOperators()
+        {
+            List<Operator> opList = new List<Operator>();
+
+            opList.Add(new Operator()
+            {
+                SymbolText = "+",
+                OperandCount = 2,
+                PrecedenceLevel = 5,
+                Associativity = OperatorAssociativity.LeftToRight,
+                Execute = (x, y) => x + y
+            });
+
+            opList.Add(new Operator()
+            {
+                SymbolText = "-",
+                OperandCount = 2,
+                PrecedenceLevel = 5,
+                Associativity = OperatorAssociativity.LeftToRight,
+                Execute = (x, y) => x - y
+            });
+
+            opList.Add(new Operator()
+            {
+                SymbolText = "*",
+                OperandCount = 2,
+                PrecedenceLevel = 4,
+                Associativity = OperatorAssociativity.LeftToRight,
+                Execute = (x, y) => x * y
+            });
+
+            opList.Add(new Operator()
+            {
+                SymbolText = "/",
+                OperandCount = 2,
+                PrecedenceLevel = 4,
+                Associativity = OperatorAssociativity.LeftToRight,
+                Execute = (x, y) => x / y
+            });
+
+            opList.Add(new Operator()
+            {
+                SymbolText = "%",
+                OperandCount = 2,
+                PrecedenceLevel = 4,
+                Associativity = OperatorAssociativity.LeftToRight,
+                Execute = (x, y) => x % y
+            });
+
+            opList.Add(new Operator()
+            {
+                SymbolText = "^",
+                OperandCount = 2,
+                PrecedenceLevel = 3,
+                Associativity = OperatorAssociativity.LeftToRight,
+                Execute = (x, y) => Math.Pow(x, y)
+            });
+
+            opList.Add(new Operator()
+            {
+                SymbolText = "_",
+                OperandCount = 1,
+                PrecedenceLevel = 2,
+                Associativity = OperatorAssociativity.RightToLeft,
+                Execute = (x, y) => -x
+            });
+
+            opList.Add(new Operator()
+            {
+                SymbolText = "(",
+                OperandCount = 0,
+                PrecedenceLevel = 1,
+                Associativity = OperatorAssociativity.LeftToRight
+            });
+
+            opList.Add(new Operator()
+            {
+                SymbolText = ")",
+                OperandCount = 0,
+                PrecedenceLevel = 1,
+                Associativity = OperatorAssociativity.LeftToRight
+            });
+
+            opList.Add(new Operator()
+            {
+                SymbolText = "X",
+                OperandCount = 0,
+                PrecedenceLevel = 0,
+                Associativity = OperatorAssociativity.LeftToRight
+            });
+
+            return opList;
         }
     }
 }

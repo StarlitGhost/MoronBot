@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Utility.Calc
+namespace MBUtilities.Calc
 {
     public static class CalcUtilities
     {
@@ -21,12 +21,12 @@ namespace Utility.Calc
 
         public static bool IsOpenParenthesis(Token token)
         {
-            return (token.Type == TokenType.Operator && token.LinearToken.Equals(AllOperators.Find(OperatorSymbol.OpenParenthesis).SymbolText));
+            return (token.Type == TokenType.Operator && token.LinearToken.Equals(AllOperators.Find("(").SymbolText));
         }
 
         public static bool IsCloseParenthesis(Token token)
         {
-            return (token.Type == TokenType.Operator && token.LinearToken.Equals(AllOperators.Find(OperatorSymbol.CloseParenthesis).SymbolText));
+            return (token.Type == TokenType.Operator && token.LinearToken.Equals(AllOperators.Find(")").SymbolText));
         }
 
         public static bool IsArithmeticOperator(Token token)

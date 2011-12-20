@@ -3,22 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Utility.Calc
+namespace MBUtilities.Calc
 {
-    public class Variable : ITokenObject
+    public class Constant : ITokenObject
     {
-        public string Name { get; set; }
         public string Value { get; set; }
 
-        public Variable()
+        public Constant()
         {
-            Name = string.Empty;
             Value = string.Empty;
         }
 
         public override string ToString()
         {
-            return (this.Name);
+            return (this.Value);
         }
     }
 }
