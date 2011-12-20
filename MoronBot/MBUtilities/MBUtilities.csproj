@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -51,6 +51,16 @@
     <Reference Include="Mono.Data.Sqlite" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Calc\CalcUtilities.cs" />
+    <Compile Include="Calc\Constant.cs" />
+    <Compile Include="Calc\Enumerations.cs" />
+    <Compile Include="Calc\Evaluator.cs" />
+    <Compile Include="Calc\Expression.cs" />
+    <Compile Include="Calc\ITokenObject.cs" />
+    <Compile Include="Calc\Operator.cs" />
+    <Compile Include="Calc\Token.cs" />
+    <Compile Include="Calc\Tokenizer.cs" />
+    <Compile Include="Calc\Variable.cs" />
     <Compile Include="Channel\Channel.cs" />
     <Compile Include="Channel\ChannelList.cs" />
     <Compile Include="Channel\User.cs" />

@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 using CwIRC;
@@ -25,6 +26,7 @@ namespace Utility
             List<IRCResponse> responses = new List<IRCResponse>();
 
             List<string> keysToDelete = new List<string>();
+            Dictionary<string, List<Tell.TellMessage>> keysToKeep = new Dictionary<string, List<Tell.TellMessage>>();
 
             foreach (KeyValuePair<string, List<Tell.TellMessage>> kvp in Tell.MessageMap)
             {
@@ -32,8 +34,17 @@ namespace Utility
                 {
                     foreach (Tell.TellMessage msg in kvp.Value)
                     {
-                        responses.Add(new IRCResponse(ResponseType.Say, message.User.Name + ": " + msg.Message, msg.Target == "PM" ? message.User.Name : msg.Target));
-                        responses.Add(new IRCResponse(ResponseType.Say, "^ from " + msg.From + " on " + msg.SentDate, msg.Target == "PM" ? message.User.Name : msg.Target));
+                        if (msg.Target == "PM" || msg.Target == message.ReplyTo)
+                        {
+                            responses.Add(new IRCResponse(ResponseType.Say, message.User.Name + ": " + msg.Message, msg.Target == "PM" ? message.User.Name : msg.Target));
+                            responses.Add(new IRCResponse(ResponseType.Say, "^ from " + msg.From + " on " + msg.SentDate, msg.Target == "PM" ? message.User.Name : msg.Target));
+                        }
+                        else
+                        {
+                            if (!keysToKeep.ContainsKey(kvp.Key))
+                                keysToKeep.Add(kvp.Key, new List<Tell.TellMessage>());
+                            keysToKeep[kvp.Key].Add(msg);
+                        }
                     }
 
                     keysToDelete.Add(kvp.Key);
@@ -44,6 +55,7 @@ namespace Utility
                 Tell.MessageMap[key].Clear();
                 Tell.MessageMap.Remove(key);
             }
+            Tell.MessageMap = Tell.MessageMap.Concat(keysToKeep).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             if (responses.Count > 0)
             {

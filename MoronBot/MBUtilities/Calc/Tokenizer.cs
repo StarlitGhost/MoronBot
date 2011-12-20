@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Utility.Calc
+namespace MBUtilities.Calc
 {
     public class Tokenizer
     {
@@ -27,7 +27,7 @@ namespace Utility.Calc
                         alphaNumericString = string.Empty;
                     }
 
-                    if (lastOp != null && (((Operator)lastOp.TokenObject).Symbol == OperatorSymbol.None || ((Operator)lastOp.TokenObject).Symbol != OperatorSymbol.CloseParenthesis))
+                    if (lastOp != null && (((Operator)lastOp.TokenObject).PrecedenceLevel < 1 || ((Operator)lastOp.TokenObject).SymbolText != ")"))
                     {
                         if (currentChar == '-')
                         {
