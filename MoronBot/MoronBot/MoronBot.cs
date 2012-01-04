@@ -183,29 +183,25 @@ namespace MoronBot
         /// <returns>Whether or not the send was successful (actually whether or not the given response is valid).</returns>
         bool Send(IRCResponse response)
         {
-            if (response != null)
-            {
-                switch (response.Type)
-                {
-                    case ResponseType.Say:
-                        Say(response.Response, response.Target);
-                        break;
-                    case ResponseType.Do:
-                        Do(response.Response, response.Target);
-                        break;
-                    case ResponseType.Notice:
-                        Notice(response.Response, response.Target);
-                        break;
-                    case ResponseType.Raw:
-                        cwIRC.SendData(response.Response);
-                        break;
-                }
-                return true;
-            }
-            else
-            {
+            if (response == null)
                 return false;
+
+            switch (response.Type)
+            {
+                case ResponseType.Say:
+                    Say(response.Response, response.Target);
+                    break;
+                case ResponseType.Do:
+                    Do(response.Response, response.Target);
+                    break;
+                case ResponseType.Notice:
+                    Notice(response.Response, response.Target);
+                    break;
+                case ResponseType.Raw:
+                    cwIRC.SendData(response.Response);
+                    break;
             }
+            return true;
         }
 
         /// <summary>
@@ -213,17 +209,17 @@ namespace MoronBot
         /// </summary>
         void SendQueue()
         {
-            if (MessageQueue.Count > 0)
+            if (MessageQueue.Count == 0)
+                return;
+
+            lock (queueSync)
             {
-                lock (queueSync)
+                foreach (IRCResponse response in MessageQueue)
                 {
-                    foreach (IRCResponse response in MessageQueue)
-                    {
-                        Send(response);
-                        System.Threading.Thread.Sleep(1700);
-                    }
-                    MessageQueue.Clear();
+                    Send(response);
+                    System.Threading.Thread.Sleep(1700);
                 }
+                MessageQueue.Clear();
             }
         }
 
@@ -369,33 +365,30 @@ namespace MoronBot
                 case "MODE":
                     ChannelList.ParseMODE(message);
                     
+                    string setter = message.User.Name.TrimStart(':');
+                    string modes = message.MessageList[3].TrimStart(':');
+                    string targets = "";
+
                     string channel = message.MessageList[2].ToLowerInvariant();
                     if (channel.StartsWith("#"))
                     {
-                        string setter = message.User.Name.TrimStart(':');
-                        string modes = message.MessageList[3].TrimStart(':');
-                        string targets = "";
                         if (message.MessageList.Count > 4)
                         {
                             for (int i = 4; i < message.MessageList.Count; ++i)
                             {
                                 if (i < message.MessageList.Count - 1)
-                                {
                                     targets += message.MessageList[i] + " ";
-                                }
                                 else
-                                {
                                     targets += message.MessageList[i];
-                                }
                             }
                         }
                         else
                         {
                             targets = message.MessageList[2];
                         }
-
-                        Log("# " + setter + " set mode: " + modes + " " + targets, channel.ToLowerInvariant());
                     }
+
+                    Log("# " + setter + " set mode: " + modes + " " + targets, channel.ToLowerInvariant());
                     break;
                 case "TOPIC":
                     ChannelList.ParseTOPIC(message);
@@ -466,34 +459,47 @@ namespace MoronBot
         /// <returns>Whether or not any of the functions generated IRCResponses.</returns>
         bool ExecuteFunctionList(List<IFunction> funcList, BotMessage message)
         {
-            bool response = false;
+            List<IRCResponse> responses = new List<IRCResponse>();
+
             foreach (IFunction f in funcList)
             {
-                List<IRCResponse> responses = null;
-                switch (f.AccessLevel)
+                List<IRCResponse> funcResponses = null;
+                try
                 {
-                    case AccessLevels.Anyone:
-                        responses = f.GetResponse(message);
-                        break;
-                    case AccessLevels.UserList:
-                        if (f.AccessList.Contains(message.User.Name.ToLowerInvariant()))
-                        {
-                            responses = f.GetResponse(message);
-                        }
+                    switch (f.AccessLevel)
+                    {
+                        case AccessLevels.Anyone:
+                            funcResponses = f.GetResponse(message);
+                            if (funcResponses != null)
+                                responses.AddRange(funcResponses);
+                            break;
+                        case AccessLevels.UserList:
+                            if (f.AccessList.Contains(message.User.Name.ToLowerInvariant()))
+                            {
+                                funcResponses = f.GetResponse(message);
+                                if (funcResponses != null)
+                                    responses.AddRange(funcResponses);
+                            }
+                            break;
+                    }
+
+                    // For the Apathy function
+                    if (responses.Count > 0 && responses[responses.Count - 1] == null)
                         break;
                 }
-                if (responses != null && responses.Count > 0)
+                catch (Exception e)
                 {
-                    lock(queueSync)
-                        MessageQueue.AddRange(responses);
-
-                    if (MessageQueue[MessageQueue.Count - 1] == null)
-                        return true;
-
-                    response = true;
+                    Logger.Write(e.Message + "\n" + e.StackTrace, Settings.Instance.ErrorFile);
                 }
             }
-            return response;
+
+            if (responses.Count == 0)
+                return false;
+
+            lock (queueSync)
+                MessageQueue.AddRange(responses);
+
+            return true;
         }
         
         #endregion Message Processing
@@ -521,16 +527,15 @@ namespace MoronBot
         /// <returns>true if load succeeded, false if it failed</returns>
         bool LoadXML(string fileLocation)
         {
-            if (File.Exists(fileLocation))
-            {
-                XmlSerializer deserializer = new XmlSerializer(Settings.Instance.GetType());
-                StreamReader streamReader = new StreamReader(fileLocation);
-                Settings.Assign((Settings)deserializer.Deserialize(streamReader));
-                streamReader.Close();
+            if (!File.Exists(fileLocation))
+                return false;
 
-                return true;
-            }
-            return false;
+            XmlSerializer deserializer = new XmlSerializer(Settings.Instance.GetType());
+            StreamReader streamReader = new StreamReader(fileLocation);
+            Settings.Assign((Settings)deserializer.Deserialize(streamReader));
+            streamReader.Close();
+
+            return true;
         }
 
         /// <summary>
