@@ -56,7 +56,13 @@ namespace Fun
                     {
                         double result = Evaluator.EvaluateBasic(postfixTokens);
                         if (verbose)
-                            output += "[" + string.Join(" | ", verboseRolls) + "] ";
+                        {
+                            string verboseOutput = "[" + string.Join(" | ", verboseRolls) + "] ";
+                            if (verboseOutput.Length < 500)
+                                output += verboseOutput;
+                            else
+                                output += "[LOTS O' DICE] ";
+                        }
                         output += result.ToString();
                     }
                     else
