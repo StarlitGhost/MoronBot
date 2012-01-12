@@ -50,7 +50,7 @@ namespace Utility
 
         public TimeTill()
         {
-            Help = "time(un)till/countdown (<event>) - Tells you the amount of time left until the specified event. Without a parameter, it will tell you how long until the next Desert Bus.";
+            Help = "time(un)till/countdown (<event>) - Tells you the amount of time until the specified event. Without a parameter, it will tell you how long until the next Desert Bus.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
@@ -64,44 +64,40 @@ namespace Utility
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^(time(un)?till|countdown)$", RegexOptions.IgnoreCase))
-            {
-                EventStruct eventStruct;
-                TimeSpan timeSpan;
-
-                if (message.ParameterList.Count > 0) // Parameters given
-                {
-                    // If an event in EventList is in the future, and the event name and command parameters match exactly,
-                    // assign to eventStruct
-                    eventStruct = EventList.Find(s =>
-                       s.EventDate > DateTime.UtcNow &&
-                       s.EventName == message.Parameters);
-
-                    // If no matching message found
-                    if (eventStruct.EventName == null)
-                    {
-                        // Same search as above, but using regex to match messages this time.
-                        eventStruct = EventList.Find(s =>
-                            s.EventDate > DateTime.UtcNow &&
-                            Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
-                    }
-
-                    // No matching events found
-                    if (eventStruct.EventName == null)
-                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in the future events list!", message.ReplyTo) };
-                }
-                else // Parameters not given, assign next Desert Bus to eventStruct.
-                {
-                    eventStruct = EventList.Find(s => s.EventName == "Desert Bus 5");
-                }
-
-                timeSpan = eventStruct.EventDate - DateTime.UtcNow;
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, eventStruct.EventName + " will occur in " + timeSpan.Days + " day(s) " + timeSpan.Hours + " hour(s) " + timeSpan.Minutes + " minute(s)", message.ReplyTo) };
-            }
-            else
-            {
+            if (!Regex.IsMatch(message.Command, "^(time(un)?till|countdown)$", RegexOptions.IgnoreCase))
                 return null;
+
+            EventStruct eventStruct;
+            TimeSpan timeSpan;
+
+            if (message.ParameterList.Count > 0) // Parameters given
+            {
+                // If an event in EventList is in the future, and the event name and command parameters match exactly,
+                // assign to eventStruct
+                eventStruct = EventList.Find(s =>
+                    s.EventDate > DateTime.UtcNow &&
+                    s.EventName == message.Parameters);
+
+                // If no matching message found
+                if (eventStruct.EventName == null)
+                {
+                    // Same search as above, but using regex to match messages this time.
+                    eventStruct = EventList.Find(s =>
+                        s.EventDate > DateTime.UtcNow &&
+                        Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
+                }
+
+                // No matching events found
+                if (eventStruct.EventName == null)
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in the future events list!", message.ReplyTo) };
             }
+            else // Parameters not given, assign next Desert Bus to eventStruct.
+            {
+                eventStruct = EventList.Find(s => s.EventName.StartsWith("DB"));
+            }
+
+            timeSpan = eventStruct.EventDate - DateTime.UtcNow;
+            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, eventStruct.EventName + " will occur in " + timeSpan.Days + " day(s) " + timeSpan.Hours + " hour(s) " + timeSpan.Minutes + " minute(s)", message.ReplyTo) };
         }
 
         public static void SaveEvents()
