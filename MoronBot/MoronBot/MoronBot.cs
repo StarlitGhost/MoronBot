@@ -97,6 +97,8 @@ namespace MoronBot
         /// </summary>
         readonly object messageSync = new object();
 
+        System.Timers.Timer connectionTimer = new System.Timers.Timer();
+
         #endregion Variables
 
         #region Constructor & Destructor
@@ -130,6 +132,10 @@ namespace MoronBot
             Say("identify mOrOnBoTuS", "NickServ");
 
             cwIRC.JOIN(Settings.Instance.Channel);
+
+            connectionTimer.Elapsed += new System.Timers.ElapsedEventHandler(connectionTimer_Elapsed);
+            connectionTimer.Interval = 120000;
+            connectionTimer.Enabled = true;
         }
         /// <summary>
         /// Destructor for MoronBot.
@@ -217,7 +223,7 @@ namespace MoronBot
                 foreach (IRCResponse response in MessageQueue)
                 {
                     Send(response);
-                    System.Threading.Thread.Sleep(1700);
+                    System.Threading.Thread.Sleep(100);
                 }
                 MessageQueue.Clear();
             }
@@ -284,6 +290,7 @@ namespace MoronBot
                 case "474": // Bot banned from channel
                     break;
                 case "010": // Server full, connect to another
+                    cwIRC.Disconnect();
                     cwIRC.Connect(message.MessageList[3], Int32.Parse(message.MessageList[4]));
                     cwIRC.NICK(Nick);
                     cwIRC.USER(Nick, "Nope", "Whatever", "MoronBot 0.1.6");
@@ -508,12 +515,27 @@ namespace MoronBot
         void CwIRC_MessageReceived(object sender, string message)
         {
             BotMessage botMessage = new BotMessage(message, Nick);
+            connectionTimer.Interval = 120000;
 
             lock (messageSync)
             {
                 MBEvents.OnNewRawIRC(this, botMessage.ToString());
                 ProcessMessage(botMessage);
             }
+        }
+
+        void connectionTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            cwIRC.Disconnect();
+
+            cwIRC.Connect(Settings.Instance.Server, Settings.Instance.Port);
+            cwIRC.NICK(Nick);
+            cwIRC.USER(Nick, "Nope", "Whatever", "MoronBot 0.1.6");
+
+            cwIRC.SendData("PASS mOrOnBoTuS");
+            Say("identify mOrOnBoTuS", "NickServ");
+
+            cwIRC.JOIN(Settings.Instance.Channel);
         }
         #endregion IRC Message Receiver
 
