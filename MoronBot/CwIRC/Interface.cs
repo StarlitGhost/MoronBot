@@ -114,6 +114,8 @@ namespace CwIRC
             streamWriter.Close();
             networkStream.Close();
             connection.Close();
+
+            worker.CancelAsync();
         }
 
         /// <summary>

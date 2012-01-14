@@ -58,7 +58,7 @@ namespace Fun
                         if (verbose)
                         {
                             string verboseOutput = "[" + string.Join(" | ", verboseRolls) + "] ";
-                            if (verboseOutput.Length < 500)
+                            if (verboseOutput.Length < 400)
                                 output += verboseOutput;
                             else
                                 output += "[LOTS O' DICE] ";
