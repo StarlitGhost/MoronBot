@@ -181,13 +181,13 @@ namespace Utility
             else
             {
                 if (userDateNumber.Number >= 3)
-                    return false;
+                    return true;
 
                 userDateNumber.MessageTime = DateTime.Now;
                 userDateNumber.Number++;
                 userDateNumberList[i] = userDateNumber;
             }
-            return true;
+            return false;
         }
     }
 }
