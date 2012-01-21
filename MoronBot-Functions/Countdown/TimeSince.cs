@@ -54,7 +54,9 @@ namespace Utility
             }
             else // Parameters not given, assign last Desert Bus to eventStruct.
             {
-                eventStruct = reversedList.Find(s => s.EventName.StartsWith("DB"));
+                eventStruct = reversedList.Find(s =>
+                    s.EventDate <= DateTime.UtcNow &&
+                    s.EventName.StartsWith("DB"));
             }
 
             timeSpan = DateTime.UtcNow - eventStruct.EventDate;
