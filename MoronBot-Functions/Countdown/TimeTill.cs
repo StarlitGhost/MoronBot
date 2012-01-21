@@ -93,7 +93,9 @@ namespace Utility
             }
             else // Parameters not given, assign next Desert Bus to eventStruct.
             {
-                eventStruct = EventList.Find(s => s.EventName.StartsWith("DB"));
+                eventStruct = EventList.Find(s =>
+                    s.EventDate > DateTime.UtcNow &&
+                    s.EventName.StartsWith("DB"));
             }
 
             timeSpan = eventStruct.EventDate - DateTime.UtcNow;
