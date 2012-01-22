@@ -59,7 +59,7 @@ namespace Utility
             if (message.ParameterList.Count == 1 || message.Parameters.Substring(message.ParameterList[0].Length + 1).Trim(' ').Length == 0)
                 return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't give a message for me to tell " + message.ParameterList[0], message.ReplyTo) };
 
-            if (message.ParameterList[0] == Settings.Instance.CurrentNick)
+            if (message.ParameterList[0].ToLowerInvariant() == Settings.Instance.CurrentNick.ToLowerInvariant())
                 return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Thanks for telling me that " + message.User.Name + ", I'm sure I'll find that useful...", message.ReplyTo) };
 
             if (RateLimit(message.User.Name))

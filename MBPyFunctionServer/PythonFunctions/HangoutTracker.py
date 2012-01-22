@@ -34,7 +34,7 @@ class Instantiate(Function):
                                                                                                                      self.lastUser),
                                    message.ReplyTo)
         
-        match = re.search('(https?\://)?talkgadget\.google\.com/hangouts/(?P<code>(extras/talk\.google\.com/)?[^\?\s]+)',
+        match = re.search('(https?\://)?(talkgadget|plus)\.google\.com/hangouts/(?P<code>(extras/talk\.google\.com/)?[^\?\s]+)',
                           message.MessageString,
                           re.IGNORECASE)
         if not match:
