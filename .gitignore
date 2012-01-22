@@ -15,3 +15,4 @@ MoronBot-PythonInterfaceOnly/*
 *.zip
 *.pyc
 MoronBot-PythonDev/*
+*.opensdf
