@@ -36,8 +36,8 @@ namespace Utility
             try
             {
                 string query = HttpUtility.UrlEncode(message.Parameters);
-                Stream responseStream = SendToServer("http://www.google.com/ig/calculator?hl=en&q=" + query);
-                string jsonResponse = ReceiveFromServer(responseStream);
+                Stream responseStream = URL.SendToServer("http://www.google.com/ig/calculator?hl=en&q=" + query);
+                string jsonResponse = URL.ReceiveFromServer(responseStream);
 
                 Result result = JsonConvert.DeserializeObject<Result>(jsonResponse);
                 if (result.rhs.Length > 0)
@@ -52,23 +52,6 @@ namespace Utility
                 Logger.Write(ex.Message, Settings.Instance.ErrorFile);
                 return null;
             }
-        }
-
-        Stream SendToServer(string url)
-        {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            HttpWebResponse webResponse = (HttpWebResponse)request.GetResponse();
-            return webResponse.GetResponseStream();
-        }
-
-        string ReceiveFromServer(Stream responseStream)
-        {
-            Encoding encode = Encoding.UTF8;
-            StreamReader stream = new StreamReader(responseStream, encode);
-
-            StringBuilder sb = new StringBuilder();
-            sb.Append(stream.ReadToEnd());
-            return sb.ToString();
         }
 
         class Result

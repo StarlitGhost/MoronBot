@@ -72,6 +72,35 @@ namespace MBUtilities
             return true;
         }
 
+        public static Stream SendToServer(string url)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            HttpWebResponse webResponse = (HttpWebResponse)request.GetResponse();
+            return webResponse.GetResponseStream();
+        }
+        public static Stream SendToServer(string url, string text)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "POST";
+            request.ContentType = "application/json; charset=utf-8";
+            StreamWriter writer = new StreamWriter(request.GetRequestStream());
+            writer.Write(text);
+            writer.Close();
+
+            HttpWebResponse webResponse = (HttpWebResponse)request.GetResponse();
+            return webResponse.GetResponseStream();
+        }
+
+        public static string ReceiveFromServer(Stream responseStream)
+        {
+            Encoding encode = Encoding.UTF8;
+            StreamReader stream = new StreamReader(responseStream, encode);
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append(stream.ReadToEnd());
+            return sb.ToString();
+        }
+
         public static string Shorten(string url)
         {
             // Check that the 'URL' given, is actually a URL
