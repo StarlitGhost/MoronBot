@@ -33,8 +33,8 @@ namespace PythonInterface
 			
 			try
 			{
-				Stream responseStream = SendToServer(url, json);
-				string jsonResponse = ReceiveFromServer(responseStream);
+				Stream responseStream = URL.SendToServer(url, json);
+                string jsonResponse = URL.ReceiveFromServer(responseStream);
 				
 				List<IRCResponse> ircResponses = JsonConvert.DeserializeObject<List<IRCResponse>>(jsonResponse);
 	            
@@ -52,35 +52,12 @@ namespace PythonInterface
 			string url = "http://localhost:8080/nickchange";
 			try
 			{
-				SendToServer(url, newNick);
+                URL.SendToServer(url, newNick);
 			}
 			catch (System.Exception /*ex*/)
 			{
 				return;
 			}
-		}
-		
-		Stream SendToServer(string url, string text)
-		{
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-			request.Method = "POST";
-			request.ContentType = "application/json; charset=utf-8";
-			StreamWriter writer = new StreamWriter(request.GetRequestStream());
-			writer.Write(text);
-			writer.Close();
-			
-			HttpWebResponse webResponse = (HttpWebResponse)request.GetResponse();
-			return webResponse.GetResponseStream();
-		}
-		
-		string ReceiveFromServer(Stream responseStream)
-		{
-			Encoding encode = Encoding.UTF8;
-			StreamReader stream = new StreamReader(responseStream, encode);
-			
-			StringBuilder sb = new StringBuilder();
-			sb.Append(stream.ReadToEnd());
-			return sb.ToString();
 		}
     }
 }
