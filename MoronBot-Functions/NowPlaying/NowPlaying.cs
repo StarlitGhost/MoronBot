@@ -146,18 +146,18 @@ namespace Internet
         }
     }
 
-    public class NowPlayingRegister : Function
+    public class NowPlayingLink : Function
     {
-        public NowPlayingRegister()
+        public NowPlayingLink()
         {
-            Help = "npregister/nplink <LastFM Name> - Links the specified LastFM account name to your IRC name.";
+            Help = "nplink <LastFM Name> - Links the specified LastFM account name to your IRC name.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^(np(register|link))$", RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(message.Command, "^n(ow)?p(laying)?link$", RegexOptions.IgnoreCase))
             {
                 if (message.ParameterList.Count > 0)
                 {
