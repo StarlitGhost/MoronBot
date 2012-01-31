@@ -8,8 +8,8 @@
     <ProjectGuid>{4670531C-7470-481B-8024-90D93698CCB0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Countdown</RootNamespace>
-    <AssemblyName>Countdown</AssemblyName>
+    <RootNamespace>Events</RootNamespace>
+    <AssemblyName>Events</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DateOf.cs" />
     <Compile Include="Event.cs" />
     <Compile Include="TimeSince.cs" />
     <Compile Include="Events.cs" />
