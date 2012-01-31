@@ -23,5 +23,5 @@ class Instantiate(Function):
             return
         
         return IRCResponse(ResponseType.Say,
-                           'http://silver.amazon.fooproject.net/pisg/desertbus.html',
+                           'sss: http://stats.fugiman.com | pisg: http://silver.amazon.fooproject.net/pisg/desertbus.html',
                            message.ReplyTo)
