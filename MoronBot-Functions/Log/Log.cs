@@ -17,14 +17,14 @@ namespace Utility
     {
         public Log()
         {
-            Help = "log (<-#>) - Posts the daily log to pastebin.com, and returns a link to it. You can also fetch previous logs, by specifying an offset in days ('|log -1' would fetch yesterday's logs, for instance).";
+            Help = "log (-#) - Posts the daily log to pastebin.com, and returns a link to it. You can also fetch previous logs, by specifying an offset in days ('|log -1' would fetch yesterday's logs, for instance).";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^(log)$", RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(message.Command, "^log$", RegexOptions.IgnoreCase))
             {
                 DateTime date = DateTime.Now.IsDaylightSavingTime() ? DateTime.UtcNow.AddHours(1.0) : DateTime.UtcNow;
 
@@ -40,8 +40,8 @@ namespace Utility
                     }
                 }
 
-                string fileDate = date.ToString(@" yyyy-MM-dd");
-                string filePath = string.Format(@".{0}logs{0}" + Settings.Instance.Server + fileDate + @"{0}" + message.ReplyTo + @".txt", Path.DirectorySeparatorChar);
+                string fileDate = date.ToString(@"-yyyyMMdd");
+                string filePath = string.Format(@".{0}logs{0}{1}{0}{2}{3}.txt", Path.DirectorySeparatorChar, Settings.Instance.Server, message.ReplyTo.ToLowerInvariant(), fileDate);
 
                 if (File.Exists(filePath))
                 {
@@ -49,7 +49,7 @@ namespace Utility
 
                     string logLink = URL.Pastebin(logText, message.ReplyTo + " Log" + fileDate, "10M", "text", "1");
 
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Log for" + fileDate + " posted: " + logLink + " (link expires in 10 mins)", message.ReplyTo) };
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, string.Format("Log for {0} posted: {1} (link expires in 10 mins)", date.ToString(@"yyyy-MM-dd"), logLink), message.ReplyTo) };
                 }
                 else
                 {
