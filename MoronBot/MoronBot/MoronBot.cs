@@ -118,7 +118,7 @@ namespace MoronBot
 
             LoadFunctions();
 
-            PluginLoader.WatchDirectory(Settings.Instance.FunctionPath, FuncDirChanged);
+            //PluginLoader.WatchDirectory(Settings.Instance.FunctionPath, FuncDirChanged);
 
             Nick = Settings.Instance.Nick;
 
@@ -157,7 +157,7 @@ namespace MoronBot
         /// <param name="p_target">The channel or user to send the message to.</param>
         public void Say(string p_message, string p_target)
         {
-            Log("<" + Nick + "> " + p_message, p_target);
+            Log(string.Format("<{0}> {1}", Nick, p_message), p_target);
             cwIRC.PRIVMSG(p_message, p_target);
         }
         /// <summary>
@@ -167,7 +167,7 @@ namespace MoronBot
         /// <param name="p_target">The channel or user to send the notice to.</param>
         public void Notice(string p_message, string p_target)
         {
-            Log("[" + Nick + "] " + p_message, p_target);
+            Log(string.Format("[{0}] {1}", Nick, p_message), p_target);
             cwIRC.NOTICE(p_message, p_target);
         }
         /// <summary>
@@ -177,9 +177,9 @@ namespace MoronBot
         /// <param name="p_target">The channel or user to send the ACTION message to.</param>
         public void Do(string p_action, string p_target)
         {
-            Log("*" + Nick + " " + p_action + "*", p_target);
+            Log(string.Format("*{0} {1}*", Nick, p_action), p_target);
             char ctcpChar = Convert.ToChar((byte)1);
-            cwIRC.PRIVMSG(ctcpChar + "ACTION " + p_action + ctcpChar, p_target);
+            cwIRC.PRIVMSG(string.Format("{0}ACTION {1}{0}", ctcpChar, p_action), p_target);
         }
 
         /// <summary>
@@ -233,13 +233,12 @@ namespace MoronBot
         {
             DateTime date = DateTime.Now.IsDaylightSavingTime() ? DateTime.UtcNow.AddHours(1.0) : DateTime.UtcNow;
 
-            string timeData = date.ToString(@"[HH:mm] ") + data;
-            MBEvents.OnNewFormattedIRC(this, fileName + " " + timeData);
+            string time = date.ToString("[HH:mm]");
+            MBEvents.OnNewFormattedIRC(this, string.Format("{0} {1} {2}", fileName, time, data));
 
-            string fileDate = date.ToString(@" yyyy-MM-dd");
             string filePath = Path.Combine(Settings.Instance.LogPath,
-                string.Format(Settings.Instance.Server + fileDate + @"{0}" + fileName + @".txt", Path.DirectorySeparatorChar));
-            Logger.Write(timeData, filePath.ToLowerInvariant());
+                string.Format("{0}{1}{2}{3}.txt", Settings.Instance.Server, Path.DirectorySeparatorChar, fileName, date.ToString(@"-yyyyMMdd")));
+            Logger.Write(string.Format("{0} {1}", time, data), filePath.ToLowerInvariant());
         }
         
         #endregion Basic Operations
@@ -324,7 +323,7 @@ namespace MoronBot
                         Nick = parameter;
                     }
 
-                    logText = message.User.Name + " is now known as " + parameter;
+                    logText = string.Format("{0} is now known as {1}", message.User.Name, parameter);
                     foreach (string chan in channels)
                         Log(logText, chan.ToLowerInvariant());
                     break;
@@ -339,21 +338,20 @@ namespace MoronBot
                     //cwIRC.SendData("WHO " + message.MessageList[2].TrimStart(':'));
                     //cwIRC.SendData("NAMES " + message.MessageList[2].TrimStart(':'));
 
-                    Log(" >> " + message.User.Name + " joined " + parameter, parameter.ToLowerInvariant());
+                    Log(string.Format(" >> {0} ({1}@{2}) joined {3}", message.User.Name, message.User.User, message.User.Hostmask, parameter), parameter.ToLowerInvariant());
                     break;
                 case "PART":
                     ChannelList.ParsePART(message, message.User.Name == Nick);
 
                     string partMsg = (message.MessageList.Count > 3 ? ", message: " + String.Join(" ", message.MessageList.ToArray(), 3, message.MessageList.Count - 3).Substring(1) : "");
-                    logText = " << " + message.User.Name + " left " + parameter + partMsg;
 
-                    Log(logText, parameter.ToLowerInvariant());
+                    Log(string.Format(" << {0} ({1}@{2}) left {3}{4}", message.User.Name, message.User.User, message.User.Hostmask, parameter, partMsg), parameter.ToLowerInvariant());
                     break;
                 case "QUIT":
                     List<string> quittedChannels = ChannelList.ParseQUIT(message);
 
                     string quitMsg = (message.MessageList.Count > 2 ? ", message: " + String.Join(" ", message.MessageList.ToArray(), 2, message.MessageList.Count - 2).Substring(1) : "");
-                    logText = " << " + message.User.Name + " quit" + quitMsg;
+                    logText = string.Format(" << {0} ({1}@{2}) quit{3}", message.User.Name, message.User.User, message.User.Hostmask, quitMsg);
                     foreach (string chan in quittedChannels)
                         Log(logText, chan.ToLowerInvariant());
                     break;
@@ -365,7 +363,7 @@ namespace MoronBot
                     }
 
                     string kickMsg = (message.MessageList.Count > 4 ? ", message: " + String.Join(" ", message.MessageList.ToArray(), 4, message.MessageList.Count - 4).Substring(1) : "");
-                    logText = "!<< " + message.User.Name + " kicked " + message.MessageList[3] + kickMsg;
+                    logText = string.Format("!<< {0} kicked {1}{2}", message.User.Name, message.MessageList[3], kickMsg);
 
                     Log(logText, parameter.ToLowerInvariant());
                     break;
@@ -395,23 +393,23 @@ namespace MoronBot
                         }
                     }
 
-                    Log("# " + setter + " set mode: " + modes + " " + targets, channel.ToLowerInvariant());
+                    Log(string.Format("# {0} set mode: {1} {2}", setter, modes, targets), channel.ToLowerInvariant());
                     break;
                 case "TOPIC":
                     ChannelList.ParseTOPIC(message);
 
-                    Log("# " + message.User.Name + " changed the topic to: " + message.MessageString, message.ReplyTo);
+                    Log(string.Format("# {0} changed the topic to: {1}", message.User.Name, message.MessageString), message.ReplyTo);
                     break;
                 case "PRIVMSG": // User messages
                     char ctcpChar = Convert.ToChar((byte)1);
                     string action = ctcpChar + "ACTION ";
                     if (message.MessageString.StartsWith(action))
                     {
-                        Log("*" + message.User.Name + " " + message.MessageString.Replace(action, "").TrimEnd(ctcpChar) + "*", message.ReplyTo);
+                        Log(string.Format("*{0} {1}*", message.User.Name, message.MessageString.Replace(action, "").TrimEnd(ctcpChar)), message.ReplyTo);
                     }
                     else
                     {
-                        Log("<" + message.User.Name + "> " + message.MessageString, message.ReplyTo);
+                        Log(string.Format("<{0}> {1}", message.User.Name, message.MessageString), message.ReplyTo);
                     }
 
                     ExecuteFunctionList(UserListFunctions, message);

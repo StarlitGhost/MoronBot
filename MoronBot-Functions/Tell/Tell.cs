@@ -65,20 +65,24 @@ namespace Utility
             if (RateLimit(message.User.Name))
                 return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You've already sent 3 messages in the last 5 minutes, slow down!", message.ReplyTo) };
 
-            string to = WildcardToRegex(message.ParameterList[0]);
-            string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
-            if (!MessageMap.ContainsKey(to))
+            foreach (string target in message.ParameterList[0].Split('&'))
             {
-                MessageMap.Add(to, new List<TellMessage>());
+                string to = WildcardToRegex(target);
+                string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
+                if (!MessageMap.ContainsKey(to))
+                {
+                    MessageMap.Add(to, new List<TellMessage>());
+                }
+                TellMessage tellMessage = new TellMessage();
+                tellMessage.From = message.User.Name;
+                tellMessage.SentDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss (UTC zz)");
+                tellMessage.Message = StringUtils.ReplaceNewlines(StringUtils.StripIRCFormatChars(msg), " | ");
+                tellMessage.Target = message.TargetType == 0 ? message.ReplyTo : "PM";
+                MessageMap[to].Add(tellMessage);
             }
-            TellMessage tellMessage = new TellMessage();
-            tellMessage.From = message.User.Name;
-            tellMessage.SentDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss (UTC zz)");
-            tellMessage.Message = StringUtils.ReplaceNewlines(StringUtils.StripIRCFormatChars(msg), " | ");
-            tellMessage.Target = message.TargetType == 0 ? message.ReplyTo : "PM";
-            MessageMap[to].Add(tellMessage);
             WriteMessages();
-            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Ok, I'll tell " + message.ParameterList[0] + " that when they next speak.", message.ReplyTo) };
+            
+            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Ok, I'll tell " + string.Join(" & ", message.ParameterList[0].Split('&')) + " that when they next speak.", message.ReplyTo) };
         }
 
         public static void WriteMessages()
