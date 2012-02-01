@@ -31,9 +31,17 @@ namespace Utility
             if (message.ParameterList.Count == 0)
                 return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Date of what?", message.ReplyTo) };
 
+            List<TimeTill.EventStruct> reversedList = new List<TimeTill.EventStruct>(TimeTill.EventList);
+            reversedList.Reverse();
+
             TimeTill.EventStruct eventStruct = TimeTill.EventList.Find(s =>
-                        s.EventDate > DateTime.UtcNow &&
-                        Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
+                s.EventDate > DateTime.UtcNow &&
+                Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
+
+            if (eventStruct.EventName == null)
+                eventStruct = reversedList.Find(s =>
+                    s.EventDate <= DateTime.UtcNow &&
+                    Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
 
             if (eventStruct.EventName == null)
                 return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in the events list.", message.ReplyTo) };
