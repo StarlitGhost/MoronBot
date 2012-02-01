@@ -21,7 +21,7 @@ namespace Internet
     {
         public Weather()
         {
-            Help = "weather <location> - Uses WorldWeatherOnline.com's free API to find the weather at the specified location. You can specify with 'town/city, country', post/zipcode, latitude & longitude, or IP address.";
+            Help = "weather <location> - Uses WorldWeatherOnline.com's free API to find the weather at the specified location. You can specify with 'town/city, country', post/zipcode, latitude & longitude, IATA airport code, or IP address.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
         }
