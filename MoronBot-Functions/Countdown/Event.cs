@@ -63,12 +63,12 @@ namespace Utility
             eventStruct.EventName = StringUtils.StripIRCFormatChars(eventStruct.EventName);
 
             if (TimeTill.EventList.FindIndex(s => s.EventName == eventStruct.EventName) >= 0)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)"), message.ReplyTo) };
+                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)"), message.ReplyTo) };
 
             TimeTill.EventList.Add(eventStruct);
             TimeTill.EventList.Sort(TimeTill.EventStruct.CompareEventStructsByDate);
             TimeTill.SaveEvents();
-            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)"), message.ReplyTo) };
+            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)"), message.ReplyTo) };
         }
     }
 }
