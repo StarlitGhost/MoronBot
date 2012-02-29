@@ -46,7 +46,7 @@ namespace Utility
             if (eventStruct.EventName == null)
                 return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in the events list.", message.ReplyTo) };
 
-            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "The date for \"" + eventStruct.EventName + "\" is " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)"), message.ReplyTo) };
+            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "The date for \"" + eventStruct.EventName + "\" is " + eventStruct.EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)"), message.ReplyTo) };
         }
     }
 }
