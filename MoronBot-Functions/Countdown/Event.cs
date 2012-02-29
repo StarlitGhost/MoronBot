@@ -58,7 +58,7 @@ namespace Utility
             }
 
             if (!parseSuccess)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Parsing of date: " + message.ParameterList[0] + " failed, expected format is dd-MM-yyyy", message.ReplyTo) };
+                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Parsing of date: " + message.ParameterList[0] + " failed, expected format is (yyyy-MM-dd HH:mm +/-offset)", message.ReplyTo) };
 
             eventStruct.EventName = StringUtils.StripIRCFormatChars(eventStruct.EventName);
 
