@@ -33,7 +33,7 @@ namespace Utility
                 return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in event list!", message.ReplyTo) };
 
             List<IRCResponse> response = new List<IRCResponse>();
-            response.Add(new IRCResponse(ResponseType.Say, "Event \"" + TimeTill.EventList[index].EventName + "\", with date \"" + TimeTill.EventList[index].EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)") + "\" removed from the event list!", message.ReplyTo));
+            response.Add(new IRCResponse(ResponseType.Say, "Event \"" + TimeTill.EventList[index].EventName + "\", with date \"" + TimeTill.EventList[index].EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)") + "\" removed from the event list!", message.ReplyTo));
             TimeTill.EventList.RemoveAt(index);
             TimeTill.SaveEvents();
             return response;
