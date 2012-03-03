@@ -21,43 +21,45 @@ namespace PythonInterface
             Help = "A C# function which passes messages to other functions written in python.";
             Type = Types.Regex;
             AccessLevel = AccessLevels.Anyone;
-			
-			MBEvents.NickChanged += OnNickChanged;
+            
+            FuncInterface.NickChanged += OnNickChanged;
+            FuncInterface.AnyMessageReceived += anyMessageReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void anyMessageReceived(object sender, BotMessage message)
         {
-			string url = "http://localhost:8080/message";
-			
+            string url = "http://localhost:8080/message";
+            
             string json = JsonConvert.SerializeObject(message);
-			
-			try
-			{
-				Stream responseStream = URL.SendToServer(url, json);
+            
+            try
+            {
+                Stream responseStream = URL.SendToServer(url, json);
                 string jsonResponse = URL.ReceiveFromServer(responseStream);
-				
-				List<IRCResponse> ircResponses = JsonConvert.DeserializeObject<List<IRCResponse>>(jsonResponse);
-	            
-	            return ircResponses;
-			}
-			catch (System.Exception /*ex*/)
-			{
-				//return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "PythonInterface Exception: " + ex.Message, message.ReplyTo) };
-				return null;
-			}
+                
+                List<BotResponse> responses = JsonConvert.DeserializeObject<List<BotResponse>>(jsonResponse);
+
+                FuncInterface.SendResponses(responses);
+                return;
+            }
+            catch (System.Exception /*ex*/)
+            {
+                //FuncInterface.SendResponse(ResponseType.Say, "PythonInterface Exception: " + ex.Message, message.ReplyTo);
+                return;
+            }
         }
-		
-		void OnNickChanged(object o, string newNick)
-		{
-			string url = "http://localhost:8080/nickchange";
-			try
-			{
+        
+        void OnNickChanged(object o, string newNick)
+        {
+            string url = "http://localhost:8080/nickchange";
+            try
+            {
                 URL.SendToServer(url, newNick);
-			}
-			catch (System.Exception /*ex*/)
-			{
-				return;
-			}
-		}
+            }
+            catch (System.Exception /*ex*/)
+            {
+                return;
+            }
+        }
     }
 }

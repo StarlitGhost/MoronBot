@@ -20,33 +20,34 @@ namespace Automatic
             Help = "Automatic function that follows urls and grabs information about the resultant webpage.";
             Type = Types.Regex;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.PRIVMSGReceived += privmsgReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void privmsgReceived(object sender, BotMessage message)
         {
-            if (message.TargetType == IRCMessage.TargetTypes.CHANNEL && !ChannelList.ChannelHasMode(message.ReplyTo, 'U'))
-            {
-                Match match = Regex.Match(message.MessageString, @"https?://[^\s]+", RegexOptions.IgnoreCase);
-                if (match.Success)
-                {
-                    if (Regex.IsMatch(match.Value, @"\.(jpe?g|gif|png|bmp)$"))
-                        return null;
+            if (message.TargetType != IRCMessage.TargetTypes.CHANNEL || ChannelList.ChannelHasMode(message.ReplyTo, 'U'))
+                return;
 
-                    string response = null;
+            Match match = Regex.Match(message.MessageString, @"https?://[^\s]+", RegexOptions.IgnoreCase);
+            if (!match.Success)
+                return;
 
-                    Match youtubeMatch = Regex.Match(match.Value, @"www\.youtube\.com/watch\?v=([^&]+)");
-                    if (youtubeMatch.Success)
-                        response = FollowYouTube(youtubeMatch.Groups[1].Value);
-                    else
-                        response = FollowStandard(match.Value);
+            if (Regex.IsMatch(match.Value, @"\.(jpe?g|gif|png|bmp)$"))
+                return;
 
-                    if (response == null)
-                        return null;
+            string response = null;
 
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, response, message.ReplyTo) };
-                }
-            }
-            return null;
+            Match youtubeMatch = Regex.Match(match.Value, @"www\.youtube\.com/watch\?[^&]+?v=([^&]+)");
+            if (youtubeMatch.Success)
+                response = FollowYouTube(youtubeMatch.Groups[1].Value);
+            else
+                response = FollowStandard(match.Value);
+
+            if (response == null)
+                return;
+
+            FuncInterface.SendResponse(ResponseType.Say, response, message.ReplyTo);
         }
 
         string FollowYouTube(string videoID)
@@ -98,7 +99,7 @@ namespace Automatic
             {
                 Logger.Write(ex.ToString() + "\r\nURL: " + url, Settings.Instance.ErrorFile);
                 // Nothing returned when attempting to fetch the url
-                //return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Nothing found at " + match.Value, message.ReplyTo) };
+                //FuncInterface.SendResponse(ResponseType.Say, "Nothing found at " + match.Value, message.ReplyTo) };
             }
             catch (System.UriFormatException ex)
             {

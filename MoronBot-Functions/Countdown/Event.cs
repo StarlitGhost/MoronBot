@@ -16,19 +16,26 @@ namespace Utility
             Help = "event <date> <event> - Adds an event to the list of events used by TimeTill and TimeSince. <date> is in dd-MM-yyyy format. Put the date in () if you want to specify time and your offset from UTC, eg: (25-12-2012 9:00 -5)";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
             if (!Regex.IsMatch(message.Command, "^event$", RegexOptions.IgnoreCase))
-                return null;
+                return;
 
             if (message.ParameterList.Count <= 1)
             {
                 if (message.ParameterList.Count > 0)
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't give an event!", message.ReplyTo) };
+                {
+                    FuncInterface.SendResponse(ResponseType.Say, "You didn't give an event!", message.ReplyTo);
+                }
                 else
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't give a date and event!", message.ReplyTo) };
+                {
+                    FuncInterface.SendResponse(ResponseType.Say, "You didn't give a date and event!", message.ReplyTo);
+                }
+                return;
             }
 
             TimeTill.EventStruct eventStruct = new TimeTill.EventStruct();
@@ -58,17 +65,24 @@ namespace Utility
             }
 
             if (!parseSuccess)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Parsing of date: " + message.ParameterList[0] + " failed, expected format is dd-MM-yyyy", message.ReplyTo) };
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "Parsing of date: " + message.ParameterList[0] + " failed, expected format is dd-MM-yyyy", message.ReplyTo);
+                return;
+            }
 
             eventStruct.EventName = StringUtils.StripIRCFormatChars(eventStruct.EventName);
 
             if (TimeTill.EventList.FindIndex(s => s.EventName == eventStruct.EventName) >= 0)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)"), message.ReplyTo) };
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)"), message.ReplyTo);
+                return;
+            }
 
             TimeTill.EventList.Add(eventStruct);
             TimeTill.EventList.Sort(TimeTill.EventStruct.CompareEventStructsByDate);
             TimeTill.SaveEvents();
-            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)"), message.ReplyTo) };
+            FuncInterface.SendResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)"), message.ReplyTo);
+            return;
         }
     }
 }

@@ -20,18 +20,26 @@ namespace Internet
             Help = "define <word> - Fetches the dictionary definition of the given word from Google.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
             if (!Regex.IsMatch(message.Command, "^(define)$", RegexOptions.IgnoreCase))
-                return null;
+                return;
 
             if (message.ParameterList.Count == 0)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Define what?", message.ReplyTo) };
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "Define what?", message.ReplyTo);
+                return;
+            }
                 
             if (Regex.IsMatch(message.Parameters, @"xela(re[ck]o)?'s existence", RegexOptions.IgnoreCase))
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Of course Xela exists! Without him I wouldn't have the capacity for apathy! ;D", message.ReplyTo) };
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "Of course Xela exists! Without him I wouldn't have the capacity for apathy! ;D", message.ReplyTo);
+                return;
+            }
 
             string query = "define: " + message.Parameters;
             string url = "http://www.google.com/search?sclient=psy&hl=en&site=&source=hp&q=" + HttpUtility.UrlEncode(query) + "&btnG=Search";
@@ -44,7 +52,8 @@ namespace Internet
             catch (System.Exception ex)
             {
                 Logger.Write(ex.Message, Settings.Instance.ErrorFile);
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Couldn't fetch page from google", message.ReplyTo) };
+                FuncInterface.SendResponse(ResponseType.Say, "Couldn't fetch page from google", message.ReplyTo);
+                return;
             }
 
             url = Regex.Match(page.Page, @"/search[^'""]+tbs=dfn:1[^'""]+").Value;
@@ -57,31 +66,36 @@ namespace Internet
             catch (System.Exception ex)
             {
                 Logger.Write(ex.Message, Settings.Instance.ErrorFile);
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Couldn't fetch page from google", message.ReplyTo) };
+                FuncInterface.SendResponse(ResponseType.Say, "Couldn't fetch page from google", message.ReplyTo);
+                return;
             }
 
             MatchCollection definitions = Regex.Matches(page.Page, @"<li style=""list-style:decimal"">(.+?)<div");
 
             if (definitions.Count == 0)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No definitions found for \"" + message.Parameters + "\"", message.ReplyTo) };
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "No definitions found for \"" + message.Parameters + "\"", message.ReplyTo);
+                return;
+            }
             
-            List<IRCResponse> responses = new List<IRCResponse>();
+            List<string> responses = new List<string>();
 
-            responses.Add(new IRCResponse(ResponseType.Say, "Definitions for " + message.Parameters + ":", message.ReplyTo));
+            responses.Add("Definitions for " + message.Parameters + ":");
 
             int defNum = 1;
             foreach (Match definition in definitions)
             {
-                responses.Add(new IRCResponse(ResponseType.Say, defNum.ToString() + ". " + HttpUtility.HtmlDecode(definition.Groups[1].Value), message.ReplyTo));
+                responses.Add(defNum.ToString() + ". " + HttpUtility.HtmlDecode(definition.Groups[1].Value));
                 defNum++;
                 if (definitions.Count > 4 && defNum > 4)
                 {
-                    responses.Add(new IRCResponse(ResponseType.Say, "And " + (definitions.Count - (defNum - 1)).ToString() + " more here: " + url, message.ReplyTo));
+                    responses.Add("And " + (definitions.Count - (defNum - 1)).ToString() + " more here: " + url);
                     break;
                 }
             }
 
-            return responses;
+            FuncInterface.SendResponses(ResponseType.Say, responses, message.ReplyTo);
+            return;
         }
     }
 }

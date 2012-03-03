@@ -24,14 +24,16 @@ namespace Internet
             Help = "weather <location> - Uses WorldWeatherOnline.com's free API to find the weather at the specified location. You can specify with 'town/city, country', post/zipcode, latitude & longitude, IATA airport code, or IP address.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
             if (!Regex.IsMatch(message.Command, @"^weather$", RegexOptions.IgnoreCase))
-                return null;
+                return;
             if (message.ParameterList.Count == 0)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't give a location!", message.ReplyTo) };
+                FuncInterface.SendResponse(ResponseType.Say, "You didn't give a location!", message.ReplyTo);
 
             try
             {
@@ -43,7 +45,7 @@ namespace Internet
                 Request location = data.request[0];
                 CurrentCondition weather = data.current_condition[0];
 
-                return new List<IRCResponse>() { new IRCResponse(
+                FuncInterface.SendResponse(
                     ResponseType.Say,
                     String.Format("{0}: {1} | {2} | {3}ºC ({4}ºF) | Humidity: {5}% | Wind: {6}kph ({7}mph) {8}",
                         location.type,
@@ -55,12 +57,14 @@ namespace Internet
                         weather.windspeedKmph,
                         weather.windspeedMiles,
                         weather.winddir16Point),
-                    message.ReplyTo) };
+                    message.ReplyTo);
             }
             catch (System.Exception ex)
             {
                 Logger.Write(ex.Message, Settings.Instance.ErrorFile);
-                return null;
+
+                FuncInterface.SendResponse(ResponseType.Say, string.Format("Couldn't find weather for '{0}'", message.Parameters), message.ReplyTo);
+                return;
             }
         }
     }

@@ -18,12 +18,14 @@ namespace Utility
             Help = "timesince/whenwas (<event>) - Tells you how long ago the specified event occurred. Without a parameter, it will tell you how long ago the last Desert Bus was.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
             if (!Regex.IsMatch(message.Command, "^(timesince|whenwas)$", RegexOptions.IgnoreCase))
-                return null;
+                return;
 
             TimeTill.EventStruct eventStruct;
             TimeSpan timeSpan;
@@ -50,7 +52,10 @@ namespace Utility
 
                 // No matching events found
                 if (eventStruct.EventName == null)
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in the past events list!", message.ReplyTo) };
+                {
+                    FuncInterface.SendResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in the past events list!", message.ReplyTo);
+                    return;
+                }
             }
             else // Parameters not given, assign last Desert Bus to eventStruct.
             {
@@ -60,7 +65,8 @@ namespace Utility
             }
 
             timeSpan = DateTime.UtcNow - eventStruct.EventDate;
-            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, eventStruct.EventName + " occurred " + timeSpan.Days + " day(s) " + timeSpan.Hours + " hour(s) " + timeSpan.Minutes + " minute(s) ago", message.ReplyTo) };
+            FuncInterface.SendResponse(ResponseType.Say, eventStruct.EventName + " occurred " + timeSpan.Days + " day(s) " + timeSpan.Hours + " hour(s) " + timeSpan.Minutes + " minute(s) ago", message.ReplyTo);
+            return;
         }
     }
 }

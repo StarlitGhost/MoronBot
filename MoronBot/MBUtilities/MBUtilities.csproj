@@ -69,6 +69,7 @@
     <Compile Include="Channel\Channel.cs" />
     <Compile Include="Channel\ChannelList.cs" />
     <Compile Include="Channel\User.cs" />
+    <Compile Include="Events.cs" />
     <Compile Include="StringUtils.cs" />
     <Compile Include="FileUtils.cs" />
     <Compile Include="Logger.cs" />
@@ -78,7 +79,6 @@
     <Compile Include="Settings.cs" />
     <Compile Include="SQLiteInterface.cs" />
     <Compile Include="URL.cs" />
-    <Compile Include="MBEvents.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

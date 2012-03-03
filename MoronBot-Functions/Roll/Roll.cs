@@ -20,15 +20,20 @@ namespace Fun
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
+
             Operators = PopulateOperators();
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
             if (Regex.IsMatch(message.Command, "^(roll)$", RegexOptions.IgnoreCase))
             {
                 if (message.ParameterList.Count == 0)
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Roll what?", message.ReplyTo) };
+                {
+                    FuncInterface.SendResponse(ResponseType.Say, "Roll what?", message.ReplyTo);
+                    return;
+                }
 
                 AllOperators.Operators = Operators;
 
@@ -75,10 +80,9 @@ namespace Fun
                     output = "Not a recognized dice expression.";
                 }
 
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, output, message.ReplyTo) };
+                FuncInterface.SendResponse(ResponseType.Say, output, message.ReplyTo);
+                return;
             }
-            
-            return null;
         }
 
         static List<Operator> PopulateOperators()

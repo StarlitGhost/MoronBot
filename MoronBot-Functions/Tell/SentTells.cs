@@ -18,40 +18,42 @@ namespace Utility
             Help = "s(ent)tells - Tells you all of the messages you have sent that have yet to be received.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^((outstanding|s(ent)?)tells)$", RegexOptions.IgnoreCase))
-            {
-                List<IRCResponse> responses = new List<IRCResponse>();
+            if (!Regex.IsMatch(message.Command, "^((outstanding|s(ent)?)tells)$", RegexOptions.IgnoreCase))
+                return;
 
-                foreach (KeyValuePair<string, List<Tell.TellMessage>> kvp in Tell.MessageMap)
+            List<string> responses = new List<string>();
+
+            foreach (KeyValuePair<string, List<Tell.TellMessage>> kvp in Tell.MessageMap)
+            {
+                bool fromUser = false;
+                foreach (Tell.TellMessage msg in kvp.Value)
                 {
-                    bool fromUser = false;
-                    foreach (Tell.TellMessage msg in kvp.Value)
+                    if (msg.From.ToLowerInvariant() == message.User.Name.ToLowerInvariant())
                     {
-                        if (msg.From.ToLowerInvariant() == message.User.Name.ToLowerInvariant())
+                        if (!fromUser)
                         {
-                            if (!fromUser)
-                            {
-                                fromUser = true;
-                                responses.Add(new IRCResponse(ResponseType.Say, "To " + kvp.Key, message.ReplyTo));
-                            }
-                            responses.Add(new IRCResponse(ResponseType.Say, " > " + msg.Message, message.ReplyTo));
+                            fromUser = true;
+                            responses.Add("To " + kvp.Key);
                         }
+                        responses.Add(" > ");
                     }
                 }
-
-                if (responses.Count == 0)
-                {
-                    responses.Add(new IRCResponse(ResponseType.Say, "There are no messages from you that have not already been received.", message.ReplyTo));
-                }
-                
-                return responses;
             }
 
-            return null;
+            if (responses.Count == 0)
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "There are no messages from you that have not already been received.", message.ReplyTo);
+                return;
+            }
+
+            FuncInterface.SendResponses(ResponseType.Say, responses, message.ReplyTo);
+            return;
         }
     }
 }

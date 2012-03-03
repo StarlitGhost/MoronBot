@@ -24,6 +24,8 @@ namespace Internet
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
+
             LoadLinks();
         }
 
@@ -32,68 +34,65 @@ namespace Internet
             SaveLinks();
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^(np|nowplaying)$", RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(message.Command, "^(np|nowplaying)$", RegexOptions.IgnoreCase))
+                return;
+
+            string lastfmName = "";
+
+            if (message.ParameterList.Count > 0)
             {
-                string lastfmName = "";
-
-                if (message.ParameterList.Count > 0)
+                if (AccountMap.ContainsKey(message.ParameterList[0].ToUpper()))
                 {
-                    if (AccountMap.ContainsKey(message.ParameterList[0].ToUpper()))
-                    {
-                        lastfmName = AccountMap[message.ParameterList[0].ToUpper()];
-                    }
-                    else
-                    {
-                        lastfmName = message.ParameterList[0];
-                    }
+                    lastfmName = AccountMap[message.ParameterList[0].ToUpper()];
                 }
                 else
                 {
-                    if (AccountMap.ContainsKey(message.User.Name.ToUpper()))
-                    {
-                        lastfmName = AccountMap[message.User.Name.ToUpper()];
-                    }
-                    else
-                    {
-                        lastfmName = message.User.Name;
-                    }
-                }
-
-                URL.WebPage recentFeed = new URL.WebPage();
-
-                try
-                {
-                    recentFeed = URL.FetchURL("http://ws.audioscrobbler.com/1.0/user/" + lastfmName + "/recenttracks.rss");
-                }
-                catch (System.Net.WebException ex)
-                {
-                    Logger.Write(ex.ToString(), Settings.Instance.ErrorFile);
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "User \"" + lastfmName + "\" not found on LastFM", message.ReplyTo) };
-                }
-
-                Match track = Regex.Match(recentFeed.Page, @"<item>\s*?<title>(?<band>.+?)–(?<song>.+?)</title>\s*?<link>(?<link>.+?)</link>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-                if (track.Success)
-                {
-                    string band = track.Groups["band"].Value;
-                    string song = track.Groups["song"].Value;
-
-                    string songMessage = "\"" + song.Trim() + "\" by " + band.Trim();
-
-                    songMessage += " (" + /*ChannelList.EvadeChannelLinkBlock(message, URL.Shorten(*/track.Groups["link"].Value/*))*/ + ")";
-
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, songMessage, message.ReplyTo) };
-                }
-                else
-                {
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "User \"" + lastfmName + "\" exists on LastFM, but hasn't scrobbled any music to it", message.ReplyTo) };
+                    lastfmName = message.ParameterList[0];
                 }
             }
             else
             {
-                return null;
+                if (AccountMap.ContainsKey(message.User.Name.ToUpper()))
+                {
+                    lastfmName = AccountMap[message.User.Name.ToUpper()];
+                }
+                else
+                {
+                    lastfmName = message.User.Name;
+                }
             }
+
+            URL.WebPage recentFeed = new URL.WebPage();
+
+            try
+            {
+                recentFeed = URL.FetchURL("http://ws.audioscrobbler.com/1.0/user/" + lastfmName + "/recenttracks.rss");
+            }
+            catch (System.Net.WebException ex)
+            {
+                Logger.Write(ex.ToString(), Settings.Instance.ErrorFile);
+                FuncInterface.SendResponse(ResponseType.Say, "User \"" + lastfmName + "\" not found on LastFM", message.ReplyTo);
+                return;
+            }
+
+            Match track = Regex.Match(recentFeed.Page, @"<item>\s*?<title>(?<band>.+?)–(?<song>.+?)</title>\s*?<link>(?<link>.+?)</link>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            if (!track.Success)
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "User \"" + lastfmName + "\" exists on LastFM, but hasn't scrobbled any music to it", message.ReplyTo);
+                return;
+            }
+
+            string band = track.Groups["band"].Value;
+            string song = track.Groups["song"].Value;
+
+            string songMessage = "\"" + song.Trim() + "\" by " + band.Trim();
+
+            songMessage += " (" + /*ChannelList.EvadeChannelLinkBlock(message, URL.Shorten(*/track.Groups["link"].Value/*))*/ + ")";
+
+            FuncInterface.SendResponse(ResponseType.Say, songMessage, message.ReplyTo);
+            return;
         }
 
         public static void SaveLinks()
@@ -153,35 +152,33 @@ namespace Internet
             Help = "nplink <LastFM Name> - Links the specified LastFM account name to your IRC name.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^n(ow)?p(laying)?link$", RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(message.Command, "^n(ow)?p(laying)?(link|reg(ister)?)$", RegexOptions.IgnoreCase))
+                return;
+
+            if (message.ParameterList.Count == 0)
             {
-                if (message.ParameterList.Count > 0)
-                {
-                    string lastFMName = StringUtils.ReplaceNewlines(StringUtils.StripIRCFormatChars(message.ParameterList[0]), "");
-                    if (NowPlaying.AccountMap.ContainsKey(message.User.Name.ToUpper()))
-                    {
-                        NowPlaying.AccountMap[message.User.Name.ToUpper()] = lastFMName;
-                    }
-                    else
-                    {
-                        NowPlaying.AccountMap.Add(message.User.Name.ToUpper(), lastFMName);
-                    }
-                    NowPlaying.SaveLinks();
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "LastFM account \"" + lastFMName + "\" is now linked to IRC name \"" + message.User.Name + "\"", message.ReplyTo) };
-                }
-                else
-                {
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't specify a LastFM account name! Format is \"" + message.Command + " <LastFM Account>\"", message.ReplyTo) };
-                }
+                FuncInterface.SendResponse(ResponseType.Say, "You didn't specify a LastFM account name! Format is \"" + message.Command + " <LastFM Account>\"", message.ReplyTo);
+                return;
+            }
+
+            string lastFMName = StringUtils.ReplaceNewlines(StringUtils.StripIRCFormatChars(message.ParameterList[0]), "");
+            if (NowPlaying.AccountMap.ContainsKey(message.User.Name.ToUpper()))
+            {
+                NowPlaying.AccountMap[message.User.Name.ToUpper()] = lastFMName;
             }
             else
             {
-                return null;
+                NowPlaying.AccountMap.Add(message.User.Name.ToUpper(), lastFMName);
             }
+            NowPlaying.SaveLinks();
+            FuncInterface.SendResponse(ResponseType.Say, "LastFM account \"" + lastFMName + "\" is now linked to IRC name \"" + message.User.Name + "\"", message.ReplyTo);
+            return;
         }
     }
 }

@@ -41,7 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BotMessage.cs" />
+    <Compile Include="BotResponse.cs" />
     <Compile Include="Function.cs" />
+    <Compile Include="Interface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

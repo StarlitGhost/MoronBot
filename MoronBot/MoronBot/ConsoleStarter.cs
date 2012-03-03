@@ -1,5 +1,7 @@
 using System;
 
+//using CwIRC;
+using MBFunctionInterface;
 using MBUtilities;
 
 namespace MoronBot
@@ -12,9 +14,9 @@ namespace MoronBot
         {
             moronBot = Program.moronBot;
 
-            MBEvents.NickChanged += moronBot_NickChanged;
-            MBEvents.NewFormattedIRC += moronBot_NewFormattedIRC;
-            MBEvents.NewRawIRC += moronBot_NewRawIRC;
+            FuncInterface.NickChanged += moronBot_NickChanged;
+            MBUtilities.Events.NewFormattedIRC += moronBot_NewFormattedIRC;
+            //CwIRC.Events.NewRawIRC += moronBot_NewRawIRC;
         }
 
         public static void Start()
@@ -23,11 +25,11 @@ namespace MoronBot
             while (true)
             {
                 text = Console.ReadLine();
-                if (text == "quit")
+                if (text == "quit" || text == "exit")
                     break;
                 string[] msg = text.Split(' ');
                 string target = msg[0].StartsWith("#") ? msg[0] : "#" + msg[0];
-                string message = text.Substring(target.Length);
+                string message = text.Substring(target.Length + 1);
                 moronBot.Say(message, target);
             }
         }

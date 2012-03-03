@@ -54,6 +54,8 @@ namespace Utility
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
+
             LoadEvents();
         }
 
@@ -62,10 +64,10 @@ namespace Utility
             SaveEvents();
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
             if (!Regex.IsMatch(message.Command, "^(time(un)?till|countdown)$", RegexOptions.IgnoreCase))
-                return null;
+                return;
 
             EventStruct eventStruct;
             TimeSpan timeSpan;
@@ -89,7 +91,10 @@ namespace Utility
 
                 // No matching events found
                 if (eventStruct.EventName == null)
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in the future events list!", message.ReplyTo) };
+                {
+                    FuncInterface.SendResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in the future events list!", message.ReplyTo);
+                    return;
+                }
             }
             else // Parameters not given, assign next Desert Bus to eventStruct.
             {
@@ -99,7 +104,9 @@ namespace Utility
             }
 
             timeSpan = eventStruct.EventDate - DateTime.UtcNow;
-            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, eventStruct.EventName + " will occur in " + timeSpan.Days + " day(s) " + timeSpan.Hours + " hour(s) " + timeSpan.Minutes + " minute(s)", message.ReplyTo) };
+
+            FuncInterface.SendResponse(ResponseType.Say, eventStruct.EventName + " will occur in " + timeSpan.Days + " day(s) " + timeSpan.Hours + " hour(s) " + timeSpan.Minutes + " minute(s)", message.ReplyTo);
+            return;
         }
 
         public static void SaveEvents()

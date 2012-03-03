@@ -21,6 +21,8 @@ namespace Fun
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
+
             LoadList();
         }
 
@@ -29,56 +31,53 @@ namespace Fun
             SaveList();
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^(mm)$", RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(message.Command, "^(mm)$", RegexOptions.IgnoreCase))
+                return;
+
+            // Return a random thing
+            if (message.ParameterList.Count == 0)
             {
-                // Specific thing requested
-                if (message.ParameterList.Count > 0)
+                FuncInterface.SendResponse(ResponseType.Say, mmList[rand.Next(mmList.Count)], message.ReplyTo);
+                return;
+            }
+
+            if (message.ParameterList[0].ToLower() == "add") // Adding something to the MM list
+            {
+                string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
+                int index = mmList.Count + 1;
+                mmList.Add(index + ". " + msg);
+                SaveList();
+                FuncInterface.SendResponse(ResponseType.Say, "Message added at index " + index, message.ReplyTo);
+                return;
+            }
+            else if (message.ParameterList[0] == "list") // Post the list to pastebin, give link
+            {
+                string list = "";
+                foreach (string item in mmList)
                 {
-                    if (message.ParameterList[0].ToLower() == "add") // Adding something to the MM list
-                    {
-                        string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
-                        int index = mmList.Count + 1;
-                        mmList.Add(index + ". " + msg);
-                        SaveList();
-                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Message added at index " + index, message.ReplyTo) };
-                    }
-                    else if (message.ParameterList[0] == "list") // Post the list to pastebin, give link
-                    {
-                        string list = "";
-                        foreach (string item in mmList)
-                        {
-                            list += item + "\n";
-                        }
-                        string url = URL.Pastebin(list, "M&M List", "10M", "text", "1");
-                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "M&M list posted: " + url + " (link expires in 10 mins)", message.ReplyTo) };
-                    }
-                    else
-                    {
-                        int number = 0;
-                        if (Int32.TryParse(message.ParameterList[0], out number))
-                        {
-                            number -= 1;
-                            if (number >= 0 && number < mmList.Count)
-                            {
-                                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, mmList[number], message.ReplyTo) };
-                            }
-                        }
-                        // Number too large or small, or not a number at all
-                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Invalid number, range is 1-" + mmList.Count, message.ReplyTo) };
-                    }
+                    list += item + "\n";
                 }
-                // No specific thing requested
-                else
-                {
-                    // Return a random thing
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, mmList[rand.Next(mmList.Count)], message.ReplyTo) };
-                }
+                string url = URL.Pastebin(list, "M&M List", "10M", "text", "1");
+                FuncInterface.SendResponse(ResponseType.Say, "M&M list posted: " + url + " (link expires in 10 mins)", message.ReplyTo);
+                return;
             }
             else
             {
-                return null;
+                int number = 0;
+                if (Int32.TryParse(message.ParameterList[0], out number))
+                {
+                    number -= 1;
+                    if (number >= 0 && number < mmList.Count)
+                    {
+                        FuncInterface.SendResponse(ResponseType.Say, mmList[number], message.ReplyTo);
+                        return;
+                    }
+                }
+                // Number too large or small, or not a number at all
+                FuncInterface.SendResponse(ResponseType.Say, "Invalid number, range is 1-" + mmList.Count, message.ReplyTo);
+                return;
             }
         }
 

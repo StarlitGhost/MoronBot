@@ -17,12 +17,14 @@ namespace Internet
             Help = "lrr (<series>) - returns a link to the latest LRR video, or the latest of a series if you specify one";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
             if (!Regex.IsMatch(message.Command, @"^l(r|l)r$", RegexOptions.IgnoreCase))
-                return null;
+                return;
 
             List<string> feeds = new List<string>(LRRChecker.FeedMap.Keys);
 
@@ -33,15 +35,19 @@ namespace Internet
                 feed = feeds.Find(s =>
                     s.ToLowerInvariant() == feed.ToLowerInvariant());
                 if (feed == String.Empty)
-                    return new List<IRCResponse>() { new IRCResponse(
+                {
+                    FuncInterface.SendResponse(
                         ResponseType.Say,
                         "\"" + message.Parameters + "\" is not one of the LRR series being monitored.",
-                        message.ReplyTo) };
+                        message.ReplyTo);
+                    return;
+                }
 
-                return new List<IRCResponse>() { new IRCResponse(
+                FuncInterface.SendResponse(
                     ResponseType.Say,
                     "Latest " + feed + ": " + LRRChecker.FeedMap[feed].LatestTitle + " (" + LRRChecker.FeedMap[feed].LatestLink + ")",
-                    message.ReplyTo) };
+                    message.ReplyTo);
+                return;
             }
             else
             {
@@ -56,10 +62,11 @@ namespace Internet
                     }
                 }
 
-                return new List<IRCResponse>() { new IRCResponse(
+                FuncInterface.SendResponse(
                     ResponseType.Say,
                     "Latest " + newest + ": " + LRRChecker.FeedMap[newest].LatestTitle + " (" + LRRChecker.FeedMap[newest].LatestLink + ")",
-                    message.ReplyTo) };
+                    message.ReplyTo);
+                return;
             }
         }
 
@@ -75,7 +82,7 @@ namespace Internet
             aliases.Add("CheckPoint", new List<string>() {
                 "check", "point", "cp", "c" });
             aliases.Add("LRRCast", new List<string>() {
-                "podcast", "cast", "lrrc", "llrc", "lcast", "lc" });
+                "podcast", "cast", "lrrc", "llrc", "lcast", "lc", "pod" });
 
             foreach (var alias in aliases)
             {

@@ -30,6 +30,8 @@ namespace Automatic
             Type = Types.Command;
             AccessLevel = AccessLevels.UserList;
 
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
+
             AccessList.Add("sirgir");
             AccessList.Add("aeltrius");
             AccessList.Add("trahsi");
@@ -46,19 +48,18 @@ namespace Automatic
             InitInsults();
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
             if (rand.Next(0, 100) == 0)
             {
-                List<IRCResponse> responses = new List<IRCResponse>();
+                List<BotResponse> responses = new List<BotResponse>();
                 foreach (Response response in GetInsult(message.User.Name))
                 {
-                    responses.Add(new IRCResponse(response.RType, response.Text, message.ReplyTo));
+                    responses.Add(new BotResponse(response.RType, response.Text, message.ReplyTo));
                 }
                 responses.Add(null);
-                return responses;
+                FuncInterface.SendResponses(responses);
             }
-            return null;
         }
 
         void InitInsults()

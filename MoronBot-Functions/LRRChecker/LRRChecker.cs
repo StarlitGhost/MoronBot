@@ -43,6 +43,8 @@ namespace Internet
             Type = Types.Regex;
             AccessLevel = AccessLevels.Anyone;
 
+            FuncInterface.AnyMessageReceived += anyMessageReceived;
+
             FeedMap.Add("Unskippable",
                 new Feed(
                     "http://www.escapistmagazine.com/rss/videos/list/82.xml",
@@ -73,9 +75,9 @@ namespace Internet
         {
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void anyMessageReceived(object sender, BotMessage message)
         {
-            List<IRCResponse> responses = new List<IRCResponse>();
+            List<string> responses = new List<string>();
 
             List<string> feeds = new List<string>(FeedMap.Keys);
             foreach (string feed in feeds)
@@ -112,14 +114,14 @@ namespace Internet
                 {
                     FeedMap[feed].LastUpdate = newestDate;
 
-                    responses.Add(new IRCResponse(ResponseType.Say, "New " + feed + "! Title: " + FeedMap[feed].LatestTitle + " (" + FeedMap[feed].LatestLink + ")", message.ReplyTo));
+                    responses.Add("New " + feed + "! Title: " + FeedMap[feed].LatestTitle + " (" + FeedMap[feed].LatestLink + ")");
                 }
             }
 
             if (responses.Count == 0)
-                return null;
+                return;
 
-            return responses;
+            FuncInterface.SendResponses(ResponseType.Say, responses, message.ReplyTo);
         }
     }
 }

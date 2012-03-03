@@ -15,29 +15,31 @@ namespace GitHub
             Help = "source (<function>) - Returns a link to the specified function's source on MoronBot's GitHub site. If no function is specified, then it links to the homepage instead.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^(source)$", RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(message.Command, "^(source)$", RegexOptions.IgnoreCase))
+                return;
+
+            if (message.ParameterList.Count == 0)
             {
-                if (message.ParameterList.Count > 0)
-                {
-                    string command = null;//moronBot.CommandList.Find(s => s.IndexOf(message.ParameterList[0], StringComparison.InvariantCultureIgnoreCase) >= 0);
-                    if (command != null)
-                    {
-                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "https://github.com/MatthewCox/MoronBot/tree/master/MoronBot-Functions/" + command + "/", message.ReplyTo) };
-                    }
-                    else
-                    {
-                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, /*"Function \"" + message.ParameterList[0] + "\" not found, linking to */"Functions directory" +/* instead*/": https://github.com/MatthewCox/MoronBot/tree/master/MoronBot-Functions", message.ReplyTo) };
-                    }
-                }
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "https://github.com/MatthewCox/MoronBot/", message.ReplyTo) };
+                FuncInterface.SendResponse(ResponseType.Say, "https://github.com/MatthewCox/MoronBot/", message.ReplyTo);
+                return;
+            }
+
+            string command = null;//moronBot.CommandList.Find(s => s.IndexOf(message.ParameterList[0], StringComparison.InvariantCultureIgnoreCase) >= 0);
+            if (command != null)
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "https://github.com/MatthewCox/MoronBot/tree/master/MoronBot-Functions/" + command + "/", message.ReplyTo);
+                return;
             }
             else
             {
-                return null;
+                FuncInterface.SendResponse(ResponseType.Say, "Functions directory: https://github.com/MatthewCox/MoronBot/tree/master/MoronBot-Functions", message.ReplyTo);
+                return;
             }
         }
     }

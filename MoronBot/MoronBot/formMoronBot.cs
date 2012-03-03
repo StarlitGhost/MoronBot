@@ -5,6 +5,7 @@ using System.Windows.Forms;
 
 using MBUtilities;
 using MBUtilities.Channel;
+using MBFunctionInterface;
 
 namespace MoronBot
 {
@@ -35,12 +36,12 @@ namespace MoronBot
             listUsers.DisplayMember = "Nick";
             listUsers.DataSource = _bindingSourceUsers;
 
-            MBEvents.NickChanged += moronBot_NickChanged;
-            MBEvents.NewRawIRC += moronBot_NewRawIRC;
-            MBEvents.NewFormattedIRC += moronBot_NewFormattedIRC;
+            FuncInterface.NickChanged += moronBot_NickChanged;
+            CwIRC.Interface.NewRawIRC += moronBot_NewRawIRC;
+            MBUtilities.Events.NewFormattedIRC += moronBot_NewFormattedIRC;
 
-            MBEvents.ChannelListModified += channelList_Modified;
-            MBEvents.UserListModified += userList_Modified;
+            MBUtilities.Events.ChannelListModified += channelList_Modified;
+            MBUtilities.Events.UserListModified += userList_Modified;
         }
 
         void btnClear_Click(object sender, EventArgs e)

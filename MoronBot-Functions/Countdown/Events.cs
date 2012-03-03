@@ -16,12 +16,14 @@ namespace Utility
             Help = "events/upcoming (<days>) - Tells you all of the events coming up in the next week, or the next <days>, if you give a number parameter.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
             if (!Regex.IsMatch(message.Command, "^(events|upcoming)$", RegexOptions.IgnoreCase))
-                return null;
+                return;
 
             double daysAhead = 7;
             if (message.ParameterList.Count > 0)
@@ -43,14 +45,15 @@ namespace Utility
             }
 
             if (weekEvents.Count == 0)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "There are no events in the coming " + daysAhead + " days!", message.ReplyTo) };
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "There are no events in the coming " + daysAhead + " days!", message.ReplyTo);
+                return;
+            }
                     
             string events = String.Join(" | ", weekEvents);
 
-            List<IRCResponse> responses = new List<IRCResponse>();
-            responses.Add(new IRCResponse(ResponseType.Say, "Events in the next " + daysAhead + " days:", message.ReplyTo));
-            responses.Add(new IRCResponse(ResponseType.Say, events, message.ReplyTo));
-            return responses;
+            FuncInterface.SendResponse(ResponseType.Say, "Events in the next " + daysAhead + " days:", message.ReplyTo);
+            FuncInterface.SendResponse(ResponseType.Say, events, message.ReplyTo);
         }
     }
 }

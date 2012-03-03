@@ -37,7 +37,7 @@ namespace MBUtilities.Channel
                     Channels.Add(channel);
                     channelID = Channels.IndexOf(channel);
 
-                    MBEvents.OnChannelListModified();
+                    Events.OnChannelListModified();
                 }
             }
 
@@ -61,7 +61,7 @@ namespace MBUtilities.Channel
                     Channels[channelID].Users.Add(user);
                     userID = Channels[channelID].Users.IndexOf(user);
 
-                    MBEvents.OnUserListModified();
+                    Events.OnUserListModified();
                 }
             }
 
@@ -169,7 +169,7 @@ namespace MBUtilities.Channel
                     }
                 }
             }
-            MBEvents.OnUserListModified();
+            Events.OnUserListModified();
 
             return channels;
         }
@@ -181,7 +181,7 @@ namespace MBUtilities.Channel
             lock (channelSync)
                 Channels[channelID].Users[userID].Hostmask = message.User.Hostmask;
 
-            MBEvents.OnUserListModified();
+            Events.OnUserListModified();
         }
 
         public static void ParsePART(BotMessage message, bool parterIsMe)
@@ -191,13 +191,13 @@ namespace MBUtilities.Channel
             lock (channelSync)
                 Channels[channelID].Users.RemoveAt(userID);
 
-            MBEvents.OnUserListModified();
+            Events.OnUserListModified();
             if (parterIsMe)
             {
                 lock (channelSync)
                     Channels.RemoveAt(channelID);
 
-                MBEvents.OnChannelListModified();
+                Events.OnChannelListModified();
             }
         }
 
@@ -217,7 +217,7 @@ namespace MBUtilities.Channel
                     }
                 }
             }
-            MBEvents.OnUserListModified();
+            Events.OnUserListModified();
 
             return quittedChannels;
         }
@@ -270,7 +270,7 @@ namespace MBUtilities.Channel
                         }
                     }
                 }
-                MBEvents.OnUserListModified();
+                Events.OnUserListModified();
             }
             else // Channel mode change
             {
@@ -281,7 +281,7 @@ namespace MBUtilities.Channel
 
                 ParseChannelModeString(modeString, channelID);
 
-                MBEvents.OnChannelListModified();
+                Events.OnChannelListModified();
             }
         }
 
@@ -330,7 +330,7 @@ namespace MBUtilities.Channel
 
             ParseChannelModeString(message.MessageList[4], channelID);
 
-            MBEvents.OnChannelListModified();
+            Events.OnChannelListModified();
         }
 
         public static void ParseTOPIC(BotMessage message)
@@ -340,7 +340,7 @@ namespace MBUtilities.Channel
             lock (channelSync)
                 Channels[channelID].Topic = message.MessageString;
 
-            MBEvents.OnChannelListModified();
+            Events.OnChannelListModified();
         }
 
         /// <summary>
@@ -354,7 +354,7 @@ namespace MBUtilities.Channel
             lock (channelSync)
                 Channels[channelID].Topic = message.RawMessage.Substring(message.RawMessage.IndexOf(':', 1) + 1);
 
-            MBEvents.OnChannelListModified();
+            Events.OnChannelListModified();
         }
 
         /// <summary>
@@ -371,7 +371,7 @@ namespace MBUtilities.Channel
                 Channels[channelID].Users[userID].Hostmask = message.MessageList[5];
             //Channels[channelID].Users[userID].Symbols = Regex.Replace(message.MessageList[8], @"[a-zA-Z]+", "");
             
-            MBEvents.OnUserListModified();
+            Events.OnUserListModified();
         }
 
         /// <summary>
@@ -414,7 +414,7 @@ namespace MBUtilities.Channel
                     }
                 }
             }
-            MBEvents.OnUserListModified();
+            Events.OnUserListModified();
         }
     }
 }

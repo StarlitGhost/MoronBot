@@ -22,6 +22,8 @@ namespace Automatic
             Type = Types.UserList;
             AccessLevel = AccessLevels.Anyone;
 
+            FuncInterface.PRIVMSGReceived += privmsgReceived;
+
             userList.Add("Kroze");
 
             InitLists();
@@ -29,19 +31,20 @@ namespace Automatic
             //doList = Settings.Instance.FunctionSettings[Name]["DoList"];
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void privmsgReceived(object sender, BotMessage message)
         {
             if (userList.Contains(message.User.Name) && rand.Next(0, 10) == 0)
             {
                 switch (rand.Next(1,3))
                 {
                     case 1:
-                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, sayList[rand.Next(sayList.Count)], message.ReplyTo) };
+                        FuncInterface.SendResponse(ResponseType.Say, sayList[rand.Next(sayList.Count)], message.ReplyTo);
+                        break;
                     case 2:
-                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Do, doList[rand.Next(doList.Count)], message.ReplyTo) };
+                        FuncInterface.SendResponse(ResponseType.Do, doList[rand.Next(doList.Count)], message.ReplyTo);
+                        break;
                 }
             }
-            return null;
         }
 
         void InitLists()

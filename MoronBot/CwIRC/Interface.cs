@@ -15,9 +15,6 @@ using System.Net.Sockets;
 
 namespace CwIRC
 {
-    public delegate void StringEventHandler(object sender, string text);
-    public delegate void VoidEventHandler(object sender);
-
     /// <summary>
     /// Class to manage connections to IRC servers, and the sending and receiving of data to them.
     /// </summary>
@@ -58,11 +55,20 @@ namespace CwIRC
 
         BackgroundWorker worker;
 
+        public delegate void StringEventHandler(object sender, string text);
+
         public event StringEventHandler MessageReceived;
         protected virtual void OnMessageReceived(string message)
         {
             if (MessageReceived != null)
                 MessageReceived(this, message);
+        }
+
+        public static event StringEventHandler NewRawIRC;
+        public static void OnNewRawIRC(object sender, string text)
+        {
+            if (NewRawIRC != null)
+                NewRawIRC(sender, text);
         }
 
         Interface()

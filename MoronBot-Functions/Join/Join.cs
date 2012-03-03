@@ -13,32 +13,34 @@ namespace Bot
             Help = "join <channel> - Joins the specified channel.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^(join)$", RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(message.Command, "^(join)$", RegexOptions.IgnoreCase))
+                return;
+
+            if (message.ParameterList.Count == 0)
             {
-                if (message.ParameterList.Count > 0)
-                {
-                    string output = "";
-                    foreach (string parameter in message.ParameterList)
-                    {
-                        string channel = parameter;
-                        if (!channel.StartsWith("#"))
-                        {
-                            channel = "#" + channel;
-                        }
-                        output += "JOIN " + channel + "\r\n";
-                    }
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Raw, output, "") };
-                }
-                else
-                {
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, message.User.Name + ", you didn't say where I should join.", message.ReplyTo) };
-                }
+                FuncInterface.SendResponse(ResponseType.Say, message.User.Name + ", you didn't say where I should join.", message.ReplyTo);
+                return;
             }
-            return null;
+
+            string output = "";
+            foreach (string parameter in message.ParameterList)
+            {
+                string channel = parameter;
+                if (!channel.StartsWith("#"))
+                {
+                    channel = "#" + channel;
+                }
+                output += "JOIN " + channel + "\r\n";
+            }
+
+            FuncInterface.SendResponse(ResponseType.Raw, output, "");
+            return;
         }
     }
 }

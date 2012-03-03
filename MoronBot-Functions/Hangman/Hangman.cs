@@ -35,6 +35,8 @@ namespace Fun
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
+
             LoadWords();
         }
 
@@ -43,133 +45,111 @@ namespace Fun
             SaveWords();
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^(h(ang)?m(an)?)$", RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(message.Command, "^(h(ang)?m(an)?)$", RegexOptions.IgnoreCase))
+                return;
+
+            if (message.ParameterList.Count == 0)
             {
-                if (message.ParameterList.Count == 0)
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Guessing is done with '|hm <letter>', to start a game do '|hm start'", message.ReplyTo) };
-
-                List<IRCResponse> responses = new List<IRCResponse>();
-                switch (message.ParameterList[0].ToLowerInvariant())
-                {
-                    case "start":
-                        if (!playing)
-                        {
-                            Start();
-                            responses.Add(new IRCResponse(ResponseType.Say, "Hangman game started!", message.ReplyTo));
-                            responses.Add(new IRCResponse(
-                                ResponseType.Say,
-                                ProgressString(),
-                                message.ReplyTo));
-                        }
-                        else
-                            responses.Add(new IRCResponse(ResponseType.Say, "There is already a game of Hangman in progress!", message.ReplyTo));
-                        break;
-                    case "stop":
-                        if (ChannelList.UserIsAnyOp(message.User.Name, message.ReplyTo))
-                        {
-                            Stop();
-                            responses.Add(new IRCResponse(ResponseType.Say, "Hangman game stopped!", message.ReplyTo));
-                        }
-                        else
-                            responses.Add(new IRCResponse(ResponseType.Say, "You need to be an operator to stop a game of Hangman!", message.ReplyTo));
-                        break;
-                    case "max":
-                        if (!playing)
-                        {
-                            int temp;
-                            if (message.ParameterList.Count > 1 && Int32.TryParse(message.ParameterList[1], out temp))
-                                maxBadGuesses = (temp < 25 ? (temp >= 1 ? temp : 1) : 25);
-                            else
-                                responses.Add(new IRCResponse(ResponseType.Say, "You didn't give a number! |hm max <0-50>", message.ReplyTo));
-
-                            responses.Add(new IRCResponse(ResponseType.Say, "Maximum bad guesses set to: " + maxBadGuesses, message.ReplyTo));
-                        }
-                        else
-                            responses.Add(new IRCResponse(ResponseType.Say, "Cannot change the maximum bad guesses while a game is in progress!", message.ReplyTo));
-                        break;
-                    case "score":
-                        if (message.ParameterList.Count > 1)
-                        {
-                            responses.Add(new IRCResponse(
-                                ResponseType.Say,
-                                GetScore(message.ParameterList[1]),
-                                message.ReplyTo));
-                        }
-                        else
-                        {
-                            responses.Add(new IRCResponse(
-                                ResponseType.Say,
-                                GetScore(message.User.Name),
-                                message.ReplyTo));
-                        }
-                        break;
-                    default:
-                        if (playing)
-                        {
-                            string guessMsg = Guess(message);
-                            string visibleWord;
-
-                            if (guessMsg != null)
-                            {
-                                responses.Add(new IRCResponse(
-                                    ResponseType.Say,
-                                    guessMsg,
-                                    message.ReplyTo));
-                                visibleWord = VisibleWord(word, guesses);
-                            }
-                            else
-                                visibleWord = word;
-
-                            if (word == visibleWord)
-                            {
-                                if (message.Parameters.ToLowerInvariant().Length == 1)
-                                    IncrementFinalLetter(message.User.Name, 1);
-                                else
-                                    IncrementWord(message.User.Name, 1);
-
-                                responses.Add(new IRCResponse(
-                                    ResponseType.Say,
-                                    "Congratulations " + message.User.Name + "! The " + WordOrPhrase(word) + " was: " + word + " " + LastRoundSummary(message.User.Name),
-                                    message.ReplyTo));
-
-                                StoreLastRound();
-
-                                Stop();
-                            }
-                            else
-                            {
-                                responses.Add(new IRCResponse(
-                                    ResponseType.Say,
-                                    ProgressString(),
-                                    message.ReplyTo));
-                                if (badGuesses == maxBadGuesses)
-                                {
-                                    responses.Add(new IRCResponse(
-                                        ResponseType.Say,
-                                        "You have failed! The " + WordOrPhrase(word) + " was: " + word,
-                                        message.ReplyTo));
-
-                                    StoreLastRound();
-
-                                    Stop();
-                                }
-                            }
-                        }
-                        else
-                        {
-                            responses.Add(new IRCResponse(
-                                ResponseType.Say,
-                                "There isn't a Hangman game running right now - use '|hm start' to start one",
-                                message.ReplyTo));
-                        }
-                        break;
-                }
-
-                return responses;
+                FuncInterface.SendResponse(ResponseType.Say, "Guessing is done with '|hm <letter>', to start a game do '|hm start'", message.ReplyTo);
+                return;
             }
-            return null;
+
+            List<string> responses = new List<string>();
+            switch (message.ParameterList[0].ToLowerInvariant())
+            {
+                case "start":
+                    if (!playing)
+                    {
+                        Start();
+                        responses.Add("Hangman game started!");
+                        responses.Add(ProgressString());
+                    }
+                    else
+                        responses.Add("There is already a game of Hangman in progress!");
+                    break;
+                case "stop":
+                    if (ChannelList.UserIsAnyOp(message.User.Name, message.ReplyTo))
+                    {
+                        Stop();
+                        responses.Add("Hangman game stopped!");
+                    }
+                    else
+                        responses.Add("You need to be an operator to stop a game of Hangman!");
+                    break;
+                case "max":
+                    if (!playing)
+                    {
+                        int temp;
+                        if (message.ParameterList.Count > 1 && Int32.TryParse(message.ParameterList[1], out temp))
+                            maxBadGuesses = (temp < 25 ? (temp >= 1 ? temp : 1) : 25);
+                        else
+                            responses.Add("You didn't give a number! |hm max <0-50>");
+
+                        responses.Add("Maximum bad guesses set to: " + maxBadGuesses);
+                    }
+                    else
+                        responses.Add("Cannot change the maximum bad guesses while a game is in progress!");
+                    break;
+                case "score":
+                    if (message.ParameterList.Count > 1)
+                    {
+                        responses.Add(GetScore(message.ParameterList[1]));
+                    }
+                    else
+                    {
+                        responses.Add(GetScore(message.User.Name));
+                    }
+                    break;
+                default:
+                    if (!playing)
+                    {
+                        responses.Add("There isn't a Hangman game running right now - use '|hm start' to start one");
+                        break;
+                    }
+
+                    string guessMsg = Guess(message);
+                    string visibleWord;
+
+                    if (guessMsg != null)
+                    {
+                        responses.Add(guessMsg);
+                        visibleWord = VisibleWord(word, guesses);
+                    }
+                    else
+                        visibleWord = word;
+
+                    if (word == visibleWord)
+                    {
+                        if (message.Parameters.ToLowerInvariant().Length == 1)
+                            IncrementFinalLetter(message.User.Name, 1);
+                        else
+                            IncrementWord(message.User.Name, 1);
+
+                        responses.Add("Congratulations " + message.User.Name + "! The " + WordOrPhrase(word) + " was: " + word + " " + LastRoundSummary(message.User.Name));
+
+                        StoreLastRound();
+
+                        Stop();
+                    }
+                    else
+                    {
+                        responses.Add(ProgressString());
+                        if (badGuesses == maxBadGuesses)
+                        {
+                            responses.Add("You have failed! The " + WordOrPhrase(word) + " was: " + word);
+
+                            StoreLastRound();
+
+                            Stop();
+                        }
+                    }
+                    break;
+            }
+
+            FuncInterface.SendResponses(ResponseType.Say, responses, message.ReplyTo);
+            return;
         }
 
         string ProgressString()

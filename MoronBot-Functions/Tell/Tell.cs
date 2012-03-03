@@ -40,6 +40,8 @@ namespace Utility
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
+
             ReadMessages();
         }
 
@@ -48,22 +50,34 @@ namespace Utility
             WriteMessages();
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
             if (!Regex.IsMatch(message.Command, "^(tell)$", RegexOptions.IgnoreCase))
-                return null;
+                return;
 
             if (message.ParameterList.Count == 0)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Tell who what?", message.ReplyTo) };
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "Tell who what?", message.ReplyTo);
+                return;
+            }
 
             if (message.ParameterList.Count == 1 || message.Parameters.Substring(message.ParameterList[0].Length + 1).Trim(' ').Length == 0)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't give a message for me to tell " + message.ParameterList[0], message.ReplyTo) };
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "You didn't give a message for me to tell " + message.ParameterList[0], message.ReplyTo);
+                return;
+            }
 
             if (message.ParameterList[0].ToLowerInvariant() == Settings.Instance.CurrentNick.ToLowerInvariant())
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Thanks for telling me that " + message.User.Name + ", I'm sure I'll find that useful...", message.ReplyTo) };
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "Thanks for telling me that " + message.User.Name + ", I'm sure I'll find that useful...", message.ReplyTo);
+                return;
+            }
 
             if (RateLimit(message.User.Name))
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You've already sent 3 messages in the last 5 minutes, slow down!", message.ReplyTo) };
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "You've already sent 3 messages in the last 5 minutes, slow down!", message.ReplyTo);
+                return;
+            }
 
             foreach (string target in message.ParameterList[0].Split('&'))
             {
@@ -82,7 +96,8 @@ namespace Utility
             }
             WriteMessages();
             
-            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Ok, I'll tell " + string.Join(" & ", message.ParameterList[0].Split('&')) + " that when they next speak.", message.ReplyTo) };
+            FuncInterface.SendResponse(ResponseType.Say, "Ok, I'll tell " + string.Join(" & ", message.ParameterList[0].Split('&')) + " that when they next speak.", message.ReplyTo);
+            return;
         }
 
         public static void WriteMessages()

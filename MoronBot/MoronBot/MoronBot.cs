@@ -39,7 +39,7 @@ namespace MoronBot
             get { return Settings.Instance.CurrentNick; }
             set
             {
-                MBEvents.OnNickChanged(this, value);
+                FuncInterface.OnNickChanged(this, value);
                 Settings.Instance.CurrentNick = value;
             }
         }
@@ -85,14 +85,6 @@ namespace MoronBot
         }
 
         /// <summary>
-        /// A queue of messages to send to the IRC server
-        /// </summary>
-        List<IRCResponse> MessageQueue = new List<IRCResponse>();
-        /// <summary>
-        /// A lock to synchronize message queue operations
-        /// </summary>
-        readonly object queueSync = new object();
-        /// <summary>
         /// A lock to synchronize message processing
         /// </summary>
         readonly object messageSync = new object();
@@ -132,6 +124,9 @@ namespace MoronBot
             Say("identify mOrOnBoTuS", "NickServ");
 
             cwIRC.JOIN(Settings.Instance.Channel);
+
+            FuncInterface.NonPRIVMSGReceived += nonPRIVMSGReceived;
+            FuncInterface.PRIVMSGReceived += privmsgReceived;
 
             connectionTimer.Elapsed += new System.Timers.ElapsedEventHandler(connectionTimer_Elapsed);
             connectionTimer.Interval = 120000;
@@ -187,7 +182,7 @@ namespace MoronBot
         /// </summary>
         /// <param name="response">The IRCResponse to send to the server.</param>
         /// <returns>Whether or not the send was successful (actually whether or not the given response is valid).</returns>
-        bool Send(IRCResponse response)
+        bool Send(BotResponse response)
         {
             if (response == null)
                 return false;
@@ -215,17 +210,12 @@ namespace MoronBot
         /// </summary>
         void SendQueue()
         {
-            if (MessageQueue.Count == 0)
-                return;
-
-            lock (queueSync)
+            BotResponse response = FuncInterface.GetResponse();
+            while (response != null)
             {
-                foreach (IRCResponse response in MessageQueue)
-                {
-                    Send(response);
-                    System.Threading.Thread.Sleep(100);
-                }
-                MessageQueue.Clear();
+                Send(response);
+
+                response = FuncInterface.GetResponse();
             }
         }
 
@@ -234,7 +224,7 @@ namespace MoronBot
             DateTime date = DateTime.Now.IsDaylightSavingTime() ? DateTime.UtcNow.AddHours(1.0) : DateTime.UtcNow;
 
             string time = date.ToString("[HH:mm]");
-            MBEvents.OnNewFormattedIRC(this, string.Format("{0} {1} {2}", fileName, time, data));
+            MBUtilities.Events.OnNewFormattedIRC(this, string.Format("{0} {1} {2}", fileName, time, data));
 
             string filePath = Path.Combine(Settings.Instance.LogPath,
                 string.Format("{0}{1}{2}{3}.txt", Settings.Instance.Server, Path.DirectorySeparatorChar, fileName, date.ToString(@"-yyyyMMdd")));
@@ -251,7 +241,40 @@ namespace MoronBot
         /// FURTHER-NOTE: Have now split off all of the bot's main functions (the ones listed by |commands), should maybe continue with the rest.
         /// </summary>
         /// <param name="p_message">The message received from the server.</param>
-        void ProcessMessage(BotMessage message)
+        void privmsgReceived(object sender, BotMessage message)
+        {
+            char ctcpChar = Convert.ToChar((byte)1);
+            string action = ctcpChar + "ACTION ";
+            if (message.MessageString.StartsWith(action))
+            {
+                Log(string.Format("*{0} {1}*", message.User.Name, message.MessageString.Replace(action, "").TrimEnd(ctcpChar)), message.ReplyTo);
+            }
+            else
+            {
+                Log(string.Format("<{0}> {1}", message.User.Name, message.MessageString), message.ReplyTo);
+            }
+
+            // Intrinsic functions
+            // These are here because they are either too linked with the bot to extract,
+            // or too simple to be worth making a Function dll for.
+            if (message.IsCommandFormat && message.User.Name == Settings.Instance.Owner)
+            {
+                if (Regex.IsMatch(message.Command, "^(pass)$", RegexOptions.IgnoreCase))
+                {
+                    cwIRC.SendData("PASS mOrOnBoTuS");
+                }
+                else if (Regex.IsMatch(message.Command, "^(unload)$", RegexOptions.IgnoreCase))
+                {
+                    UnloadFunction(message);
+                }
+                else if (Regex.IsMatch(message.Command, "^(load)$", RegexOptions.IgnoreCase))
+                {
+                    LoadFunction(message);
+                }
+            }
+        }
+
+        void nonPRIVMSGReceived(object sender, BotMessage message)
         {
             if (message.Type == "PING")
             {
@@ -369,7 +392,7 @@ namespace MoronBot
                     break;
                 case "MODE":
                     ChannelList.ParseMODE(message);
-                    
+
                     string setter = message.User.Name.TrimStart(':');
                     string modes = message.MessageList[3].TrimStart(':');
                     string targets = "";
@@ -400,111 +423,10 @@ namespace MoronBot
 
                     Log(string.Format("# {0} changed the topic to: {1}", message.User.Name, message.MessageString), message.ReplyTo);
                     break;
-                case "PRIVMSG": // User messages
-                    char ctcpChar = Convert.ToChar((byte)1);
-                    string action = ctcpChar + "ACTION ";
-                    if (message.MessageString.StartsWith(action))
-                    {
-                        Log(string.Format("*{0} {1}*", message.User.Name, message.MessageString.Replace(action, "").TrimEnd(ctcpChar)), message.ReplyTo);
-                    }
-                    else
-                    {
-                        Log(string.Format("<{0}> {1}", message.User.Name, message.MessageString), message.ReplyTo);
-                    }
-
-                    ExecuteFunctionList(UserListFunctions, message);
-                    SendQueue();
-
-                    if (Settings.Instance.IgnoreList.Contains(message.User.Name.ToUpper()))
-                        return;
-
-                    ExecuteFunctionList(RegexFunctions, message);
-                    SendQueue();
-
-                    Match match = Regex.Match(message.MessageString, @"^(\||" + Nick + @"(,|:)?[ ])", RegexOptions.IgnoreCase);
-                    if (match.Success)
-                    {
-                        ExecuteFunctionList(CommandFunctions, message);
-                        SendQueue();
-
-                        // Intrinsic functions
-                        // These are here because they are either too linked with the bot to extract,
-                        // or too simple to be worth making a Function dll for.
-                        if (message.User.Name == Settings.Instance.Owner)
-                        {
-                            if (Regex.IsMatch(message.Command, "^(pass)$", RegexOptions.IgnoreCase))
-                            {
-                                cwIRC.SendData("PASS mOrOnBoTuS");
-                            }
-                            else if (Regex.IsMatch(message.Command, "^(unload)$", RegexOptions.IgnoreCase))
-                            {
-                                UnloadFunction(message);
-                            }
-                            else if (Regex.IsMatch(message.Command, "^(load)$", RegexOptions.IgnoreCase))
-                            {
-                                LoadFunction(message);
-                            }
-                        }
-                    }
-
-                    SendQueue();
-                    break;
                 default:
                     Log(message.RawMessage, "-unknown");
                     break;
             }
-        }
-
-        /// <summary>
-        /// Executes all of the functions in a given list, passing the given message to all of them
-        /// Also sends any responses that any of them generate.
-        /// </summary>
-        /// <param name="funcList">The list of functions (List<Functions.Function>) to execute.</param>
-        /// <param name="message">The BotMessage to pass to each function.</param>
-        /// <returns>Whether or not any of the functions generated IRCResponses.</returns>
-        bool ExecuteFunctionList(List<IFunction> funcList, BotMessage message)
-        {
-            List<IRCResponse> responses = new List<IRCResponse>();
-
-            foreach (IFunction f in funcList)
-            {
-                List<IRCResponse> funcResponses = null;
-                try
-                {
-                    switch (f.AccessLevel)
-                    {
-                        case AccessLevels.Anyone:
-                            funcResponses = f.GetResponse(message);
-                            if (funcResponses != null)
-                                responses.AddRange(funcResponses);
-                            break;
-                        case AccessLevels.UserList:
-                            if (f.AccessList.Contains(message.User.Name.ToLowerInvariant()))
-                            {
-                                funcResponses = f.GetResponse(message);
-                                if (funcResponses != null)
-                                    responses.AddRange(funcResponses);
-                            }
-                            break;
-                    }
-
-                    // For the Apathy function
-                    if (responses.Count > 0 && responses[responses.Count - 1] == null)
-                        break;
-                }
-                catch (Exception e)
-                {
-                    Logger.Write(e.Message + "\n" + e.StackTrace, Settings.Instance.ErrorFile);
-                }
-            }
-
-            if (responses.Count == 0)
-                return false;
-
-            lock (queueSync)
-                MessageQueue.AddRange(responses);
-
-            return true;
         }
         
         #endregion Message Processing
@@ -517,9 +439,30 @@ namespace MoronBot
 
             lock (messageSync)
             {
-                MBEvents.OnNewRawIRC(this, botMessage.ToString());
-                ProcessMessage(botMessage);
+                try
+                {
+                    CwIRC.Interface.OnNewRawIRC(this, botMessage.ToString());
+                    FuncInterface.OnAnyMessageReceived(this, botMessage);
+
+                    if (botMessage.Type == "PRIVMSG")
+                    {
+                        FuncInterface.OnPRIVMSGReceived(sender, botMessage);
+
+                        if (botMessage.IsCommandFormat)
+                            FuncInterface.OnCommandFormatMessageReceived(sender, botMessage);
+                    }
+                    else
+                    {
+                        FuncInterface.OnNonPRIVMSGReceived(sender, botMessage);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Write(ex.Message, Settings.Instance.ErrorFile);
+                }
             }
+
+            SendQueue();
         }
 
         void connectionTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -633,15 +576,15 @@ namespace MoronBot
                     {
                         LoadFunction(unloadedList[index]);
                         unloadedList.RemoveAt(index);
-                        MessageQueue.Add(new IRCResponse(ResponseType.Say, "Function \"" + funcName + "\" loaded!", message.ReplyTo));
+                        FuncInterface.SendResponse(ResponseType.Say, "Function \"" + funcName + "\" loaded!", message.ReplyTo);
                     }
                     else
                     {
-                        MessageQueue.Add(new IRCResponse(ResponseType.Say, "Function \"" + funcName + "\" not found!", message.ReplyTo));
+                        FuncInterface.SendResponse(ResponseType.Say, "Function \"" + funcName + "\" not found!", message.ReplyTo);
                     }
                 }
             else
-                MessageQueue.Add(new IRCResponse(ResponseType.Say, "You didn't specify a function to load!", message.ReplyTo));
+                FuncInterface.SendResponse(ResponseType.Say, "You didn't specify a function to load!", message.ReplyTo);
         }
 
         void UnloadFunction(BotMessage message)
@@ -652,12 +595,12 @@ namespace MoronBot
                     if (UnloadFromFunctionList(funcName, CommandFunctions) ||
                         UnloadFromFunctionList(funcName, RegexFunctions) ||
                         UnloadFromFunctionList(funcName, UserListFunctions))
-                        MessageQueue.Add(new IRCResponse(ResponseType.Say, "Function \"" + funcName + "\" unloaded!", message.ReplyTo));
+                        FuncInterface.SendResponse(ResponseType.Say, "Function \"" + funcName + "\" unloaded!", message.ReplyTo);
                     else
-                        MessageQueue.Add(new IRCResponse(ResponseType.Say, "Function \"" + funcName + "\" not found!", message.ReplyTo));
+                        FuncInterface.SendResponse(ResponseType.Say, "Function \"" + funcName + "\" not found!", message.ReplyTo);
                 }
             else
-                MessageQueue.Add(new IRCResponse(ResponseType.Say, "You didn't specify a function to unload!", message.ReplyTo));
+                FuncInterface.SendResponse(ResponseType.Say, "You didn't specify a function to unload!", message.ReplyTo);
         }
 
         bool UnloadFromFunctionList(string funcName, List<IFunction> funcList)

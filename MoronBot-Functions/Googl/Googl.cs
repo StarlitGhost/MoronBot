@@ -18,32 +18,32 @@ namespace Internet
             Help = "googl/shorten <url> - Gives you a shortened version of a url, via Goo.gl";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, @"^(goo\.?gl|shorten)$", RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(message.Command, @"^(goo\.?gl|shorten)$", RegexOptions.IgnoreCase))
+                return;
+            
+            if (message.ParameterList.Count == 0)
             {
-                // URL given
-                if (message.ParameterList.Count > 0)
-                {
-                    string shortURL = URL.Shorten(message.Parameters);
-                    if (shortURL != null)
-                    {
-                        return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, shortURL, message.ReplyTo) };
-                    }
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No URL detected in your message.", message.ReplyTo) };
-                }
                 // No URL given
-                else
-                {
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't give a URL to shorten!", message.ReplyTo) };
-                }
+                FuncInterface.SendResponse(ResponseType.Say, "You didn't give a URL to shorten!", message.ReplyTo);
+                return;
             }
-            else
+
+            string shortURL = URL.Shorten(message.Parameters);
+
+            if (shortURL == null)
             {
-                return null;
+                FuncInterface.SendResponse(ResponseType.Say, "No URL detected in your message.", message.ReplyTo);
+                return;
             }
+
+            FuncInterface.SendResponse(ResponseType.Say, shortURL, message.ReplyTo);
+            return;
         }
     }
 }

@@ -24,14 +24,19 @@ namespace Utility
             Help = "calc <expr> - Uses Google's calculation API to give you the result of <expr>";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
             if (!Regex.IsMatch(message.Command, @"^(calc(ulate)?)$", RegexOptions.IgnoreCase))
-                return null;
+                return;
             if (message.ParameterList.Count == 0)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't give an expression to calculate!", message.ReplyTo) };
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "You didn't give an expression to calculate!", message.ReplyTo);
+                return;
+            }
 
             try
             {
@@ -41,16 +46,20 @@ namespace Utility
 
                 Result result = JsonConvert.DeserializeObject<Result>(jsonResponse);
                 if (result.rhs.Length > 0)
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Result: " + result.rhs, message.ReplyTo) };
+                {
+                    FuncInterface.SendResponse(ResponseType.Say, "Result: " + result.rhs, message.ReplyTo);
+                    return;
+                }
                 if (result.error.Length > 0)
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Error: " + result.error, message.ReplyTo) };
-
-                return null;
+                {
+                    FuncInterface.SendResponse(ResponseType.Say, "Error: " + result.error, message.ReplyTo);
+                    return;
+                }
             }
             catch (System.Exception ex)
             {
                 Logger.Write(ex.Message, Settings.Instance.ErrorFile);
-                return null;
+                return;
             }
         }
 

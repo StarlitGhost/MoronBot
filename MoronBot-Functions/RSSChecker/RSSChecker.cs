@@ -37,6 +37,8 @@ namespace Internet
             Type = Types.Regex;
             AccessLevel = AccessLevels.Anyone;
 
+            FuncInterface.AnyMessageReceived += anyMessageReceived;
+
             Feed homestuck = new Feed();
             homestuck.URL = "http://www.mspaintadventures.com/rss/rss.xml";
             homestuck.LastUpdate = DateTime.Now;
@@ -50,7 +52,7 @@ namespace Internet
             //SaveFeeds(Settings.Instance.Server + ".Feeds.xml");
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void anyMessageReceived(object sender, BotMessage message)
         {
             //foreach (KeyValuePair<string, Feed> feed in FeedMap)
             //{
@@ -64,7 +66,7 @@ namespace Internet
             catch (System.Exception ex)
             {
                 Logger.Write(ex.Message, Settings.Instance.ErrorFile);
-                return null;
+                return;
             }
 
             XmlDocument feedDoc = new XmlDocument();
@@ -76,37 +78,37 @@ namespace Internet
             DateTime newestDate = new DateTime();
             DateTime.TryParse(firstItem.SelectSingleNode("pubDate").FirstChild.Value, out newestDate);
 
-            if (newestDate > FeedMap["Homestuck"].LastUpdate)
+            if (newestDate <= FeedMap["Homestuck"].LastUpdate)
+                return;
+
+            XmlNode oldestNew = feedDoc.SelectSingleNode(@"/rss/channel/item");
+
+            int numUpdates = 0;
+
+            foreach (XmlNode item in feedDoc.SelectNodes(@"/rss/channel/item"))
             {
-                XmlNode oldestNew = feedDoc.SelectSingleNode(@"/rss/channel/item");
+                DateTime itemDate = new DateTime();
+                DateTime.TryParse(item.SelectSingleNode("pubDate").FirstChild.Value, out itemDate);
 
-                int numUpdates = 0;
-
-                foreach (XmlNode item in feedDoc.SelectNodes(@"/rss/channel/item"))
+                if (itemDate > FeedMap["Homestuck"].LastUpdate)
                 {
-                    DateTime itemDate = new DateTime();
-                    DateTime.TryParse(item.SelectSingleNode("pubDate").FirstChild.Value, out itemDate);
-
-                    if (itemDate > FeedMap["Homestuck"].LastUpdate)
-                    {
-                        oldestNew = item;
-                        numUpdates++;
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    oldestNew = item;
+                    numUpdates++;
                 }
-
-                FeedMap["Homestuck"] = new Feed(FeedMap["Homestuck"].URL, newestDate);
-
-                string itemTitle = oldestNew.SelectSingleNode("title").FirstChild.Value;
-                string itemLink = ChannelList.EvadeChannelLinkBlock(message, oldestNew.SelectSingleNode("link").FirstChild.Value);
-
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Homestuck has updated, " + numUpdates + " new pages! New ones start here: " + itemTitle + " (" + itemLink + ")", message.ReplyTo) };
+                else
+                {
+                    break;
+                }
             }
+
+            FeedMap["Homestuck"] = new Feed(FeedMap["Homestuck"].URL, newestDate);
+
+            string itemTitle = oldestNew.SelectSingleNode("title").FirstChild.Value;
+            string itemLink = ChannelList.EvadeChannelLinkBlock(message, oldestNew.SelectSingleNode("link").FirstChild.Value);
+
+            FuncInterface.SendResponse(ResponseType.Say, "Homestuck has updated, " + numUpdates + " new pages! New ones start here: " + itemTitle + " (" + itemLink + ")", message.ReplyTo);
+            return;
             //}
-            return null;
         }
 
         //public void SaveFeeds(string fileName)

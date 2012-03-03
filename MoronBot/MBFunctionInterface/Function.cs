@@ -56,14 +56,6 @@ namespace MBFunctionInterface
         /// At the moment you would have to enforce this in the function itself.
         /// </summary>
         List<string> AccessList { get; set; }
-
-        /// <summary>
-        /// The method the bot calls for any messages matching your function's type.
-        /// </summary>
-        /// <param name="message">A message for you to deal with</param>
-        /// <param name="moronBot">The bot itself - may need to remove this from here</param>
-        /// <returns>A list of IRCResponses to send back to the channel/user</returns>
-        List<IRCResponse> GetResponse(BotMessage message);
     }
 
     public abstract class Function : IFunction
@@ -73,8 +65,6 @@ namespace MBFunctionInterface
         public Types Type { get; set; }
         public AccessLevels AccessLevel { get; set; }
         public List<string> AccessList { get; set; }
-
-        public abstract List<IRCResponse> GetResponse(BotMessage message);
 
         /// <summary>
         /// Helper function to get the name of 'this' class; ie, one implementing this abstract base.

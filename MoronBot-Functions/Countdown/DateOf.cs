@@ -21,15 +21,20 @@ namespace Utility
             Help = "dateof <event> - returns the date of the specified event.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
             if (!Regex.IsMatch(message.Command, @"^dateof$", RegexOptions.IgnoreCase))
-                return null;
+                return;
 
             if (message.ParameterList.Count == 0)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Date of what?", message.ReplyTo) };
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "Date of what?", message.ReplyTo);
+                return;
+            }
 
             List<TimeTill.EventStruct> reversedList = new List<TimeTill.EventStruct>(TimeTill.EventList);
             reversedList.Reverse();
@@ -44,9 +49,13 @@ namespace Utility
                     Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
 
             if (eventStruct.EventName == null)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in the events list.", message.ReplyTo) };
+            {
+                FuncInterface.SendResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in the events list.", message.ReplyTo);
+                return;
+            }
 
-            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "The date for \"" + eventStruct.EventName + "\" is " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)"), message.ReplyTo) };
+            FuncInterface.SendResponse(ResponseType.Say, "The date for \"" + eventStruct.EventName + "\" is " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)"), message.ReplyTo);
+            return;
         }
     }
 }

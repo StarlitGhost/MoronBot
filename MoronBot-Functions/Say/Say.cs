@@ -13,25 +13,23 @@ namespace Bot
             Help = "say <text> - Says the given text in the current channel.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^(say)$", RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(message.Command, "^(say)$", RegexOptions.IgnoreCase))
+                return;
+
+            if (message.ParameterList.Count == 0)
             {
-                if (message.ParameterList.Count > 0)
-                {
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, message.Parameters, message.ReplyTo) };
-                }
-                else
-                {
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Say what?", message.ReplyTo) };
-                }
+                FuncInterface.SendResponse(ResponseType.Say, "Say what?", message.ReplyTo);
+                return;
             }
-            else
-            {
-                return null;
-            }
+
+            FuncInterface.SendResponse(ResponseType.Say, message.Parameters, message.ReplyTo);
+            return;
         }
     }
 }

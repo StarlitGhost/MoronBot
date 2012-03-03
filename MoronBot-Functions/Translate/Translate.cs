@@ -19,36 +19,39 @@ namespace Internet
             Help = "translate <sentence> - Translates the given sentence to English.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
+
+            FuncInterface.CommandFormatMessageReceived += commandReceived;
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void commandReceived(object sender, BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^(translate)$", RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(message.Command, "^(translate)$", RegexOptions.IgnoreCase))
+                return;
+
+            if (message.ParameterList.Count == 0)
             {
-                if (message.ParameterList.Count > 0)
-                {
-                    string translatedString;
-                    try
-                    {
-                        string translateTerm = message.Parameters.Replace('"', ' ');
-                        translatedString = Gapi.Language.Translator.Translate(translateTerm, Gapi.Language.Language.English);
-                    }
-                    catch (Gapi.Core.GapiException ex)
-                    {
-                        Logger.Write(ex.ToString(), Settings.Instance.ErrorFile);
-                        translatedString = "Couldn't work out what language you're using.";
-                    }
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, translatedString, message.ReplyTo) };
-                }
-                else
-                {
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Translate what?", message.ReplyTo) };
-                }
+                FuncInterface.SendResponse(ResponseType.Say, "Translate what?", message.ReplyTo);
+                return;
             }
-            else
+
+            string translatedString;
+            try
             {
-                return null;
+                string translateTerm = message.Parameters.Replace('"', ' ');
+                translatedString = Gapi.Language.Translator.Translate(translateTerm, Gapi.Language.Language.English);
             }
+            catch (Gapi.Core.GapiException ex)
+            {
+                Logger.Write(ex.ToString(), Settings.Instance.ErrorFile);
+                translatedString = "Couldn't work out what language you're using.";
+            }
+            catch (System.Net.WebException ex)
+            {
+                Logger.Write(ex.ToString(), Settings.Instance.ErrorFile);
+                translatedString = "Google Translate appears to be down.";
+            }
+            FuncInterface.SendResponse(ResponseType.Say, translatedString, message.ReplyTo);
+            return;
         }
     }
 }

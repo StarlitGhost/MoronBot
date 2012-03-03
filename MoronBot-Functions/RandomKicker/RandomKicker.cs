@@ -19,16 +19,17 @@ namespace Automatic
             Type = Types.UserList;
             AccessLevel = AccessLevels.Anyone;
 
+            FuncInterface.PRIVMSGReceived += privmsgReceived;
+
             userList.Add("SirGir");
         }
 
-        public override List<IRCResponse> GetResponse(BotMessage message)
+        void privmsgReceived(object sender, BotMessage message)
         {
             if (userList.Contains(message.User.Name) && rand.Next(0, 5) == 0)
             {
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Raw, "KICK " + message.ReplyTo + " " + message.User.Name + " ::D", "") };
+                FuncInterface.SendResponse(ResponseType.Raw, "KICK " + message.ReplyTo + " " + message.User.Name + " ::D", "");
             }
-            return null;
         }
     }
 }
