@@ -40,7 +40,7 @@ namespace Utility
                 return;
             }
 
-            FuncInterface.SendResponse(ResponseType.Say, "Event \"" + TimeTill.EventList[index].EventName + "\", with date \"" + TimeTill.EventList[index].EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)") + "\" removed from the event list!", message.ReplyTo);
+            FuncInterface.SendResponse(ResponseType.Say, "Event \"" + TimeTill.EventList[index].EventName + "\", with date \"" + TimeTill.EventList[index].EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)") + "\" removed from the event list!", message.ReplyTo);
             TimeTill.EventList.RemoveAt(index);
             TimeTill.SaveEvents();
         }

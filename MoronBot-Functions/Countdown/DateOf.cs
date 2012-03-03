@@ -54,7 +54,7 @@ namespace Utility
                 return;
             }
 
-            FuncInterface.SendResponse(ResponseType.Say, "The date for \"" + eventStruct.EventName + "\" is " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)"), message.ReplyTo);
+            FuncInterface.SendResponse(ResponseType.Say, "The date for \"" + eventStruct.EventName + "\" is " + eventStruct.EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)"), message.ReplyTo);
             return;
         }
     }

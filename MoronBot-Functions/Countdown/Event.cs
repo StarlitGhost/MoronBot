@@ -13,7 +13,7 @@ namespace Utility
     {
         public Event()
         {
-            Help = "event <date> <event> - Adds an event to the list of events used by TimeTill and TimeSince. <date> is in dd-MM-yyyy format. Put the date in () if you want to specify time and your offset from UTC, eg: (25-12-2012 9:00 -5)";
+            Help = "event <date> <event> - Adds an event to the list of events used by TimeTill and TimeSince. <date> is in yyyy-MM-dd format. Put the date in () if you want to specify time and your offset from UTC, eg: (2012-12-25 9:00 -5)";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
@@ -66,7 +66,7 @@ namespace Utility
 
             if (!parseSuccess)
             {
-                FuncInterface.SendResponse(ResponseType.Say, "Parsing of date: " + message.ParameterList[0] + " failed, expected format is dd-MM-yyyy", message.ReplyTo);
+                FuncInterface.SendResponse(ResponseType.Say, "Parsing of date: " + message.ParameterList[0] + " failed, expected format is (yyyy-MM-dd HH:mm +/-offset)", message.ReplyTo);
                 return;
             }
 
@@ -74,14 +74,14 @@ namespace Utility
 
             if (TimeTill.EventList.FindIndex(s => s.EventName == eventStruct.EventName) >= 0)
             {
-                FuncInterface.SendResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)"), message.ReplyTo);
+                FuncInterface.SendResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)"), message.ReplyTo);
                 return;
             }
 
             TimeTill.EventList.Add(eventStruct);
             TimeTill.EventList.Sort(TimeTill.EventStruct.CompareEventStructsByDate);
             TimeTill.SaveEvents();
-            FuncInterface.SendResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString(@"dd-MM-yyyy \a\t HH:mm (UTC)"), message.ReplyTo);
+            FuncInterface.SendResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)"), message.ReplyTo);
             return;
         }
     }
