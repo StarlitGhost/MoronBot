@@ -28,6 +28,9 @@ namespace PythonInterface
 
         void anyMessageReceived(object sender, BotMessage message)
         {
+            if (message.Type != "PRIVMSG")
+                return;
+
             string url = "http://localhost:8080/message";
             
             string json = JsonConvert.SerializeObject(message);
@@ -42,9 +45,9 @@ namespace PythonInterface
                 FuncInterface.SendResponses(responses);
                 return;
             }
-            catch (System.Exception /*ex*/)
+            catch (System.Exception ex)
             {
-                //FuncInterface.SendResponse(ResponseType.Say, "PythonInterface Exception: " + ex.Message, message.ReplyTo);
+                Logger.Write("PythonInterface Exception: " + ex.Message, Settings.Instance.ErrorFile);
                 return;
             }
         }
@@ -56,8 +59,9 @@ namespace PythonInterface
             {
                 URL.SendToServer(url, newNick);
             }
-            catch (System.Exception /*ex*/)
+            catch (System.Exception ex)
             {
+                Logger.Write("PythonInterface Exception: " + ex.Message, Settings.Instance.ErrorFile);
                 return;
             }
         }
