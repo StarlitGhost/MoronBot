@@ -44,12 +44,25 @@ namespace Utility
 
             if (weekEvents.Count == 0)
                 return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "There are no events in the coming " + daysAhead + " days!", message.ReplyTo) };
-                    
-            string events = String.Join(" | ", weekEvents);
 
             List<IRCResponse> responses = new List<IRCResponse>();
             responses.Add(new IRCResponse(ResponseType.Say, "Events in the next " + daysAhead + " days:", message.ReplyTo));
+
+            string events = weekEvents[0];
+            foreach (string weekEvent in weekEvents)
+            {
+                if ((events + " | " + weekEvent).Length < 400)
+                {
+                    events += " | " + weekEvent;
+                }
+                else
+                {
+                    responses.Add(new IRCResponse(ResponseType.Say, events, message.ReplyTo));
+                    events = weekEvent;
+                }
+            }
             responses.Add(new IRCResponse(ResponseType.Say, events, message.ReplyTo));
+
             return responses;
         }
     }

@@ -43,7 +43,7 @@ namespace Utility
 
                 int hour = date.Hour;
                 string timeOfDayMessage = "morning";
-                if (hour > 12 && hour < 17)
+                if (hour >= 12 && hour < 17)
                 {
                     timeOfDayMessage = "afternoon";
                 }
