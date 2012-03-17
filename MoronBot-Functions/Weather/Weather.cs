@@ -30,12 +30,22 @@ namespace Internet
         {
             if (!Regex.IsMatch(message.Command, @"^weather$", RegexOptions.IgnoreCase))
                 return null;
+            string query = string.Empty;
             if (message.ParameterList.Count == 0)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't give a location!", message.ReplyTo) };
-
+            {
+                URL.WebPage page = URL.FetchURL("http://www.tsukiakariusagi.net/chatmaplookup.php?nick=" + message.User.Name);
+                if (page.Page == ",")
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't give a location, and you're not registered on the !chatmap", message.ReplyTo) };
+                else
+                    query = page.Page;
+            }
+            else
+            {
+                query = HttpUtility.UrlEncode(message.Parameters);
+            }
+            
             try
             {
-                string query = HttpUtility.UrlEncode(message.Parameters);
                 Stream responseStream = URL.SendToServer("http://free.worldweatheronline.com/feed/weather.ashx?format=json&num_of_days=0&key=f31c15f2f7142209122801&q=" + query);
                 string jsonResponse = URL.ReceiveFromServer(responseStream);
 
