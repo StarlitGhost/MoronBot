@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="DateOf.cs" />
     <Compile Include="Event.cs" />
+    <Compile Include="EventAuto.cs" />
     <Compile Include="TimeSince.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="RemoveEvent.cs" />
