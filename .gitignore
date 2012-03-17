@@ -16,3 +16,4 @@ MoronBot-PythonInterfaceOnly/*
 *.pyc
 MoronBot-PythonDev/*
 *.opensdf
+*.tgz

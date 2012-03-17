@@ -43,7 +43,7 @@ namespace Utility
                 if (result.rhs.Length > 0)
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Result: " + result.rhs, message.ReplyTo) };
                 if (result.error.Length > 0)
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Error: " + result.error, message.ReplyTo) };
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Calculation Error or Unsupported Operations", message.ReplyTo) };
 
                 return null;
             }

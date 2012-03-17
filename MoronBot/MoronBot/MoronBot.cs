@@ -231,7 +231,7 @@ namespace MoronBot
 
         void Log(string data, string fileName)
         {
-            DateTime date = DateTime.Now.IsDaylightSavingTime() ? DateTime.UtcNow.AddHours(1.0) : DateTime.UtcNow;
+            DateTime date = DateTime.UtcNow;
 
             string time = date.ToString("[HH:mm]");
             MBEvents.OnNewFormattedIRC(this, string.Format("{0} {1} {2}", fileName, time, data));
