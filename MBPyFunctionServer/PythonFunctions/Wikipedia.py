@@ -41,7 +41,7 @@ class Instantiate(Function):
     Help = 'wiki(pedia) <search term> - returns the top result for a given search term from wikipedia.'
     
     def GetResponse(self, message):
-        if not message.MessageString[:1] == '|':
+        if message.Type != 'PRIVMSG' or not message.MessageString[:1] == '|':
             return
         
         match = re.search('^wiki(pedia)?$', message.Command, re.IGNORECASE)

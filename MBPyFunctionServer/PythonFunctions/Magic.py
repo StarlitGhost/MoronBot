@@ -15,7 +15,7 @@ class Instantiate(Function):
     Help = '|mtg <card name>'
     
     def GetResponse(self, message):
-        if not message.MessageString[:1] == '|':
+        if message.Type != 'PRIVMSG' or not message.MessageString[:1] == '|':
             return
         
         match = re.search('^mtgf?$', message.Command, re.IGNORECASE)

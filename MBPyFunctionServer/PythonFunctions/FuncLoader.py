@@ -10,6 +10,9 @@ class Instantiate(Function):
     Help = "Handles loading/unloading of python functions."
 
     def GetResponse(self, message):
+        if message.Type != 'PRIVMSG' or not message.MessageString[:1] == '|':
+            return
+            
         if message.Command == "pyload":
             path = message.ParameterList[0]
             try:

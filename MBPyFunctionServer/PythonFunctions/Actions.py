@@ -9,6 +9,9 @@ class Instantiate(Function):
     Help = 'Responds to various actions'
 
     def GetResponse(self, message):
+        if message.Type != 'PRIVMSG':
+            return
+        
         match = re.search("^\\x01ACTION (?P<action>(pokes|gropes|molests|slaps|kicks|rubs|hugs|cuddles|glomps)),?[ ]%s([^a-zA-Z0-9_\|`\[\]\^-]|$)" % CurrentNick,
                           message.MessageString,
                           re.IGNORECASE)

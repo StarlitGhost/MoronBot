@@ -334,6 +334,11 @@ namespace MoronBot
                     {
                         cwIRC.SendData("MODE " + message.MessageList[2].TrimStart(':'));
                     }
+                    
+                    ExecuteFunctionList(RegexFunctions, message);
+                    ExecuteFunctionList(UserListFunctions, message);
+                    ExecuteFunctionList(CommandFunctions, message);
+                    SendQueue();
 
                     //cwIRC.SendData("WHO " + message.MessageList[2].TrimStart(':'));
                     //cwIRC.SendData("NAMES " + message.MessageList[2].TrimStart(':'));

@@ -23,7 +23,12 @@ class MessageHandler:
         data = web.data()
         jsonData = json.loads(data)
         message = IRCMessage(jsonData)
-        message.MessageString = message.MessageString.encode('ascii', 'xmlcharrefreplace')
+        
+        if message.MessageString is not None:
+            message.MessageString = message.MessageString.encode('ascii', 'xmlcharrefreplace')
+            
+        #print message.__dict__
+            
         print ( '%s <%s> %s' % (message.ReplyTo,
                                 message.User.Name,
                                 message.MessageString) )

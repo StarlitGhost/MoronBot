@@ -129,6 +129,9 @@ namespace Fun
                 Associativity = OperatorAssociativity.LeftToRight,
                 Execute = (x, y) =>
                 {
+                    if (x > 42)
+                        return 0;
+
                     int total = 0;
                     string rollString = "";
                     for (int dice = 0; dice < x; dice++)

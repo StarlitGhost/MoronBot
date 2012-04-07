@@ -20,6 +20,9 @@ class Instantiate(Function):
     lastUser = None
     
     def GetResponse(self, message):
+        if message.Type != 'PRIVMSG':
+            return
+            
         if message.MessageString[:1] == '|':
             match = re.search('^hangout$', message.Command, re.IGNORECASE)
             if match:
@@ -37,11 +40,10 @@ class Instantiate(Function):
         match = re.search('(https?\://)?(talkgadget|plus)\.google\.com/hangouts/(?P<code>(extras/talk\.google\.com/)?[^\?\s]+)',
                           message.MessageString,
                           re.IGNORECASE)
+        
         if not match:
-            print 'no match'
             return
         
-        print match.group('code')
         if match.group('code') == self.lastCode:
             return
         

@@ -30,7 +30,7 @@ namespace Utility
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
-            if ((DateTime.UtcNow - _lastDate).Minutes < 1)
+            if ((DateTime.UtcNow - _lastDate).Minutes < 5)
                 return null;
 
             for (int i = 0; i < TimeTill.EventList.Count; i++)

@@ -15,6 +15,9 @@ class Instantiate(Function):
     Help = 'Guards against the terrible influx of Mormon Jesus'
 
     def GetResponse(self, message):
+        if message.Type != 'PRIVMSG':
+            return
+            
         match = re.search('([^a-zA-Z]|^)mormon jesus([^a-zA-Z]|$)',
                           message.MessageString,
                           re.IGNORECASE)

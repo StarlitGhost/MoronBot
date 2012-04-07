@@ -15,7 +15,7 @@ class Instantiate(Function):
     Help = 'Responds with a link to the chat stats webpage'
 
     def GetResponse(self, message):
-        if not message.MessageString[:1] == '|':
+        if message.Type != 'PRIVMSG' or not message.MessageString[:1] == '|':
             return
         
         match = re.search('^stats$', message.Command, re.IGNORECASE)
