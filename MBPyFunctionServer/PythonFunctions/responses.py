@@ -101,7 +101,10 @@ class Instantiate(Function):
 
 
 	def GetResponse(self, message):
-		if message.Type == 'PRIVMSG' and message.MessageString[:1] == '|':
+		if message.Type != 'PRIVMSG':
+			return
+		
+		if message.MessageString[:1] == '|':
 			match = re.search('^responses?$', message.Command, re.IGNORECASE)
 			if not match:
 				return
