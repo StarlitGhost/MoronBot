@@ -69,6 +69,7 @@ namespace CwIRC
         {
             worker = new BackgroundWorker();
 
+            worker.WorkerSupportsCancellation = true;
             worker.DoWork += worker_DoWork;
             worker.ProgressChanged += worker_ProgressChanged;
             worker.WorkerReportsProgress = true;
@@ -215,6 +216,9 @@ namespace CwIRC
                 {
                     worker.ReportProgress(0, inMessage);
                 }
+
+                if (worker.CancellationPending)
+                    break;
             }
         }
         /// <summary>

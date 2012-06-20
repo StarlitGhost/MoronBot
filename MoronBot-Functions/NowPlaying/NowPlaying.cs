@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
 
 using CwIRC;
 using MBFunctionInterface;
-
 using MBUtilities;
 using MBUtilities.Channel;
 
@@ -17,6 +17,9 @@ namespace Internet
     public class NowPlaying : Function
     {
         public static Dictionary<string, string> AccountMap = new Dictionary<string, string>();
+
+        static Object fileLock = new Object();
+        public static Object dataLock = new Object();
 
         public NowPlaying()
         {
@@ -34,65 +37,61 @@ namespace Internet
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^(np|nowplaying)$", RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(message.Command, "^(np|nowplaying)$", RegexOptions.IgnoreCase))
+                return null;
+
+            string lastfmName = "";
+
+            if (message.ParameterList.Count > 0)
             {
-                string lastfmName = "";
-
-                if (message.ParameterList.Count > 0)
+                if (AccountMap.ContainsKey(message.ParameterList[0].ToUpper()))
                 {
-                    if (AccountMap.ContainsKey(message.ParameterList[0].ToUpper()))
-                    {
-                        lastfmName = AccountMap[message.ParameterList[0].ToUpper()];
-                    }
-                    else
-                    {
-                        lastfmName = message.ParameterList[0];
-                    }
+                    lastfmName = AccountMap[message.ParameterList[0].ToUpper()];
                 }
                 else
                 {
-                    if (AccountMap.ContainsKey(message.User.Name.ToUpper()))
-                    {
-                        lastfmName = AccountMap[message.User.Name.ToUpper()];
-                    }
-                    else
-                    {
-                        lastfmName = message.User.Name;
-                    }
-                }
-
-                URL.WebPage recentFeed = new URL.WebPage();
-
-                try
-                {
-                    recentFeed = URL.FetchURL("http://ws.audioscrobbler.com/1.0/user/" + lastfmName + "/recenttracks.rss");
-                }
-                catch (System.Net.WebException ex)
-                {
-                    Logger.Write(ex.ToString(), Settings.Instance.ErrorFile);
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "User \"" + lastfmName + "\" not found on LastFM", message.ReplyTo) };
-                }
-
-                Match track = Regex.Match(recentFeed.Page, @"<item>\s*?<title>(?<band>.+?)–(?<song>.+?)</title>\s*?<link>(?<link>.+?)</link>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-                if (track.Success)
-                {
-                    string band = track.Groups["band"].Value;
-                    string song = track.Groups["song"].Value;
-
-                    string songMessage = "\"" + song.Trim() + "\" by " + band.Trim();
-
-                    songMessage += " (" + /*ChannelList.EvadeChannelLinkBlock(message, URL.Shorten(*/track.Groups["link"].Value/*))*/ + ")";
-
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, songMessage, message.ReplyTo) };
-                }
-                else
-                {
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "User \"" + lastfmName + "\" exists on LastFM, but hasn't scrobbled any music to it", message.ReplyTo) };
+                    lastfmName = message.ParameterList[0];
                 }
             }
             else
             {
-                return null;
+                if (AccountMap.ContainsKey(message.User.Name.ToUpper()))
+                {
+                    lastfmName = AccountMap[message.User.Name.ToUpper()];
+                }
+                else
+                {
+                    lastfmName = message.User.Name;
+                }
+            }
+
+            URL.WebPage recentFeed = new URL.WebPage();
+
+            try
+            {
+                recentFeed = URL.FetchURL("http://ws.audioscrobbler.com/1.0/user/" + lastfmName + "/recenttracks.rss");
+            }
+            catch (System.Net.WebException ex)
+            {
+                Logger.Write(ex.ToString(), Settings.Instance.ErrorFile);
+                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "User \"" + lastfmName + "\" not found on LastFM", message.ReplyTo) };
+            }
+
+            Match track = Regex.Match(recentFeed.Page, @"<item>\s*?<title>(?<band>.+?)–(?<song>.+?)</title>\s*?<link>(?<link>.+?)</link>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            if (track.Success)
+            {
+                string band = track.Groups["band"].Value;
+                string song = track.Groups["song"].Value;
+
+                string songMessage = "\"" + song.Trim() + "\" by " + band.Trim();
+
+                songMessage += " (" + /*ChannelList.EvadeChannelLinkBlock(message, URL.Shorten(*/track.Groups["link"].Value/*))*/ + ")";
+
+                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, songMessage, message.ReplyTo) };
+            }
+            else
+            {
+                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "User \"" + lastfmName + "\" exists on LastFM, but hasn't scrobbled any music to it", message.ReplyTo) };
             }
         }
 
@@ -105,23 +104,27 @@ namespace Internet
             XmlWriterSettings xws = new XmlWriterSettings();
             xws.Indent = true;
             xws.NewLineOnAttributes = true;
-            using (XmlWriter writer = XmlWriter.Create(fileName, xws))
+
+            lock (fileLock) lock (dataLock)
             {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("Links");
-
-                foreach (KeyValuePair<string, string> link in AccountMap)
+                using (XmlWriter writer = XmlWriter.Create(fileName, xws))
                 {
-                    writer.WriteStartElement("Link");
+                    writer.WriteStartDocument();
+                    writer.WriteStartElement("Links");
 
-                    writer.WriteElementString("IRCName", link.Key);
-                    writer.WriteElementString("LastFMName", link.Value);
+                    foreach (KeyValuePair<string, string> link in AccountMap)
+                    {
+                        writer.WriteStartElement("Link");
+
+                        writer.WriteElementString("IRCName", link.Key);
+                        writer.WriteElementString("LastFMName", link.Value);
+
+                        writer.WriteEndElement();
+                    }
 
                     writer.WriteEndElement();
+                    writer.WriteEndDocument();
                 }
-
-                writer.WriteEndElement();
-                writer.WriteEndDocument();
             }
         }
 
@@ -132,16 +135,25 @@ namespace Internet
             if (!File.Exists(fileName))
                 return;
 
-            XmlDocument doc = new XmlDocument();
-            doc.Load(new StreamReader(File.OpenRead(fileName)));
-            XmlNode root = doc.DocumentElement;
-
-            foreach (XmlNode linkNode in root.SelectNodes(@"/Links/Link"))
+            lock (fileLock) lock (dataLock)
             {
-                string IRCName = linkNode.SelectSingleNode("IRCName").FirstChild.Value;
-                string LastFMName = linkNode.SelectSingleNode("LastFMName").FirstChild.Value;
+                using (FileStream fstream = File.OpenRead(fileName))
+                {
+                    using (StreamReader reader = new StreamReader(fstream))
+                    {
+                        XmlDocument doc = new XmlDocument();
+                        doc.Load(reader);
+                        XmlNode root = doc.DocumentElement;
 
-                AccountMap.Add(IRCName, LastFMName);
+                        foreach (XmlNode linkNode in root.SelectNodes(@"/Links/Link"))
+                        {
+                            string IRCName = linkNode.SelectSingleNode("IRCName").FirstChild.Value;
+                            string LastFMName = linkNode.SelectSingleNode("LastFMName").FirstChild.Value;
+
+                            AccountMap.Add(IRCName, LastFMName);
+                        }
+                    }
+                }
             }
         }
     }
@@ -157,31 +169,29 @@ namespace Internet
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^n(ow)?p(laying)?link$", RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(message.Command, "^n(ow)?p(laying)?link$", RegexOptions.IgnoreCase))
+                return null;
+
+            if (message.ParameterList.Count == 0)
+                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't specify a LastFM account name! Format is \"" + message.Command + " <LastFM Account>\"", message.ReplyTo) };
+
+            string lastFMName = StringUtils.ReplaceNewlines(StringUtils.StripIRCFormatChars(message.ParameterList[0]), "");
+
+            lock (NowPlaying.dataLock)
             {
-                if (message.ParameterList.Count > 0)
+                if (NowPlaying.AccountMap.ContainsKey(message.User.Name.ToUpper()))
                 {
-                    string lastFMName = StringUtils.ReplaceNewlines(StringUtils.StripIRCFormatChars(message.ParameterList[0]), "");
-                    if (NowPlaying.AccountMap.ContainsKey(message.User.Name.ToUpper()))
-                    {
-                        NowPlaying.AccountMap[message.User.Name.ToUpper()] = lastFMName;
-                    }
-                    else
-                    {
-                        NowPlaying.AccountMap.Add(message.User.Name.ToUpper(), lastFMName);
-                    }
-                    NowPlaying.SaveLinks();
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "LastFM account \"" + lastFMName + "\" is now linked to IRC name \"" + message.User.Name + "\"", message.ReplyTo) };
+                    NowPlaying.AccountMap[message.User.Name.ToUpper()] = lastFMName;
                 }
                 else
                 {
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't specify a LastFM account name! Format is \"" + message.Command + " <LastFM Account>\"", message.ReplyTo) };
+                    NowPlaying.AccountMap.Add(message.User.Name.ToUpper(), lastFMName);
                 }
             }
-            else
-            {
-                return null;
-            }
+
+            NowPlaying.SaveLinks();
+
+            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "LastFM account \"" + lastFMName + "\" is now linked to IRC name \"" + message.User.Name + "\"", message.ReplyTo) };
         }
     }
 }

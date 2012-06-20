@@ -23,11 +23,15 @@ namespace MoronBot
             while (true)
             {
                 text = Console.ReadLine();
-                if (text == "quit")
+                if (text == "quit" || text == "exit")
                     break;
                 string[] msg = text.Split(' ');
                 string target = msg[0].StartsWith("#") ? msg[0] : "#" + msg[0];
-                string message = text.Substring(target.Length);
+                if (target.Length + 1 >= text.Length)
+                    continue;
+
+                string message = text.Substring(target.Length + 1);
+
                 moronBot.Say(message, target);
             }
         }

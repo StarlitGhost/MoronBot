@@ -25,10 +25,14 @@ namespace Utility
             if (!Regex.IsMatch(message.Command, "^(timesince|whenwas)$", RegexOptions.IgnoreCase))
                 return null;
 
-            TimeTill.EventStruct eventStruct;
+            Events.EventStruct eventStruct;
             TimeSpan timeSpan;
 
-            List<TimeTill.EventStruct> reversedList = new List<TimeTill.EventStruct>(TimeTill.EventList);
+            List<Events.EventStruct> reversedList = null;
+            lock (Events.eventListLock)
+            {
+                reversedList = new List<Events.EventStruct>(Events.EventList);
+            }
             reversedList.Reverse();
 
             if (message.ParameterList.Count > 0) // Parameters given

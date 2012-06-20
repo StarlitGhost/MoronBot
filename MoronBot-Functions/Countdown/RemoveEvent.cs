@@ -25,17 +25,23 @@ namespace Utility
 
             if (message.ParameterList.Count == 0)
                 return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't specify an event to remove!", message.ReplyTo) };
-                
-            int index = TimeTill.EventList.FindIndex(s => s.EventName == message.Parameters);
-            if (index < 0)
-                index = TimeTill.EventList.FindIndex(s => Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
-            if (index < 0)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in event list!", message.ReplyTo) };
 
             List<IRCResponse> response = new List<IRCResponse>();
-            response.Add(new IRCResponse(ResponseType.Say, "Event \"" + TimeTill.EventList[index].EventName + "\", with date \"" + TimeTill.EventList[index].EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)") + "\" removed from the event list!", message.ReplyTo));
-            TimeTill.EventList.RemoveAt(index);
-            TimeTill.SaveEvents();
+
+            int index = 0;
+            lock (Events.eventListLock)
+            {
+                index = Events.EventList.FindIndex(s => Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
+
+                if (index < 0)
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No event matching \"" + message.Parameters + "\" found in event list!", message.ReplyTo) };
+
+                response.Add(new IRCResponse(ResponseType.Say, "Event \"" + Events.EventList[index].EventName + "\", with date \"" + Events.EventList[index].EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)") + "\" removed from the event list!", message.ReplyTo));
+                Events.EventList.RemoveAt(index);
+            }
+
+            Events.SaveEvents();
+
             return response;
         }
     }

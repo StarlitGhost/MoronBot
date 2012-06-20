@@ -93,7 +93,12 @@ namespace CwIRC
                     User.Hostmask = "";
                 }
 
-                if (messageType == "PRIVMSG" || messageType == "TOPIC")
+                if (messageType == "JOIN")
+                {
+                    TargetType = TargetTypes.CHANNEL;
+                    replyTo = messageList[2].TrimStart(':');
+                }
+                else if (messageType == "PRIVMSG" || messageType == "TOPIC")
                 {
                     if (messageList[2].TrimStart(':').StartsWith("#"))
                     {

@@ -31,12 +31,19 @@ namespace Utility
             if (message.ParameterList.Count == 0)
                 return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Date of what?", message.ReplyTo) };
 
-            List<TimeTill.EventStruct> reversedList = new List<TimeTill.EventStruct>(TimeTill.EventList);
-            reversedList.Reverse();
+            List<Events.EventStruct> reversedList = null;
+            Events.EventStruct eventStruct = new Events.EventStruct();
 
-            TimeTill.EventStruct eventStruct = TimeTill.EventList.Find(s =>
-                s.EventDate > DateTime.UtcNow &&
-                Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
+            lock (Events.eventListLock)
+            {
+                reversedList = new List<Events.EventStruct>(Events.EventList);
+
+                eventStruct = Events.EventList.Find(s =>
+                    s.EventDate > DateTime.UtcNow &&
+                    Regex.IsMatch(s.EventName, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
+            }
+
+            reversedList.Reverse();
 
             if (eventStruct.EventName == null)
                 eventStruct = reversedList.Find(s =>

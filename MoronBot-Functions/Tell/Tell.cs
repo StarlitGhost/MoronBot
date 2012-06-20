@@ -34,6 +34,9 @@ namespace Utility
 
         List<UserDateNumber> userDateNumberList = new List<UserDateNumber>();
 
+        public static Object tellMapLock = new Object();
+        static Object tellFileLock = new Object(); 
+
         public Tell()
         {
             Help = "tell <user> <message> - Tells the specified user the specified message, when they next speak.";
@@ -65,21 +68,30 @@ namespace Utility
             if (RateLimit(message.User.Name))
                 return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You've already sent 3 messages in the last 5 minutes, slow down!", message.ReplyTo) };
 
-            foreach (string target in message.ParameterList[0].Split('&'))
+            lock (tellMapLock)
             {
-                string to = WildcardToRegex(target);
-                string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
-                if (!MessageMap.ContainsKey(to))
+                foreach (string target in message.ParameterList[0].Split('&'))
                 {
-                    MessageMap.Add(to, new List<TellMessage>());
+                    string to = WildcardToRegex(target);
+                    string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
+                    if (!MessageMap.ContainsKey(to))
+                    {
+                        MessageMap.Add(to, new List<TellMessage>());
+                    }
+                    TellMessage tellMessage = new TellMessage();
+                    tellMessage.From = message.User.Name;
+                    tellMessage.SentDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss (UTC zz)");
+                    tellMessage.Message = StringUtils.ReplaceNewlines(StringUtils.StripIRCFormatChars(msg), " | ");
+
+                    if (message.TargetType == IRCMessage.TargetTypes.CHANNEL)
+                        tellMessage.Target = message.ReplyTo;
+                    else
+                        tellMessage.Target = "PM";
+
+                    MessageMap[to].Add(tellMessage);
                 }
-                TellMessage tellMessage = new TellMessage();
-                tellMessage.From = message.User.Name;
-                tellMessage.SentDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss (UTC zz)");
-                tellMessage.Message = StringUtils.ReplaceNewlines(StringUtils.StripIRCFormatChars(msg), " | ");
-                tellMessage.Target = message.TargetType == 0 ? message.ReplyTo : "PM";
-                MessageMap[to].Add(tellMessage);
             }
+
             WriteMessages();
             
             return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Ok, I'll tell " + string.Join(" & ", message.ParameterList[0].Split('&')) + " that when they next speak.", message.ReplyTo) };
@@ -87,74 +99,86 @@ namespace Utility
 
         public static void WriteMessages()
         {
-            string fileName = Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}TellMessages.xml", Path.DirectorySeparatorChar));
-
-            FileUtils.CreateDirIfNotExists(fileName);
-
-            XmlWriterSettings xws = new XmlWriterSettings();
-            xws.Indent = true;
-            xws.NewLineOnAttributes = true;
-            using (XmlWriter writer = XmlWriter.Create(fileName, xws))
+            lock (tellFileLock) lock (tellMapLock)
             {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("Users");
+                string fileName = Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}TellMessages.xml", Path.DirectorySeparatorChar));
 
-                foreach (KeyValuePair<string, List<TellMessage>> userMessages in MessageMap)
+                FileUtils.CreateDirIfNotExists(fileName);
+
+                XmlWriterSettings xws = new XmlWriterSettings();
+                xws.Indent = true;
+                xws.NewLineOnAttributes = true;
+                using (XmlWriter writer = XmlWriter.Create(fileName, xws))
                 {
-                    writer.WriteStartElement("User");
-                    writer.WriteElementString("Name", userMessages.Key);
+                    writer.WriteStartDocument();
+                    writer.WriteStartElement("Users");
 
-                    writer.WriteStartElement("Messages");
-
-                    foreach (TellMessage tellMessage in userMessages.Value)
+                    foreach (KeyValuePair<string, List<TellMessage>> userMessages in MessageMap)
                     {
-                        writer.WriteStartElement("Message");
+                        writer.WriteStartElement("User");
+                        writer.WriteElementString("Name", userMessages.Key);
 
-                        writer.WriteElementString("Text", tellMessage.Message);
-                        writer.WriteElementString("From", tellMessage.From);
-                        writer.WriteElementString("Date", tellMessage.SentDate);
-                        writer.WriteElementString("Target", tellMessage.Target);
+                        writer.WriteStartElement("Messages");
+
+                        foreach (TellMessage tellMessage in userMessages.Value)
+                        {
+                            writer.WriteStartElement("Message");
+
+                            writer.WriteElementString("Text", tellMessage.Message);
+                            writer.WriteElementString("From", tellMessage.From);
+                            writer.WriteElementString("Date", tellMessage.SentDate);
+                            writer.WriteElementString("Target", tellMessage.Target);
+
+                            writer.WriteEndElement();
+                        }
 
                         writer.WriteEndElement();
+                        writer.WriteEndElement();
                     }
-
                     writer.WriteEndElement();
-                    writer.WriteEndElement();
+                    writer.WriteEndDocument();
                 }
-                writer.WriteEndElement();
-                writer.WriteEndDocument();
             }
         }
 
         void ReadMessages()
         {
-            string fileName = Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}TellMessages.xml", Path.DirectorySeparatorChar));
-
-            if (!File.Exists(fileName))
-                return;
-
-            XmlDocument doc = new XmlDocument();
-            doc.Load(new StreamReader(File.OpenRead(fileName)));
-            XmlNode root = doc.DocumentElement;
-
-            foreach (XmlNode userNode in root.SelectNodes(@"/Users/User"))
+            lock (tellFileLock) lock (tellMapLock)
             {
-                string user = userNode.SelectSingleNode("Name").FirstChild.Value;
+                string fileName = Path.Combine(Settings.Instance.DataPath, Settings.Instance.Server + string.Format("{0}TellMessages.xml", Path.DirectorySeparatorChar));
 
-                List<TellMessage> tellMessages = new List<TellMessage>();
+                if (!File.Exists(fileName))
+                    return;
 
-                foreach (XmlNode messageNode in userNode.SelectNodes(@"Messages/Message"))
+                XmlDocument doc = new XmlDocument();
+                using (FileStream fstream = File.OpenRead(fileName))
                 {
-                    TellMessage tellMessage = new TellMessage();
-                    tellMessage.Message = messageNode.SelectSingleNode("Text").FirstChild.Value;
-                    tellMessage.From = messageNode.SelectSingleNode("From").FirstChild.Value;
-                    tellMessage.SentDate = messageNode.SelectSingleNode("Date").FirstChild.Value;
-                    tellMessage.Target = messageNode.SelectSingleNode("Target").FirstChild.Value;
+                    using (StreamReader reader = new StreamReader(fstream))
+                    {
+                        doc.Load(reader);
+                        XmlNode root = doc.DocumentElement;
 
-                    tellMessages.Add(tellMessage);
+                        foreach (XmlNode userNode in root.SelectNodes(@"/Users/User"))
+                        {
+                            string user = userNode.SelectSingleNode("Name").FirstChild.Value;
+
+                            List<TellMessage> tellMessages = new List<TellMessage>();
+
+                            foreach (XmlNode messageNode in userNode.SelectNodes(@"Messages/Message"))
+                            {
+                                TellMessage tellMessage = new TellMessage();
+                                tellMessage.Message = messageNode.SelectSingleNode("Text").FirstChild.Value;
+                                tellMessage.From = messageNode.SelectSingleNode("From").FirstChild.Value;
+                                tellMessage.SentDate = messageNode.SelectSingleNode("Date").FirstChild.Value;
+                                tellMessage.Target = messageNode.SelectSingleNode("Target").FirstChild.Value;
+
+                                tellMessages.Add(tellMessage);
+                            }
+
+                            MessageMap.Add(user, tellMessages);
+                        }
+                    }
                 }
-
-                MessageMap.Add(user, tellMessages);
             }
         }
 

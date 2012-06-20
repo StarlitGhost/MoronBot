@@ -26,7 +26,7 @@ namespace Utility
         {
             if (Regex.IsMatch(message.Command, "^log$", RegexOptions.IgnoreCase))
             {
-                DateTime date = DateTime.Now.IsDaylightSavingTime() ? DateTime.UtcNow.AddHours(1.0) : DateTime.UtcNow;
+                DateTime date = DateTime.UtcNow;
 
                 if (message.ParameterList.Count > 0)
                 {

@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{22165B18-211D-4C5C-9530-6A345A1FCE10}</ProjectGuid>
+    <ProjectGuid>{694E25B9-7705-4EAD-950B-0E00451997AD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Conversation</RootNamespace>
-    <AssemblyName>Conversation</AssemblyName>
+    <RootNamespace>Pathfinder</RootNamespace>
+    <AssemblyName>Pathfinder</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -32,11 +32,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CwIRC">
+    <Reference Include="CwIRC, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\MoronBot\bin\CwIRC.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MBFunctionInterface">
+    <Reference Include="MBFunctionInterface, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\MoronBot\bin\MBFunctionInterface.dll</HintPath>
       <Private>False</Private>
     </Reference>
@@ -52,7 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Conversation.cs" />
+    <Compile Include="Pathfinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

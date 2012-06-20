@@ -32,7 +32,12 @@ namespace MBFunctionInterface
             if (Type == "PRIVMSG")
             {
                 Match match = Regex.Match(MessageString, "^(\\||" + currentNick + "(,|:)?[ ])", RegexOptions.IgnoreCase);
-                parameters = MessageString.Substring(match.Value.Length);
+                if (!match.Success)
+                    return;
+
+                parameterList = MessageString.Substring(match.Value.Length).Trim().Split(' ').ToList();
+
+                parameters = MessageString.Substring(match.Value.Length).Trim();
                 if (parameters.Length > 0)
                 {
                     parameterList = parameters.Split(' ').ToList();

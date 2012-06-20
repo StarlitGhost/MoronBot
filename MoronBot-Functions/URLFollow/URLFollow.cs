@@ -24,29 +24,30 @@ namespace Automatic
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
-            if (message.TargetType == IRCMessage.TargetTypes.CHANNEL && !ChannelList.ChannelHasMode(message.ReplyTo, 'U'))
-            {
-                Match match = Regex.Match(message.MessageString, @"https?://[^\s]+", RegexOptions.IgnoreCase);
-                if (match.Success)
-                {
-                    if (Regex.IsMatch(match.Value, @"\.(jpe?g|gif|png|bmp)$"))
-                        return null;
+            if (message.Type != "PRIVMSG"
+                || message.TargetType != IRCMessage.TargetTypes.CHANNEL
+                || ChannelList.ChannelHasMode(message.ReplyTo, 'U'))
+                return null;
 
-                    string response = null;
+            Match match = Regex.Match(message.MessageString, @"https?://[^\s]+", RegexOptions.IgnoreCase);
+            if (!match.Success)
+                return null;
+            
+            if (Regex.IsMatch(match.Value, @"\.(jpe?g|gif|png|bmp)$"))
+                return null;
 
-                    Match youtubeMatch = Regex.Match(match.Value, @"www\.youtube\.com/watch\?v=([^&]+)");
-                    if (youtubeMatch.Success)
-                        response = FollowYouTube(youtubeMatch.Groups[1].Value);
-                    else
-                        response = FollowStandard(match.Value);
+            string response = null;
 
-                    if (response == null)
-                        return null;
+            Match youtubeMatch = Regex.Match(match.Value, @"www\.youtube\.com/watch\?v=([^&]+)");
+            if (youtubeMatch.Success)
+                response = FollowYouTube(youtubeMatch.Groups[1].Value);
+            else
+                response = FollowStandard(match.Value);
 
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, response, message.ReplyTo) };
-                }
-            }
-            return null;
+            if (response == null)
+                return null;
+
+            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, response, message.ReplyTo) };
         }
 
         string FollowYouTube(string videoID)

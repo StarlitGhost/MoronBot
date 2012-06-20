@@ -31,7 +31,7 @@ namespace Utility
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't give a date and event!", message.ReplyTo) };
             }
 
-            TimeTill.EventStruct eventStruct = new TimeTill.EventStruct();
+            Events.EventStruct eventStruct = new Events.EventStruct();
             bool parseSuccess = false;
 
             if (message.ParameterList[0].StartsWith("("))
@@ -62,12 +62,17 @@ namespace Utility
 
             eventStruct.EventName = StringUtils.StripIRCFormatChars(eventStruct.EventName);
 
-            if (TimeTill.EventList.FindIndex(s => s.EventName == eventStruct.EventName) >= 0)
-                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)"), message.ReplyTo) };
+            lock (Events.eventListLock)
+            {
+                if (Events.EventList.FindIndex(s => s.EventName == eventStruct.EventName) >= 0)
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)"), message.ReplyTo) };
 
-            TimeTill.EventList.Add(eventStruct);
-            TimeTill.EventList.Sort(TimeTill.EventStruct.CompareEventStructsByDate);
-            TimeTill.SaveEvents();
+                Events.EventList.Add(eventStruct);
+                Events.EventList.Sort(Events.EventStruct.CompareEventStructsByDate);
+            }
+
+            Events.SaveEvents();
+
             return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Added event \"" + eventStruct.EventName + "\" on " + eventStruct.EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)"), message.ReplyTo) };
         }
     }

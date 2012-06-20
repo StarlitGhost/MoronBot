@@ -33,24 +33,29 @@ namespace Utility
             if ((DateTime.UtcNow - _lastDate).Minutes < 5)
                 return null;
 
-            for (int i = 0; i < TimeTill.EventList.Count; i++)
+            lock (Events.eventListLock)
             {
-                TimeTill.EventStruct autoEvent = TimeTill.EventList[i];
-                if (autoEvent.EventDate < DateTime.UtcNow && autoEvent.EventDate > _lastDate)
+                for (int i = 0; i < Events.EventList.Count; i++)
                 {
+                    Events.EventStruct autoEvent = Events.EventList[i];
+
+                    if (autoEvent.EventDate <= _lastDate || autoEvent.EventDate >= DateTime.UtcNow)
+                        continue;
+
                     List<IRCResponse> responses = new List<IRCResponse>();
-                    TimeTill.EventStruct lastEvent = autoEvent;
+                    Events.EventStruct lastEvent = autoEvent;
                     while (autoEvent.EventDate < DateTime.UtcNow)
                     {
                         responses.Add(new IRCResponse(ResponseType.Say, "It's time for \"" + autoEvent.EventName + "\"!", message.ReplyTo));
                         lastEvent = autoEvent;
-                        autoEvent = TimeTill.EventList[++i];
+                        autoEvent = Events.EventList[++i];
                     }
                     _lastDate = lastEvent.EventDate;
 
                     if (responses.Count > 1)
                         return responses;
-                    return null;
+
+                    break;
                 }
             }
 

@@ -23,49 +23,52 @@ namespace Utility
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
+            if (message.Type != "PRIVMSG")
+                return null;
+
             List<IRCResponse> responses = new List<IRCResponse>();
 
             List<string> keysToDelete = new List<string>();
             Dictionary<string, List<Tell.TellMessage>> keysToKeep = new Dictionary<string, List<Tell.TellMessage>>();
 
-            foreach (KeyValuePair<string, List<Tell.TellMessage>> kvp in Tell.MessageMap)
+            lock (Tell.tellMapLock)
             {
-                if (Regex.IsMatch(message.User.Name, kvp.Key, RegexOptions.IgnoreCase))
+                foreach (KeyValuePair<string, List<Tell.TellMessage>> kvp in Tell.MessageMap)
                 {
-                    foreach (Tell.TellMessage msg in kvp.Value)
+                    if (Regex.IsMatch(message.User.Name, kvp.Key, RegexOptions.IgnoreCase))
                     {
-                        if (msg.Target == "PM" || msg.Target == message.ReplyTo)
+                        foreach (Tell.TellMessage msg in kvp.Value)
                         {
-                            responses.Add(new IRCResponse(ResponseType.Say, message.User.Name + ": " + msg.Message, msg.Target == "PM" ? message.User.Name : msg.Target));
-                            responses.Add(new IRCResponse(ResponseType.Say, "^ from " + msg.From + " on " + msg.SentDate, msg.Target == "PM" ? message.User.Name : msg.Target));
+                            if (msg.Target == "PM" || msg.Target == message.ReplyTo)
+                            {
+                                responses.Add(new IRCResponse(ResponseType.Say, message.User.Name + ": " + msg.Message, msg.Target == "PM" ? message.User.Name : msg.Target));
+                                responses.Add(new IRCResponse(ResponseType.Say, "^ from " + msg.From + " on " + msg.SentDate, msg.Target == "PM" ? message.User.Name : msg.Target));
+                            }
+                            else
+                            {
+                                if (!keysToKeep.ContainsKey(kvp.Key))
+                                    keysToKeep.Add(kvp.Key, new List<Tell.TellMessage>());
+                                keysToKeep[kvp.Key].Add(msg);
+                            }
                         }
-                        else
-                        {
-                            if (!keysToKeep.ContainsKey(kvp.Key))
-                                keysToKeep.Add(kvp.Key, new List<Tell.TellMessage>());
-                            keysToKeep[kvp.Key].Add(msg);
-                        }
+
+                        keysToDelete.Add(kvp.Key);
                     }
-
-                    keysToDelete.Add(kvp.Key);
                 }
+                foreach (string key in keysToDelete)
+                {
+                    Tell.MessageMap[key].Clear();
+                    Tell.MessageMap.Remove(key);
+                }
+                Tell.MessageMap = Tell.MessageMap.Concat(keysToKeep).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
-            foreach (string key in keysToDelete)
-            {
-                Tell.MessageMap[key].Clear();
-                Tell.MessageMap.Remove(key);
-            }
-            Tell.MessageMap = Tell.MessageMap.Concat(keysToKeep).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-            if (responses.Count > 0)
-            {
-                Tell.WriteMessages();
-                return responses;
-            }
-            else
-            {
+            if (responses.Count == 0)
                 return null;
-            }
+
+            Tell.WriteMessages();
+
+            return responses;
         }
     }
 }

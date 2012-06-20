@@ -520,11 +520,8 @@ namespace MoronBot
             BotMessage botMessage = new BotMessage(message, Nick);
             connectionTimer.Interval = 120000;
 
-            lock (messageSync)
-            {
-                MBEvents.OnNewRawIRC(this, botMessage.ToString());
-                ProcessMessage(botMessage);
-            }
+            MBEvents.OnNewRawIRC(this, botMessage.ToString());
+            ProcessMessage(botMessage);
         }
 
         void connectionTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)

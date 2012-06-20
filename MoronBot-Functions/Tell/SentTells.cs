@@ -22,36 +22,37 @@ namespace Utility
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^((outstanding|s(ent)?)tells)$", RegexOptions.IgnoreCase))
-            {
-                List<IRCResponse> responses = new List<IRCResponse>();
+            if (!Regex.IsMatch(message.Command, "^((outstanding|s(ent)?)tells)$", RegexOptions.IgnoreCase))
+                return null;
 
+            List<IRCResponse> responses = new List<IRCResponse>();
+
+            lock (Tell.tellMapLock)
+            {
                 foreach (KeyValuePair<string, List<Tell.TellMessage>> kvp in Tell.MessageMap)
                 {
                     bool fromUser = false;
                     foreach (Tell.TellMessage msg in kvp.Value)
                     {
-                        if (msg.From.ToLowerInvariant() == message.User.Name.ToLowerInvariant())
+                        if (msg.From.ToLowerInvariant() != message.User.Name.ToLowerInvariant())
+                            continue;
+
+                        if (!fromUser)
                         {
-                            if (!fromUser)
-                            {
-                                fromUser = true;
-                                responses.Add(new IRCResponse(ResponseType.Say, "To " + kvp.Key, message.ReplyTo));
-                            }
-                            responses.Add(new IRCResponse(ResponseType.Say, " > " + msg.Message, message.ReplyTo));
+                            fromUser = true;
+                            responses.Add(new IRCResponse(ResponseType.Say, "To " + kvp.Key, message.ReplyTo));
                         }
+                        responses.Add(new IRCResponse(ResponseType.Say, " > " + msg.Message, message.ReplyTo));
                     }
                 }
-
-                if (responses.Count == 0)
-                {
-                    responses.Add(new IRCResponse(ResponseType.Say, "There are no messages from you that have not already been received.", message.ReplyTo));
-                }
-                
-                return responses;
             }
 
-            return null;
+            if (responses.Count == 0)
+            {
+                responses.Add(new IRCResponse(ResponseType.Say, "There are no messages from you that have not already been received.", message.ReplyTo));
+            }
+
+            return responses;
         }
     }
 }

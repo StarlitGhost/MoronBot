@@ -28,27 +28,14 @@ namespace Automatic
         {
             Help = "Meh, I can't be bothered to fill this out.";
             Type = Types.Command;
-            AccessLevel = AccessLevels.UserList;
-
-            AccessList.Add("sirgir");
-            AccessList.Add("aeltrius");
-            AccessList.Add("trahsi");
-            AccessList.Add("xelareko");
-            AccessList.Add("xelareco");
-            AccessList.Add("aerocmdr");
-            AccessList.Add("knishimura");
-            AccessList.Add("kiraisl");
-            AccessList.Add("pikachaos");
-            AccessList.Add("tyranic-moron");
-            AccessList.Add("maerarde");
-            AccessList.Add("dragoon");
+            AccessLevel = AccessLevels.Anyone;
 
             InitInsults();
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
-            if (rand.Next(0, 100) == 0)
+            if (rand.Next(0, 500) == 0)
             {
                 List<IRCResponse> responses = new List<IRCResponse>();
                 foreach (Response response in GetInsult(message.User.Name))

@@ -10,83 +10,81 @@ using MBUtilities;
 
 namespace Fun
 {
-    public class LP : Function
+    public class Pathfinder : Function
     {
         Random rand = new Random();
-        List<string> lpList = new List<string>();
+        List<string> pfList = new List<string>();
 
         Object fileLock = new Object();
 
-        public LP()
+        public Pathfinder()
         {
-            Help = "LP (<number>) - Returns a random \"Thing from a DesertBus Chat Let's Play\", or a specific one if you add a number.";
+            Help = "pf (<number> / add <thing> / list) - Returns a random thing from the DesertBus Survivors' Pathfinder game, a specific one if you give a number, adds a thing to the list, or submits the list to pastebin.";
             Type = Types.Command;
             AccessLevel = AccessLevels.Anyone;
 
             LoadList();
         }
 
-        ~LP()
+        ~Pathfinder()
         {
             SaveList();
         }
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
-            if (!Regex.IsMatch(message.Command, "^(lp)$", RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(message.Command, "^(pf)$", RegexOptions.IgnoreCase))
                 return null;
 
-            // Specific thing requested
             if (message.ParameterList.Count == 0)
             {
-                if (lpList.Count > 0)
+                if (pfList.Count > 0)
                 {
                     // Return a random thing
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, lpList[rand.Next(lpList.Count)], message.ReplyTo) };
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, pfList[rand.Next(pfList.Count)], message.ReplyTo) };
                 }
                 else
                 {
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "There is currently no LP data!", message.ReplyTo) };
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "There is currently no Pathfinder data!", message.ReplyTo) };
                 }
             }
 
             switch (message.ParameterList[0].ToLower())
             {
-                case "add": // Adding something to the LP list
+                case "add": // Adding something to the list
                     string msg = message.Parameters.Substring(message.ParameterList[0].Length + 1);
 
                     int index;
                     lock (fileLock)
                     {
-                        index = lpList.Count + 1;
-                        lpList.Add(index + ". " + msg);
+                        index = pfList.Count + 1;
+                        pfList.Add(index + ". " + msg);
                     }
 
                     SaveList();
-
                     return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Message added at index " + index, message.ReplyTo) };
 
                 case "list": // Post the list to pastebin, give link
                     string list = "";
-                    foreach (string item in lpList)
+                    foreach (string item in pfList)
                     {
                         list += item + "\n";
                     }
-                    string url = URL.Pastebin(list, "Let's Play List", "10M", "text", "1");
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Let's Play list posted: " + url + " (link expires in 10 mins)", message.ReplyTo) };
+                    string url = URL.Pastebin(list, "DesertBus Survivors' Pathfinder List", "10M", "text", "1");
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "DB Pathfinder list posted: " + url + " (link expires in 10 mins)", message.ReplyTo) };
 
                 default:
                     int number = 0;
                     if (Int32.TryParse(message.ParameterList[0], out number))
                     {
                         number -= 1;
-                        if (number >= 0 && number < lpList.Count)
+                        if (number >= 0 && number < pfList.Count)
                         {
-                            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, lpList[number], message.ReplyTo) };
+                            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, pfList[number], message.ReplyTo) };
                         }
                     }
                     // Number too large or small, or not a number at all
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Invalid number, range is 1-" + lpList.Count, message.ReplyTo) };
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Invalid number, range is 1-" + pfList.Count, message.ReplyTo) };
             }
         }
 
@@ -94,7 +92,7 @@ namespace Fun
         {
             lock (fileLock)
             {
-                lpList.AddRange(File.ReadAllLines(Path.Combine(Settings.Instance.DataPath, "lp.txt")));
+                pfList.AddRange(File.ReadAllLines(Path.Combine(Settings.Instance.DataPath, "pathfinder.txt")));
             }
         }
 
@@ -102,7 +100,7 @@ namespace Fun
         {
             lock (fileLock)
             {
-                File.WriteAllLines(Path.Combine(Settings.Instance.DataPath, "lp.txt"), lpList.ToArray());
+                File.WriteAllLines(Path.Combine(Settings.Instance.DataPath, "pathfinder.txt"), pfList.ToArray());
             }
         }
     }

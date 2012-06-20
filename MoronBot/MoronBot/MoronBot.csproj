@@ -54,6 +54,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Externalconsole>true</Externalconsole>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -159,7 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CwIRC\CwIRC.csproj">
-      <Project>{E4D2DC70-87EA-405A-ACDC-8E0AD3015607}</Project>
+      <Project>{e4d2dc70-87ea-405a-acdc-8e0ad3015607}</Project>
       <Name>CwIRC</Name>
     </ProjectReference>
     <ProjectReference Include="..\MBFunctionInterface\MBFunctionInterface.csproj">

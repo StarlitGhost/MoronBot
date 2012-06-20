@@ -21,48 +21,47 @@ namespace Utility
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
-            if (Regex.IsMatch(message.Command, "^(r(emove)?tell)$", RegexOptions.IgnoreCase))
-            {
-                if (message.ParameterList.Count > 0)
-                {
-                    List<string> keysToRemove = new List<string>();
+            if (!Regex.IsMatch(message.Command, "^(r(emove)?tell)$", RegexOptions.IgnoreCase))
+                return null;
 
-                    foreach (string user in Tell.MessageMap.Keys)
+            if (message.ParameterList.Count == 0)
+                return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't specify a message to remove!", message.ReplyTo) };
+
+            List<string> keysToRemove = new List<string>();
+
+                foreach (string user in Tell.MessageMap.Keys)
+                {
+                    List<IRCResponse> response = new List<IRCResponse>();
+
+                    lock (Tell.tellMapLock)
                     {
                         int index = Tell.MessageMap[user].FindIndex(s =>
                             s.From.ToLowerInvariant() == message.User.Name.ToLowerInvariant() &&
                             Regex.IsMatch(s.Message, ".*" + message.Parameters + ".*", RegexOptions.IgnoreCase));
 
-                        if (index >= 0)
-                        {
-                            List<IRCResponse> response = new List<IRCResponse>();
-                            response.Add(new IRCResponse(ResponseType.Say, "Message \"" +
-                                Tell.MessageMap[user][index].Message +
-                                "\", sent on date \"" +
-                                Tell.MessageMap[user][index].SentDate +
-                                "\" to \"" +
-                                user +
-                                "\" removed from the message database!", message.ReplyTo));
+                        if (index < 0)
+                            continue;
 
-                            Tell.MessageMap[user].RemoveAt(index);
+                        response.Add(new IRCResponse(ResponseType.Say, "Message \"" +
+                            Tell.MessageMap[user][index].Message +
+                            "\", sent on date \"" +
+                            Tell.MessageMap[user][index].SentDate +
+                            "\" to \"" +
+                            user +
+                            "\" removed from the message database!", message.ReplyTo));
 
-                            if (Tell.MessageMap[user].Count == 0)
-                                Tell.MessageMap.Remove(user);
+                        Tell.MessageMap[user].RemoveAt(index);
 
-                            Tell.WriteMessages();
-                            return response;
-                        }
+                        if (Tell.MessageMap[user].Count == 0)
+                            Tell.MessageMap.Remove(user);
                     }
-                    
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No message sent by you containing \"" + message.Parameters + "\" found in the message database!", message.ReplyTo) };
-                }
-                else
-                {
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "You didn't specify a message to remove!", message.ReplyTo) };
-                }
+
+                    Tell.WriteMessages();
+
+                    return response;
             }
 
-            return null;
+            return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "No message sent by you containing \"" + message.Parameters + "\" found in the message database!", message.ReplyTo) };
         }
     }
 }
