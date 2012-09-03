@@ -54,7 +54,7 @@ namespace PythonInterface
             {
                 URL.SendToServer(url, newNick);
             }
-            catch (System.Exception /*ex*/)
+            catch (System.Net.WebException /*ex*/)
             {
                 return;
             }

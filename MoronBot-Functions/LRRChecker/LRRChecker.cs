@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System;
-using System.Text.RegularExpressions;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml;
 
 using CwIRC;

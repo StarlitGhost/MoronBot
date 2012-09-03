@@ -43,10 +43,8 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="Bitly, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\MoronBot\Bitly.dll</HintPath>
     </Reference>
@@ -54,6 +52,7 @@
       <HintPath>..\MoronBot\GAPI.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Data.Sqlite" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Calc\CalcUtilities.cs" />
