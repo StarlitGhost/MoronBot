@@ -1,11 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-
-using Bitly;
-using System;
 
 namespace MBUtilities
 {

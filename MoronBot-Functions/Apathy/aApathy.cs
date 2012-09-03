@@ -35,6 +35,9 @@ namespace Automatic
 
         public override List<IRCResponse> GetResponse(BotMessage message)
         {
+            if (message.Type != "PRIVMSG")
+                return null;
+
             if (rand.Next(0, 500) == 0)
             {
                 List<IRCResponse> responses = new List<IRCResponse>();
