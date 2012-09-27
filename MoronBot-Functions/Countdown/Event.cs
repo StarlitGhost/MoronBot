@@ -64,8 +64,9 @@ namespace Utility
 
             lock (Events.eventListLock)
             {
-                if (Events.EventList.FindIndex(s => s.EventName == eventStruct.EventName) >= 0)
-                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + eventStruct.EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)"), message.ReplyTo) };
+                int index = Events.EventList.FindIndex(s => s.EventName == eventStruct.EventName);
+                if (index >= 0)
+                    return new List<IRCResponse>() { new IRCResponse(ResponseType.Say, "Event \"" + eventStruct.EventName + "\" is already in the event list, on " + Events.EventList[index].EventDate.ToString(@"yyyy-MM-dd \a\t HH:mm (UTC)"), message.ReplyTo) };
 
                 Events.EventList.Add(eventStruct);
                 Events.EventList.Sort(Events.EventStruct.CompareEventStructsByDate);

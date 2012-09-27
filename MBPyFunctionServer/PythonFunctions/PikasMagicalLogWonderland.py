@@ -32,12 +32,12 @@ class Instantiate(Function):
         output = []
         
         while date < now:
-            proc = subprocess.Popen(['/usr/bin/php','/opt/moronbot/getloghash.php',replyTo+"-"+ date.strftime('%Y%m%d')], stdout=subprocess.PIPE)
+            proc = subprocess.Popen(['/usr/bin/php','/home/ubuntu/moronbot/getloghash.php',replyTo+"-"+ date.strftime('%Y%m%d')], stdout=subprocess.PIPE)
             hash = proc.stdout.read()
             if hash == "Not found":
                 output.append(IRCResponse(ResponseType.Say, "No log for %s found." % date.strftime('%Y/%m/%d'), replyTo))
             else:
-                output.append(IRCResponse(ResponseType.Say, "Log for " + date.strftime('%Y/%m/%d') + ": http://stats.fugiman.com/logs/?l=" + hash, replyTo))
+                output.append(IRCResponse(ResponseType.Say, "Log for " + date.strftime('%Y/%m/%d') + ": http://www.moronic-works.co.uk/logs/?l=" + hash, replyTo))
             date += datetime.timedelta(days = 1)
         
         return output
