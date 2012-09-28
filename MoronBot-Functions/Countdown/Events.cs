@@ -101,6 +101,7 @@ namespace Utility
             responses.Add(new IRCResponse(ResponseType.Say, "Events in the next " + daysAhead + " days:", message.ReplyTo));
 
             string events = weekEvents[0];
+            weekEvents.RemoveAt(0);
             foreach (string weekEvent in weekEvents)
             {
                 if ((events + " | " + weekEvent).Length < 400)
