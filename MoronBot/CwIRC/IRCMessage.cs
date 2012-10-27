@@ -117,7 +117,7 @@ namespace CwIRC
                         messageString = messageString.Substring(1, messageString.Length - 1);
                     }
 
-                    if (MessageString[0] == Convert.ToChar((byte)1))
+                    if (MessageString.StartsWith(Convert.ToChar((byte)1).ToString()))
                     {
                         int messageEnd = MessageString.IndexOf(Convert.ToChar((byte)1), 1);
                         if (messageEnd > 1)

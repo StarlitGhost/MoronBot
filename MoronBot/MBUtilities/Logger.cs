@@ -48,7 +48,7 @@ namespace MBUtilities
                         }
                         fileInUse = false;
                     }
-                    catch (System.IO.IOException ex)
+                    catch (System.IO.IOException /*ex*/)
                     {
                         fileInUse = true;
                     }
